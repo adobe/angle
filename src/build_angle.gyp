@@ -112,6 +112,17 @@
         'compiler/preprocessor/symbols.h',
         'compiler/preprocessor/tokens.c',
         'compiler/preprocessor/tokens.h',
+        'compiler/websafe/DependencyGraph.cpp',
+        'compiler/websafe/DependencyGraph.h',
+        'compiler/websafe/DependencyGraphBuilder.cpp',
+        'compiler/websafe/DependencyGraphBuilder.h',
+        'compiler/websafe/DependencyGraphOutput.cpp',
+        'compiler/websafe/DependencyGraphOutput.h',
+        'compiler/websafe/DependencyGraphTraverse.cpp',
+        'compiler/websafe/ValidateWebSafeFragmentShader.cpp',
+        'compiler/websafe/ValidateWebSafeFragmentShader.h',
+        'compiler/websafe/ValidateWebSafeVertexShader.cpp',
+        'compiler/websafe/ValidateWebSafeVertexShader.h',
       ],
       'conditions': [
         ['OS=="win"', {

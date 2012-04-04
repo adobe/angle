@@ -1,0 +1,72 @@
+//
+// Copyright (c) 2002-2012 The ANGLE Project Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+//
+
+#include "compiler/websafe/DependencyGraphOutput.h"
+#include "compiler/InfoSink.h"
+#include "compiler/ParseHelper.h"
+#include "compiler/websafe/ValidateWebSafeFragmentShader.h"
+
+// FIXME(mvujovic): We do not know if the execution time of built-in operations like sin, pow, etc.
+// can vary based on the value of the input arguments. If so, we should restrict those as well.
+void ValidateWebSafeFragmentShader::validate(const TDependencyGraph& graph)
+{
+    mNumErrors = 0;
+
+    // FIXME(mvujovic): The dependency graph does not support user defined function calls right now, so we generate errors for them.
+    validateUserDefinedFunctionCallUsage(graph);
+
+    // Traverse the dependency graph starting at s_texture and generate an error each time we hit a condition nodes.
+    TGraphSymbol* uTextureGraphSymbol = graph.getGlobalSymbolByName(mRestrictedSymbol);
+    if (uTextureGraphSymbol &&
+        uTextureGraphSymbol->getIntermSymbol()->getQualifier() == EvqUniform &&
+        uTextureGraphSymbol->getIntermSymbol()->getBasicType() == EbtSampler2D)
+        uTextureGraphSymbol->traverse(this);
+}
+
+void ValidateWebSafeFragmentShader::validateUserDefinedFunctionCallUsage(const TDependencyGraph& graph)
+{
+    for (TFunctionCallVector::const_iterator iter = graph.beginUserDefinedFunctionCalls(); iter != graph.endUserDefinedFunctionCalls(); ++iter)
+    {
+        TGraphFunctionCall* functionCall = *iter;
+        beginError(functionCall->getIntermFunctionCall());
+        mSink << "A call to a user defined function is not permitted.\n";
+    }
+}
+
+void ValidateWebSafeFragmentShader::beginError(const TIntermNode* node)
+{
+    ++mNumErrors;
+    mSink.prefix(EPrefixError);
+    mSink.location(node->getLine());
+}
+
+void ValidateWebSafeFragmentShader::visitArgument(TGraphArgument* parameter)
+{
+    if (parameter->getIntermFunctionCall()->getName() != "texture2D(s21;vf2;" || parameter->getArgumentNumber() != 1)
+        return;
+
+    beginError(parameter->getIntermFunctionCall());
+    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted to be the second argument of a texture2D call.\n";
+}
+
+void ValidateWebSafeFragmentShader::visitSelection(TGraphSelection* selection)
+{
+    beginError(selection->getIntermSelection());
+    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted in a conditional statement.\n";
+}
+
+void ValidateWebSafeFragmentShader::visitLoop(TGraphLoop* loop)
+{
+    beginError(loop->getIntermLoop());
+    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted in a loop condition.\n";
+}
+
+void ValidateWebSafeFragmentShader::visitLogicalOp(TGraphLogicalOp* logicalOp)
+{
+    beginError(logicalOp->getIntermLogicalOp());
+    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted on the left hand side of a logical "
+          << logicalOp->getOpString() << " operator.\n";
+}

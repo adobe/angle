@@ -24,6 +24,7 @@
 
 class LongNameMap;
 class TCompiler;
+class TDependencyGraph;
 
 //
 // The base class used to back handles returned to the driver.
@@ -79,6 +80,13 @@ protected:
     void mapLongVariableNames(TIntermNode* root);
     // Translate to object code.
     virtual void translate(TIntermNode* root) = 0;
+    // Returns true if the shader is considered web safe.
+    bool validateWebSafeShader(TIntermNode* root, const TString& restrictedSymbol, bool outputGraph);
+    // Returns true if the shader does not define the restricted symbol.
+    bool validateWebSafeVertexShader(TIntermNode* root, const TString& restrictedSymbol);
+    // Returns true if the shader does not use the restricted symbol to affect control flow or in
+    // operations whose time can depend on the input values.
+    bool validateWebSafeFragmentShader(const TDependencyGraph& graph, const TString& restrictedSymbol);    
     // Get built-in extensions with default behavior.
     const TExtensionBehavior& getExtensionBehavior() const;
 

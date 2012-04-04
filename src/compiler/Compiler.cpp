@@ -5,13 +5,17 @@
 //
 
 #include "compiler/BuiltInFunctionEmulator.h"
+#include "compiler/websafe/DependencyGraph.h"
+#include "compiler/websafe/DependencyGraphOutput.h"
 #include "compiler/DetectRecursion.h"
+#include "compiler/websafe/ValidateWebSafeVertexShader.h"
 #include "compiler/ForLoopUnroll.h"
 #include "compiler/Initialize.h"
 #include "compiler/MapLongVariableNames.h"
 #include "compiler/ParseHelper.h"
 #include "compiler/ShHandle.h"
 #include "compiler/ValidateLimitations.h"
+#include "compiler/websafe/ValidateWebSafeFragmentShader.h"
 
 namespace {
 bool InitializeSymbolTable(
@@ -161,6 +165,12 @@ bool TCompiler::compile(const char* const shaderStrings[],
         if (success && (compileOptions & SH_VALIDATE_LOOP_INDEXING))
             success = validateLimitations(root);
 
+        // FIXME(mvujovic): For now, we only consider "u_texture" to be a potentially unsafe symbol.
+        // If we end up using web safe shader analysis, we should expose an API to pass in the names
+        // of other potentially unsafe symbols (e.g. uniforms referencing cross-domain textures).
+        if (success && (compileOptions & SH_WEB_SAFE))
+            success = validateWebSafeShader(root, "u_texture", compileOptions & SH_DEPENDENCY_GRAPH);
+
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
             ForLoopUnroll::MarkForLoopsWithIntegerIndicesForUnrolling(root);
@@ -239,6 +249,41 @@ bool TCompiler::validateLimitations(TIntermNode* root) {
     ValidateLimitations validate(shaderType, infoSink.info);
     root->traverse(&validate);
     return validate.numErrors() == 0;
+}
+
+bool TCompiler::validateWebSafeShader(TIntermNode* root, const TString& restrictedSymbol, bool outputGraph)
+{
+    bool success = false;
+
+    if (shaderType == SH_FRAGMENT_SHADER) {
+        TDependencyGraph graph(root);
+
+        success = validateWebSafeFragmentShader(graph, restrictedSymbol);
+
+        if (outputGraph) {
+            TDependencyGraphOutput output(infoSink.info);
+            output.outputAllSpanningTrees(graph);
+        }
+    }
+    else {
+        success = validateWebSafeVertexShader(root, restrictedSymbol);
+    }
+
+    return success;
+}
+
+bool TCompiler::validateWebSafeFragmentShader(const TDependencyGraph& graph, const TString& restrictedSymbol)
+{
+    ValidateWebSafeFragmentShader validator(infoSink.info, restrictedSymbol);
+    validator.validate(graph);
+    return validator.numErrors() == 0;
+}
+
+bool TCompiler::validateWebSafeVertexShader(TIntermNode* root, const TString& restrictedSymbol)
+{
+    ValidateWebSafeVertexShader validator(infoSink.info, restrictedSymbol);
+    validator.validate(root);
+    return validator.numErrors() == 0;
 }
 
 void TCompiler::collectAttribsUniforms(TIntermNode* root)

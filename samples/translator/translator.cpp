@@ -85,6 +85,8 @@ int main(int argc, char* argv[])
             case 'u': compileOptions |= SH_ATTRIBUTES_UNIFORMS; break;
             case 'l': compileOptions |= SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX; break;
             case 'e': compileOptions |= SH_EMULATE_BUILT_IN_FUNCTIONS; break;
+            case 'd': compileOptions |= SH_DEPENDENCY_GRAPH; break;
+            case 'w': compileOptions |= SH_WEB_SAFE; break;
             case 'b':
                 if (argv[0][2] == '=') {
                     switch (argv[0][3]) {
@@ -196,6 +198,8 @@ void usage()
         "       -u       : print active attribs and uniforms\n"
         "       -l       : unroll for-loops with integer indices\n"
         "       -e       : emulate certain built-in functions (workaround for driver bugs)\n"
+        "       -w       : enforce web safe shader restrictions\n"
+        "       -d       : print the dependency graph used to enforce web safe shader restrictions\n"
         "       -b=e     : output GLSL ES code (this is by default)\n"
         "       -b=g     : output GLSL code\n"
         "       -b=h     : output HLSL code\n"
