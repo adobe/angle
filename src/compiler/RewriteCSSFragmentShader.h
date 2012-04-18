@@ -34,6 +34,8 @@ private:
     TIntermSymbol* createVaryingVec2(const TString& name);
     TIntermAggregate* createFunctionCall(const TString& name);
     void addArgument(TIntermNode* argument, TIntermAggregate* functionCall);
+    TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right);
+    TIntermAggregate* createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName);
     
     void insertAtTopOfShader(TIntermNode* node);
     void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);

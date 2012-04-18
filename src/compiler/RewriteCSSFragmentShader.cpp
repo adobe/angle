@@ -62,6 +62,22 @@ TIntermAggregate* RewriteCSSFragmentShader::createFunctionCall(const TString& na
     return functionCall;
 }
 
+TIntermBinary* RewriteCSSFragmentShader::createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right)
+{
+    TIntermBinary* binary = new TIntermBinary(op);
+    binary->setLeft(left);
+    binary->setRight(right);
+    return binary; 
+}
+
+TIntermAggregate* RewriteCSSFragmentShader::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
+{
+    TIntermAggregate* texture2DCall = createFunctionCall("texture2D(s21;vf2;");
+    addArgument(createUniformSampler2D(textureUniformName), texture2DCall);
+    addArgument(createVaryingVec2(texCoordVaryingName), texture2DCall);
+    return texture2DCall;
+}
+
 void RewriteCSSFragmentShader::addArgument(TIntermNode* argument, TIntermAggregate* functionCall)
 {
     functionCall->getSequence().push_back(argument);
@@ -72,10 +88,8 @@ void RewriteCSSFragmentShader::addArgument(TIntermNode* argument, TIntermAggrega
 void RewriteCSSFragmentShader::insertCSSFragColorDeclaration()
 {
     // Declaration
-    TIntermBinary* initialize = new TIntermBinary(EOpInitialize);
+    TIntermBinary* initialize = createBinary(EOpInitialize, createGlobalVec4("css_FragColor"), createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f));
     initialize->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4));
-    initialize->setLeft(createGlobalVec4("css_FragColor"));
-    initialize->setRight(createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f));
     
     TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
     declaration->getSequence().push_back(initialize);
@@ -104,20 +118,8 @@ void RewriteCSSFragmentShader::insertTexCoordVarying()
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
 void RewriteCSSFragmentShader::insertBlendingOp(TIntermAggregate* mainFunction)
 {
-    TIntermAggregate* texture2DCall = createFunctionCall("texture2D(s21;vf2;");
-    addArgument(createUniformSampler2D("s_texture"), texture2DCall);
-    addArgument(createVaryingVec2("v_texCoord"), texture2DCall);
-    
-    // css_FragColor * texture2D...
-    TIntermBinary* mul = new TIntermBinary(EOpMul);
-    mul->setLeft(createGlobalVec4("css_FragColor"));
-    mul->setRight(texture2DCall);
-    
-    // gl_FragColor = css_FragColor * ...
-    TIntermBinary* assign = new TIntermBinary(EOpAssign);
-    assign->setLeft(createGlobalVec4("gl_FragColor"));
-    assign->setRight(mul);
-
+    TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4("css_FragColor"), createTexture2DCall("s_texture", "v_texCoord"));
+    TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4("gl_FragColor"), rhs);
     insertAtEndOfFunction(assign, mainFunction);
 }
 
