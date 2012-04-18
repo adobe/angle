@@ -72,21 +72,24 @@ TIntermBinary* RewriteCSSFragmentShader::createBinary(TOperator op, TIntermTyped
 
 TIntermAggregate* RewriteCSSFragmentShader::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
 {
-    TIntermAggregate* texture2DCall = createFunctionCall("texture2D(s21;vf2;");
+    TIntermAggregate* texture2DCall = createFunctionCall("texture2D(s21;vf2;"); // TODO: Maybe pool allocate strings?
     addArgument(createUniformSampler2D(textureUniformName), texture2DCall);
     addArgument(createVaryingVec2(texCoordVaryingName), texture2DCall);
     return texture2DCall;
 }
 
-TIntermAggregate* RewriteCSSFragmentShader::createGlobalVec4Declaration(const TString& symbolName, TIntermTyped* rhs)
+TIntermAggregate* RewriteCSSFragmentShader::createDeclaration(TIntermNode* child)
 {
-    TIntermBinary* initialize = createBinary(EOpInitialize, createGlobalVec4(symbolName), rhs);
-    initialize->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4));
-    
     TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
-    declaration->getSequence().push_back(initialize);
-    
-    return declaration;
+    declaration->getSequence().push_back(child);
+    return declaration;    
+}
+
+TIntermBinary* RewriteCSSFragmentShader::createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs)
+{
+    TIntermBinary* initialization = createBinary(EOpInitialize, createGlobalVec4(symbolName), rhs);
+    initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4)); // TODO: What precision?
+    return initialization;
 }
 
 void RewriteCSSFragmentShader::addArgument(TIntermNode* argument, TIntermAggregate* functionCall)
@@ -94,20 +97,15 @@ void RewriteCSSFragmentShader::addArgument(TIntermNode* argument, TIntermAggrega
     functionCall->getSequence().push_back(argument);
 }
 
-// TODO: Pool allocate strings.
-// TODO: What precision?
 void RewriteCSSFragmentShader::insertCSSFragColorDeclaration()
 {
-    insertAtTopOfShader(createGlobalVec4Declaration("css_FragColor", createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f)));
+    insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization("css_FragColor", createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
 // Inserts "uniform sampler2D s_texture".
 void RewriteCSSFragmentShader::insertTextureUniform()
 {
-    TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
-    declaration->getSequence().push_back(createUniformSampler2D("s_texture"));
-
-    insertAtTopOfShader(declaration);
+    insertAtTopOfShader(createDeclaration(createUniformSampler2D("s_texture")));
 }
 
 // TODO: How should we manage v_texCoord. Is it safe to allow it to be custom defined? If so, do we enforce its type?
