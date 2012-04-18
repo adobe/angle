@@ -78,6 +78,17 @@ TIntermAggregate* RewriteCSSFragmentShader::createTexture2DCall(const TString& t
     return texture2DCall;
 }
 
+TIntermAggregate* RewriteCSSFragmentShader::createGlobalVec4Declaration(const TString& symbolName, TIntermTyped* rhs)
+{
+    TIntermBinary* initialize = createBinary(EOpInitialize, createGlobalVec4(symbolName), rhs);
+    initialize->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4));
+    
+    TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
+    declaration->getSequence().push_back(initialize);
+    
+    return declaration;
+}
+
 void RewriteCSSFragmentShader::addArgument(TIntermNode* argument, TIntermAggregate* functionCall)
 {
     functionCall->getSequence().push_back(argument);
@@ -87,14 +98,7 @@ void RewriteCSSFragmentShader::addArgument(TIntermNode* argument, TIntermAggrega
 // TODO: What precision?
 void RewriteCSSFragmentShader::insertCSSFragColorDeclaration()
 {
-    // Declaration
-    TIntermBinary* initialize = createBinary(EOpInitialize, createGlobalVec4("css_FragColor"), createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f));
-    initialize->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4));
-    
-    TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
-    declaration->getSequence().push_back(initialize);
-    
-    insertAtTopOfShader(declaration);
+    insertAtTopOfShader(createGlobalVec4Declaration("css_FragColor", createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f)));
 }
 
 // Inserts "uniform sampler2D s_texture".
