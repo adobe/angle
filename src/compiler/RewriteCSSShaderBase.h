@@ -26,6 +26,7 @@ protected:
     TIntermSymbol* createGlobalVec4(const TString& name);
     TIntermSymbol* createUniformSampler2D(const TString& name);
     TIntermSymbol* createVaryingVec2(const TString& name);
+    TIntermSymbol* createAttributeVec2(const TString& name);
     TIntermAggregate* createFunctionCall(const TString& name);
     void addArgument(TIntermNode* argument, TIntermAggregate* functionCall);
     TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right);

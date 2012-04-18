@@ -24,6 +24,7 @@ TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y,
     return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4));    
 }
 
+// TODO: Is symbol id 0 ok?
 TIntermSymbol* RewriteCSSShaderBase::createGlobalVec4(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
@@ -37,6 +38,11 @@ TIntermSymbol* RewriteCSSShaderBase::createUniformSampler2D(const TString& name)
 TIntermSymbol* RewriteCSSShaderBase::createVaryingVec2(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqVaryingIn, 2));
+}
+
+TIntermSymbol* RewriteCSSShaderBase::createAttributeVec2(const TString& name)
+{
+    return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqAttribute, 2));
 }
 
 TIntermAggregate* RewriteCSSShaderBase::createFunctionCall(const TString& name)

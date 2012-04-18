@@ -7,9 +7,19 @@
 #include "compiler/RewriteCSSVertexShader.h"
 #include "ParseHelper.h"
 
+const char* kCSSATexCoord = "css_a_texCoord";
+
 void RewriteCSSVertexShader::rewrite()
 {
+    insertTexCoordVarying();
+    insertTexCoordAttribute();
+    
     GlobalParseContext->treeRoot->traverse(this);
+}
+
+void RewriteCSSVertexShader::insertTexCoordAttribute()
+{
+    insertAtTopOfShader(createDeclaration(createAttributeVec2(kCSSATexCoord)));
 }
 
 void RewriteCSSVertexShader::visitSymbol(TIntermSymbol* node)
