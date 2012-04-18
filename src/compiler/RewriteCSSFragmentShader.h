@@ -9,16 +9,17 @@
 
 #include "GLSLANG/ShaderLang.h"
 
+#include "compiler/RewriteCSSShaderBase.h"
 #include "compiler/intermediate.h"
 #include "compiler/InfoSink.h"
 
 class TInfoSinkBase;
 
-class RewriteCSSFragmentShader : public TIntermTraverser {
+class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
 public:
-    RewriteCSSFragmentShader(TInfoSinkBase& sink) : TIntermTraverser(false, false, true), mSink(sink) {}
-    void rewrite();
-    int numErrors() { return 0; } // TODO: Implement.
+    RewriteCSSFragmentShader(TInfoSinkBase& infoSink) : RewriteCSSShaderBase(infoSink) {}
+    virtual void rewrite();
+    virtual int numErrors() { return 0; } // TODO: Implement.
     
     virtual void visitSymbol(TIntermSymbol*);
     virtual bool visitBinary(Visit visit, TIntermBinary*);
@@ -28,26 +29,9 @@ public:
     virtual bool visitLoop(Visit visit, TIntermLoop*);
     virtual bool visitBranch(Visit visit, TIntermBranch*);
 private:
-    TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
-    TIntermSymbol* createGlobalVec4(const TString& name);
-    TIntermSymbol* createUniformSampler2D(const TString& name);
-    TIntermSymbol* createVaryingVec2(const TString& name);
-    TIntermAggregate* createFunctionCall(const TString& name);
-    void addArgument(TIntermNode* argument, TIntermAggregate* functionCall);
-    TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right);
-    TIntermAggregate* createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName);
-    TIntermAggregate* createDeclaration(TIntermNode* child);
-    TIntermBinary* createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs);
-    
-    void insertAtTopOfShader(TIntermNode* node);
-    void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
-    
     void insertCSSFragColorDeclaration();
     void insertTextureUniform();
-    void insertTexCoordVarying();
     void insertBlendingOp(TIntermAggregate* mainFunction);
-    
-    TInfoSinkBase& mSink;
 };
 
 #endif  // COMPILER_REWRITE_CSS_FRAGMENT_SHADER
