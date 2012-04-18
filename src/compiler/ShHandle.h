@@ -73,7 +73,7 @@ protected:
     // TODO: Describe
     bool rewriteCSSFragmentShader(TIntermNode* root);
     // TODO: Describe
-    bool validateCSSVertexShader(TIntermNode* root);
+    bool rewriteCSSVertexShader(TIntermNode* root);
     // Returns true if the given shader does not exceed the minimum
     // functionality mandated in GLSL 1.0 spec Appendix A.
     bool validateLimitations(TIntermNode* root);

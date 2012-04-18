@@ -12,7 +12,7 @@
 #include "compiler/ParseHelper.h"
 #include "compiler/RewriteCSSFragmentShader.h"
 #include "compiler/ShHandle.h"
-#include "compiler/ValidateCSSVertexShader.h"
+#include "compiler/RewriteCSSVertexShader.h"
 #include "compiler/ValidateLimitations.h"
 
 namespace {
@@ -165,7 +165,7 @@ bool TCompiler::compile(const char* const shaderStrings[],
         
         if (success && (compileOptions & SH_CSS_SHADER)) {
             if (shaderType == SH_VERTEX_SHADER) 
-                success = validateCSSVertexShader(root);
+                success = rewriteCSSVertexShader(root);
             else
                 success = rewriteCSSFragmentShader(root);
         }
@@ -251,11 +251,11 @@ bool TCompiler::rewriteCSSFragmentShader(TIntermNode* root)
     return rewriter.numErrors() == 0;    
 }
 
-bool TCompiler::validateCSSVertexShader(TIntermNode* root)
+bool TCompiler::rewriteCSSVertexShader(TIntermNode* root)
 {    
-    ValidateCSSVertexShader validate(infoSink.info);
-    root->traverse(&validate);
-    return validate.numErrors() == 0;
+    RewriteCSSVertexShader rewriter(infoSink.info);
+    rewriter.rewrite();
+    return rewriter.numErrors() == 0;
 }
 
 bool TCompiler::validateLimitations(TIntermNode* root) {

@@ -137,7 +137,6 @@ void RewriteCSSFragmentShader::insertTexCoordVarying()
 }
 
 // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
-// TODO: Maybe assert that main function body is there and the right type.
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
 void RewriteCSSFragmentShader::insertBlendingOp(TIntermAggregate* mainFunction)
 {

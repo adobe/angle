@@ -14,10 +14,10 @@
 
 class TInfoSinkBase;
 
-class ValidateCSSVertexShader : public TIntermTraverser {
+class RewriteCSSVertexShader : public TIntermTraverser {
 public:
-    ValidateCSSVertexShader(TInfoSinkBase& sink) : TIntermTraverser(true, false, false), mSink(sink), mFoundRestrictedSymbol(false) {}
-    
+    RewriteCSSVertexShader(TInfoSinkBase& sink) : TIntermTraverser(true, false, false), mSink(sink), mFoundRestrictedSymbol(false) {}
+    void rewrite();
     int numErrors() { return mFoundRestrictedSymbol ? 1 : 0; }
     
     virtual void visitSymbol(TIntermSymbol*);
