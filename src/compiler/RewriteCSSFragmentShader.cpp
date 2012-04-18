@@ -7,13 +7,20 @@
 #include "compiler/RewriteCSSFragmentShader.h"
 #include "ParseHelper.h"
 
+static const char* kGLFragColor = "gl_FragColor";
+static const char* kCSSGLFragColor = "css_gl_FragColor";
+static const char* kCSSUTexture = "css_u_texture";
+static const char* kCSSVTexCoord = "css_v_texCoord";
+static const char* kTexture2D = "texture2D(s21;vf2;";
+static const char* kMain = "main(";
+
 void RewriteCSSFragmentShader::rewrite()
 {
     insertTextureUniform();
     insertTexCoordVarying();
     insertCSSFragColorDeclaration();
     
-    // Replace all "gl_FragColor" with "css_FragColor".
+    // Replace all kGLFragColor with kCSSGLFragColor.
     GlobalParseContext->treeRoot->traverse(this);
 }
 
@@ -25,10 +32,24 @@ void RewriteCSSFragmentShader::insertAtTopOfShader(TIntermNode* node)
 
 void RewriteCSSFragmentShader::insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function)
 {
-    // Insert at the end of the main function.
-    // FIXME: Handle main with no body. Crashes.
-    TIntermAggregate* functionBody = function->getSequence()[1]->getAsAggregate();
-    functionBody->getSequence().push_back(node);
+    TIntermAggregate* body = NULL;
+    TIntermSequence& paramsAndBody = function->getSequence();
+    
+    // The function should have parameters and may have a body.
+    ASSERT(paramsAndBody.size() == 1 || paramsAndBody.size() == 2);
+    
+    if (paramsAndBody.size() == 2) {
+        body = paramsAndBody[1]->getAsAggregate();
+    } else {
+        // Make a function body if necessary.
+        body = new TIntermAggregate(EOpSequence);
+        paramsAndBody.push_back(body);
+    }
+    
+    // The function body should be an aggregate node.
+    ASSERT(body);
+    
+    body->getSequence().push_back(node);
 }
 
 TIntermConstantUnion* RewriteCSSFragmentShader::createVec4Constant(float x, float y, float z, float w)
@@ -73,7 +94,7 @@ TIntermBinary* RewriteCSSFragmentShader::createBinary(TOperator op, TIntermTyped
 
 TIntermAggregate* RewriteCSSFragmentShader::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
 {
-    TIntermAggregate* texture2DCall = createFunctionCall("texture2D(s21;vf2;"); // TODO: Maybe pool allocate strings?
+    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D); // TODO: Maybe pool allocate strings?
     addArgument(createUniformSampler2D(textureUniformName), texture2DCall);
     addArgument(createVaryingVec2(texCoordVaryingName), texture2DCall);
     return texture2DCall;
@@ -100,20 +121,19 @@ void RewriteCSSFragmentShader::addArgument(TIntermNode* argument, TIntermAggrega
 
 void RewriteCSSFragmentShader::insertCSSFragColorDeclaration()
 {
-    insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization("css_FragColor", createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+    insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kCSSGLFragColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
-// Inserts "uniform sampler2D s_texture".
+// Inserts "uniform sampler2D css_u_texture".
 void RewriteCSSFragmentShader::insertTextureUniform()
 {
-    insertAtTopOfShader(createDeclaration(createUniformSampler2D("s_texture")));
+    insertAtTopOfShader(createDeclaration(createUniformSampler2D(kCSSUTexture)));
 }
 
-// TODO: How should we manage v_texCoord? Is it safe to allow it to be custom defined? If so, do we enforce its type?
-// Inserts "varying vec2 v_texCoord" if not present.
+// Inserts "varying vec2 css_v_texCoord".
 void RewriteCSSFragmentShader::insertTexCoordVarying()
 {
-    insertAtTopOfShader(createDeclaration(createVaryingVec2("v_texCoord")));
+    insertAtTopOfShader(createDeclaration(createVaryingVec2(kCSSVTexCoord)));
 }
 
 // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
@@ -121,18 +141,17 @@ void RewriteCSSFragmentShader::insertTexCoordVarying()
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
 void RewriteCSSFragmentShader::insertBlendingOp(TIntermAggregate* mainFunction)
 {
-    TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4("css_FragColor"), createTexture2DCall("s_texture", "v_texCoord"));
-    TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4("gl_FragColor"), rhs);
+    TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSGLFragColor), createTexture2DCall(kCSSUTexture, kCSSVTexCoord));
+    TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kGLFragColor), rhs);
     insertAtEndOfFunction(assign, mainFunction);
 }
 
 void RewriteCSSFragmentShader::visitSymbol(TIntermSymbol* node)
 {
-    const char* kFragColor = "gl_FragColor";
-    if (node->getSymbol() == kFragColor) {  
+    if (node->getSymbol() == kGLFragColor) {  
         node->setId(0);
         node->getTypePointer()->setQualifier(EvqGlobal);
-        node->setSymbol("css_FragColor");
+        node->setSymbol(kCSSGLFragColor);
     }
 }
 
@@ -153,7 +172,7 @@ bool RewriteCSSFragmentShader::visitSelection(Visit visit, TIntermSelection* nod
 
 bool RewriteCSSFragmentShader::visitAggregate(Visit visit, TIntermAggregate* node)
 {
-    if (node->getOp() == EOpFunction && node->getName() == "main(")
+    if (node->getOp() == EOpFunction && node->getName() == kMain)
         insertBlendingOp(node);
     
     return true;
