@@ -10,6 +10,7 @@
 void RewriteCSSFragmentShader::rewrite()
 {
     insertTextureUniform();
+    insertTexCoordVarying();
     insertCSSFragColorDeclaration();
     
     // Replace all "gl_FragColor" with "css_FragColor".
@@ -108,11 +109,11 @@ void RewriteCSSFragmentShader::insertTextureUniform()
     insertAtTopOfShader(createDeclaration(createUniformSampler2D("s_texture")));
 }
 
-// TODO: How should we manage v_texCoord. Is it safe to allow it to be custom defined? If so, do we enforce its type?
+// TODO: How should we manage v_texCoord? Is it safe to allow it to be custom defined? If so, do we enforce its type?
 // Inserts "varying vec2 v_texCoord" if not present.
 void RewriteCSSFragmentShader::insertTexCoordVarying()
 {
-    
+    insertAtTopOfShader(createDeclaration(createVaryingVec2("v_texCoord")));
 }
 
 // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
