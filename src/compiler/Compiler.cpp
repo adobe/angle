@@ -10,7 +10,9 @@
 #include "compiler/Initialize.h"
 #include "compiler/MapLongVariableNames.h"
 #include "compiler/ParseHelper.h"
+#include "compiler/RewriteCSSFragmentShader.h"
 #include "compiler/ShHandle.h"
+#include "compiler/ValidateCSSVertexShader.h"
 #include "compiler/ValidateLimitations.h"
 
 namespace {
@@ -160,6 +162,13 @@ bool TCompiler::compile(const char* const shaderStrings[],
 
         if (success && (compileOptions & SH_VALIDATE_LOOP_INDEXING))
             success = validateLimitations(root);
+        
+        if (success && (compileOptions & SH_CSS_SHADER)) {
+            if (shaderType == SH_VERTEX_SHADER) 
+                success = validateCSSVertexShader(root);
+            else
+                success = rewriteCSSFragmentShader(root);
+        }
 
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
@@ -233,6 +242,20 @@ bool TCompiler::detectRecursion(TIntermNode* root)
             UNREACHABLE();
             return false;
     }
+}
+
+bool TCompiler::rewriteCSSFragmentShader(TIntermNode* root)
+{
+    RewriteCSSFragmentShader rewriter(infoSink.info);
+    rewriter.rewrite();
+    return rewriter.numErrors() == 0;    
+}
+
+bool TCompiler::validateCSSVertexShader(TIntermNode* root)
+{    
+    ValidateCSSVertexShader validate(infoSink.info);
+    root->traverse(&validate);
+    return validate.numErrors() == 0;
 }
 
 bool TCompiler::validateLimitations(TIntermNode* root) {

@@ -85,6 +85,7 @@ int main(int argc, char* argv[])
             case 'u': compileOptions |= SH_ATTRIBUTES_UNIFORMS; break;
             case 'l': compileOptions |= SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX; break;
             case 'e': compileOptions |= SH_EMULATE_BUILT_IN_FUNCTIONS; break;
+            case 'c': compileOptions |= SH_CSS_SHADER; break;
             case 'b':
                 if (argv[0][2] == '=') {
                     switch (argv[0][3]) {
