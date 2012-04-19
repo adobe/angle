@@ -9,8 +9,8 @@
 
 static const char* kGLFragColor = "gl_FragColor";
 static const char* kCSSGLFragColor = "css_gl_FragColor";
-static const char* kCSSUTexture = "css_u_texture";
-static const char* kCSSVTexCoord = "css_v_texCoord";
+static const char* kCSSTextureUniformTexture = "css_u_texture";
+static const char* kCSSTexCoordVarying = "css_v_texCoord";
 static const char* kTexture2D = "texture2D(s21;vf2;";
 static const char* kMain = "main(";
 
@@ -32,14 +32,14 @@ void RewriteCSSFragmentShader::insertCSSFragColorDeclaration()
 // Inserts "uniform sampler2D css_u_texture".
 void RewriteCSSFragmentShader::insertTextureUniform()
 {
-    insertAtTopOfShader(createDeclaration(createUniformSampler2D(kCSSUTexture)));
+    insertAtTopOfShader(createDeclaration(createUniformSampler2D(kCSSTextureUniformTexture)));
 }
 
 // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
 void RewriteCSSFragmentShader::insertBlendingOp(TIntermAggregate* mainFunction)
 {
-    TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSGLFragColor), createTexture2DCall(kCSSUTexture, kCSSVTexCoord));
+    TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSGLFragColor), createTexture2DCall(kCSSTextureUniformTexture, kCSSTexCoordVarying));
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kGLFragColor), rhs);
     insertAtEndOfFunction(assign, mainFunction);
 }

@@ -7,19 +7,25 @@
 #include "compiler/RewriteCSSVertexShader.h"
 #include "ParseHelper.h"
 
-const char* kCSSATexCoord = "css_a_texCoord";
+const char* kCSSTexCoordAttribute = "css_a_texCoord";
 
 void RewriteCSSVertexShader::rewrite()
 {
     insertTexCoordVarying();
     insertTexCoordAttribute();
+    insertCSSTexCoordVaryingAssignment();
     
     GlobalParseContext->treeRoot->traverse(this);
 }
 
 void RewriteCSSVertexShader::insertTexCoordAttribute()
 {
-    insertAtTopOfShader(createDeclaration(createAttributeVec2(kCSSATexCoord)));
+    insertAtTopOfShader(createDeclaration(createAttributeVec2(kCSSTexCoordAttribute)));
+}
+
+void RewriteCSSVertexShader::insertCSSTexCoordVaryingAssignment()
+{
+    // TODO: Implement.
 }
 
 void RewriteCSSVertexShader::visitSymbol(TIntermSymbol* node)

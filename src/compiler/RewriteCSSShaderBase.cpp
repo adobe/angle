@@ -9,8 +9,8 @@
 
 static const char* kGLFragColor = "gl_FragColor";
 static const char* kCSSGLFragColor = "css_gl_FragColor";
-static const char* kCSSUTexture = "css_u_texture";
-static const char* kCSSVTexCoord = "css_v_texCoord";
+static const char* kCSSTextureUniformTexture = "css_u_texture";
+static const char* kCSSTexCoordVarying = "css_v_texCoord";
 static const char* kTexture2D = "texture2D(s21;vf2;";
 static const char* kMain = "main(";
 
@@ -90,7 +90,7 @@ void RewriteCSSShaderBase::addArgument(TIntermNode* argument, TIntermAggregate* 
 // Inserts "varying vec2 css_v_texCoord".
 void RewriteCSSShaderBase::insertTexCoordVarying()
 {
-    insertAtTopOfShader(createDeclaration(createVaryingVec2(kCSSVTexCoord)));
+    insertAtTopOfShader(createDeclaration(createVaryingVec2(kCSSTexCoordVarying)));
 }
 
 void RewriteCSSShaderBase::insertAtTopOfShader(TIntermNode* node)
@@ -99,7 +99,18 @@ void RewriteCSSShaderBase::insertAtTopOfShader(TIntermNode* node)
     globalSequence.insert(globalSequence.begin(), node);
 }
 
+void RewriteCSSShaderBase::insertAtTopOfFunction(TIntermNode* node, TIntermAggregate* function)
+{
+    TIntermSequence& bodySequence = getOrCreateFunctionBody(function)->getSequence();
+    bodySequence.insert(bodySequence.begin(), node);
+}
+
 void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function)
+{
+    getOrCreateFunctionBody(function)->getSequence().push_back(node);
+}
+
+TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate* function)
 {
     TIntermAggregate* body = NULL;
     TIntermSequence& paramsAndBody = function->getSequence();
@@ -117,6 +128,6 @@ void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermNode* node, TIntermAggre
     
     // The function body should be an aggregate node.
     ASSERT(body);
-    
-    body->getSequence().push_back(node);
+
+    return body;
 }

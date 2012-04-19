@@ -21,6 +21,7 @@ public:
     
     virtual void rewrite() = 0;
     virtual int numErrors() = 0;
+    
 protected:
     TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
     TIntermSymbol* createGlobalVec4(const TString& name);
@@ -35,11 +36,14 @@ protected:
     TIntermBinary* createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs);
     
     void insertAtTopOfShader(TIntermNode* node);
+    void insertAtTopOfFunction(TIntermNode* node, TIntermAggregate* function);
     void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
-    
     void insertTexCoordVarying();
     
     TInfoSinkBase& sink;
+    
+private:
+    TIntermAggregate* getOrCreateFunctionBody(TIntermAggregate* function);
 };
 
 #endif  // COMPILER_REWRITE_CSS_SHADER_BASE
