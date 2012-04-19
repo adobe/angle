@@ -7,12 +7,12 @@
 #include "compiler/RewriteCSSShaderBase.h"
 #include "ParseHelper.h"
 
-static const char* kGLFragColor = "gl_FragColor";
-static const char* kCSSGLFragColor = "css_gl_FragColor";
-static const char* kCSSTextureUniformTexture = "css_u_texture";
-static const char* kCSSTexCoordVarying = "css_v_texCoord";
-static const char* kTexture2D = "texture2D(s21;vf2;";
-static const char* kMain = "main(";
+const char* const RewriteCSSShaderBase::kGLFragColor = "gl_FragColor";
+const char* const RewriteCSSShaderBase::kCSSGLFragColor = "css_gl_FragColor";
+const char* const RewriteCSSShaderBase::kCSSTextureUniformTexture = "css_u_texture";
+const char* const RewriteCSSShaderBase::kCSSTexCoordVarying = "css_v_texCoord";
+const char* const RewriteCSSShaderBase::kTexture2D = "texture2D(s21;vf2;";
+const char* const RewriteCSSShaderBase::kMain = "main(";
 
 TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y, float z, float w)
 {
@@ -130,4 +130,9 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
     ASSERT(body);
 
     return body;
+}
+
+bool RewriteCSSShaderBase::isMainFunction(TIntermAggregate* node)
+{
+    return node->getOp() == EOpFunction && node->getName() == kMain;
 }

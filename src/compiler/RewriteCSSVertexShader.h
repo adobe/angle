@@ -30,7 +30,7 @@ public:
     virtual bool visitBranch(Visit visit, TIntermBranch*);
 private:
     void insertTexCoordAttribute();
-    void insertCSSTexCoordVaryingAssignment();
+    void insertCSSTexCoordVaryingAssignment(TIntermAggregate* mainFunction);
 };
 
 #endif  // COMPILER_VALIDATE_CSS_VERTEX_SHADER

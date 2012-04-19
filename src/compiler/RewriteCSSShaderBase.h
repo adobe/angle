@@ -23,6 +23,13 @@ public:
     virtual int numErrors() = 0;
     
 protected:
+    static const char* const kGLFragColor;
+    static const char* const kCSSGLFragColor;
+    static const char* const kCSSTextureUniformTexture;
+    static const char* const kCSSTexCoordVarying;
+    static const char* const kTexture2D;
+    static const char* const kMain;
+    
     TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
     TIntermSymbol* createGlobalVec4(const TString& name);
     TIntermSymbol* createUniformSampler2D(const TString& name);
@@ -39,6 +46,8 @@ protected:
     void insertAtTopOfFunction(TIntermNode* node, TIntermAggregate* function);
     void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
     void insertTexCoordVarying();
+    
+    bool isMainFunction(TIntermAggregate* node);
     
     TInfoSinkBase& sink;
     

@@ -70,7 +70,7 @@ bool RewriteCSSFragmentShader::visitSelection(Visit visit, TIntermSelection* nod
 
 bool RewriteCSSFragmentShader::visitAggregate(Visit visit, TIntermAggregate* node)
 {
-    if (node->getOp() == EOpFunction && node->getName() == kMain)
+    if (isMainFunction(node))
         insertBlendingOp(node);
     
     return true;
