@@ -14,8 +14,6 @@ void RewriteCSSVertexShader::rewrite()
     insertTexCoordVarying();
     insertTexCoordAttribute();
     insertCSSTexCoordVaryingAssignment(findMainFunction());
-    
-    GlobalParseContext->treeRoot->traverse(this);
 }
 
 void RewriteCSSVertexShader::insertTexCoordAttribute()
@@ -26,38 +24,4 @@ void RewriteCSSVertexShader::insertTexCoordAttribute()
 void RewriteCSSVertexShader::insertCSSTexCoordVaryingAssignment(TIntermAggregate* mainFunction)
 {
     insertAtTopOfFunction(createBinary(EOpAssign, createVaryingVec2(kCSSTexCoordVarying), createAttributeVec2(kCSSTexCoordAttribute)), findMainFunction());
-}
-
-void RewriteCSSVertexShader::visitSymbol(TIntermSymbol* node)
-{
-}
-
-bool RewriteCSSVertexShader::visitBinary(Visit visit, TIntermBinary* node)
-{
-    return true;
-}
-
-bool RewriteCSSVertexShader::visitUnary(Visit visit, TIntermUnary* node)
-{
-    return true;
-}
-
-bool RewriteCSSVertexShader::visitSelection(Visit visit, TIntermSelection* node)
-{
-    return true;
-}
-
-bool RewriteCSSVertexShader::visitAggregate(Visit visit, TIntermAggregate* node)
-{   
-    return true;
-}
-
-bool RewriteCSSVertexShader::visitLoop(Visit visit, TIntermLoop* node)
-{
-    return true;
-}
-
-bool RewriteCSSVertexShader::visitBranch(Visit visit, TIntermBranch* node)
-{
-    return true;
 }

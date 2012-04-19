@@ -28,10 +28,20 @@ public:
     virtual bool visitAggregate(Visit visit, TIntermAggregate*);
     virtual bool visitLoop(Visit visit, TIntermLoop*);
     virtual bool visitBranch(Visit visit, TIntermBranch*);
-private:
+private:    
     void insertCSSFragColorDeclaration();
     void insertTextureUniform();
     void insertBlendingOp();
+    
+    //
+    // Replaces all instances of kGLFragColor with kCSSGLFragColor.
+    //
+    class ReplaceGLFragColor : public TIntermTraverser
+    {
+    public:
+        ReplaceGLFragColor() : TIntermTraverser(true, false, false) {}
+        virtual void visitSymbol(TIntermSymbol*);
+    };
 };
 
 #endif  // COMPILER_REWRITE_CSS_FRAGMENT_SHADER

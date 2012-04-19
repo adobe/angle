@@ -14,9 +14,9 @@
 
 class TInfoSinkBase;
 
-class RewriteCSSShaderBase : public TIntermTraverser {
+class RewriteCSSShaderBase {
 public:
-    RewriteCSSShaderBase(TInfoSinkBase& infoSink) : TIntermTraverser(false, false, true), sink(infoSink) {}
+    RewriteCSSShaderBase(TInfoSinkBase& infoSink) : sink(infoSink) {}
     virtual ~RewriteCSSShaderBase() {}
     
     virtual void rewrite() = 0;

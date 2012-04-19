@@ -7,22 +7,32 @@
 #include "compiler/RewriteCSSFragmentShader.h"
 #include "ParseHelper.h"
 
-static const char* kGLFragColor = "gl_FragColor";
-static const char* kCSSGLFragColor = "css_gl_FragColor";
-static const char* kCSSTextureUniformTexture = "css_u_texture";
-static const char* kCSSTexCoordVarying = "css_v_texCoord";
-static const char* kTexture2D = "texture2D(s21;vf2;";
-static const char* kMain = "main(";
+//
+// ReplaceGLFragColor implementation
+//
+
+void RewriteCSSFragmentShader::ReplaceGLFragColor::visitSymbol(TIntermSymbol* node)
+{
+    if (node->getSymbol() == kGLFragColor) {  
+        node->setId(0);
+        node->getTypePointer()->setQualifier(EvqGlobal);
+        node->setSymbol(kCSSGLFragColor);
+    }
+}
+
+//
+// RewriteCSSFragmentShader implementation
+//
 
 void RewriteCSSFragmentShader::rewrite()
 {
+    ReplaceGLFragColor replaceGLFragColor;
+    GlobalParseContext->treeRoot->traverse(&replaceGLFragColor);
+    
     insertTextureUniform();
     insertTexCoordVarying();
     insertCSSFragColorDeclaration();
     insertBlendingOp();
-    
-    // Replace all kGLFragColor with kCSSGLFragColor.
-    GlobalParseContext->treeRoot->traverse(this);
 }
 
 void RewriteCSSFragmentShader::insertCSSFragColorDeclaration()
@@ -47,11 +57,6 @@ void RewriteCSSFragmentShader::insertBlendingOp()
 
 void RewriteCSSFragmentShader::visitSymbol(TIntermSymbol* node)
 {
-    if (node->getSymbol() == kGLFragColor) {  
-        node->setId(0);
-        node->getTypePointer()->setQualifier(EvqGlobal);
-        node->setSymbol(kCSSGLFragColor);
-    }
 }
 
 bool RewriteCSSFragmentShader::visitBinary(Visit visit, TIntermBinary* node)
