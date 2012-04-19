@@ -7,12 +7,39 @@
 #include "compiler/RewriteCSSShaderBase.h"
 #include "ParseHelper.h"
 
+// TODO: Try empty shader.
+
+//
+// implementation
+//
+
+void RewriteCSSShaderBase::RewriteCollidingNames::visitSymbol(TIntermSymbol* node)
+{
+    // TODO: Use std string methods.
+    if (node->getSymbol().compare(0, strlen(kCSSPrefix), kCSSPrefix) == 0 ||
+        node->getSymbol().compare(0, strlen(kUserPrefix), kUserPrefix) == 0) {
+        node->setSymbol(TString(kUserPrefix).append(node->getSymbol()));
+    }
+}
+
+//
+// RewriteCSSShaderBase implementation
+//
+
+const char* const RewriteCSSShaderBase::kCSSPrefix = "css_";
+const char* const RewriteCSSShaderBase::kUserPrefix = "usr_";
 const char* const RewriteCSSShaderBase::kGLFragColor = "gl_FragColor";
 const char* const RewriteCSSShaderBase::kCSSGLFragColor = "css_gl_FragColor";
 const char* const RewriteCSSShaderBase::kCSSTextureUniformTexture = "css_u_texture";
 const char* const RewriteCSSShaderBase::kCSSTexCoordVarying = "css_v_texCoord";
 const char* const RewriteCSSShaderBase::kTexture2D = "texture2D(s21;vf2;";
 const char* const RewriteCSSShaderBase::kMain = "main(";
+
+void RewriteCSSShaderBase::rewrite()
+{
+    RewriteCollidingNames rewriteCollidingNames;
+    GlobalParseContext->treeRoot->traverse(&rewriteCollidingNames);
+}
 
 TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y, float z, float w)
 {

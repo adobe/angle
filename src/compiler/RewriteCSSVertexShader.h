@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_VALIDATE_CSS_VERTEX_SHADER
-#define COMPILER_VALIDATE_CSS_VERTEX_SHADER
+#ifndef COMPILER_REWRITE_CSS_VERTEX_SHADER
+#define COMPILER_REWRITE_CSS_VERTEX_SHADER
 
 #include "GLSLANG/ShaderLang.h"
 
@@ -19,11 +19,10 @@ class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSVertexShader(TInfoSinkBase& infoSink) : RewriteCSSShaderBase(infoSink) {}
     void rewrite();
-    int numErrors() { return 0; } // TODO: Implement.
     
 private:
     void insertTexCoordAttribute();
     void insertCSSTexCoordVaryingAssignment(TIntermAggregate* mainFunction);
 };
 
-#endif  // COMPILER_VALIDATE_CSS_VERTEX_SHADER
+#endif  // COMPILER_REWRITE_CSS_VERTEX_SHADER

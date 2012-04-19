@@ -19,10 +19,11 @@ public:
     RewriteCSSShaderBase(TInfoSinkBase& infoSink) : sink(infoSink) {}
     virtual ~RewriteCSSShaderBase() {}
     
-    virtual void rewrite() = 0;
-    virtual int numErrors() = 0;
+    virtual void rewrite();
     
 protected:    
+    static const char* const kCSSPrefix;
+    static const char* const kUserPrefix;
     static const char* const kGLFragColor;
     static const char* const kCSSGLFragColor;
     static const char* const kCSSTextureUniformTexture;
@@ -50,6 +51,13 @@ protected:
     TIntermAggregate* findMainFunction();
     
     TInfoSinkBase& sink;
+    
+    class RewriteCollidingNames : public TIntermTraverser
+    {
+    public:
+        RewriteCollidingNames() : TIntermTraverser(true, false, false) {}
+        virtual void visitSymbol(TIntermSymbol*);
+    };
     
 private:
     TIntermAggregate* getOrCreateFunctionBody(TIntermAggregate* function);

@@ -19,15 +19,7 @@ class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSFragmentShader(TInfoSinkBase& infoSink) : RewriteCSSShaderBase(infoSink) {}
     virtual void rewrite();
-    virtual int numErrors() { return 0; } // TODO: Implement.
     
-    virtual void visitSymbol(TIntermSymbol*);
-    virtual bool visitBinary(Visit visit, TIntermBinary*);
-    virtual bool visitUnary(Visit visit, TIntermUnary*);
-    virtual bool visitSelection(Visit visit, TIntermSelection*);
-    virtual bool visitAggregate(Visit visit, TIntermAggregate*);
-    virtual bool visitLoop(Visit visit, TIntermLoop*);
-    virtual bool visitBranch(Visit visit, TIntermBranch*);
 private:    
     void insertCSSFragColorDeclaration();
     void insertTextureUniform();

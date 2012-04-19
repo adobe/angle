@@ -26,6 +26,8 @@ void RewriteCSSFragmentShader::ReplaceGLFragColor::visitSymbol(TIntermSymbol* no
 
 void RewriteCSSFragmentShader::rewrite()
 {
+    RewriteCSSShaderBase::rewrite();
+    
     ReplaceGLFragColor replaceGLFragColor;
     GlobalParseContext->treeRoot->traverse(&replaceGLFragColor);
     
@@ -53,38 +55,4 @@ void RewriteCSSFragmentShader::insertBlendingOp()
     TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSGLFragColor), createTexture2DCall(kCSSTextureUniformTexture, kCSSTexCoordVarying));
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kGLFragColor), rhs);
     insertAtEndOfFunction(assign, findMainFunction());
-}
-
-void RewriteCSSFragmentShader::visitSymbol(TIntermSymbol* node)
-{
-}
-
-bool RewriteCSSFragmentShader::visitBinary(Visit visit, TIntermBinary* node)
-{
-    return true;
-}
-
-bool RewriteCSSFragmentShader::visitUnary(Visit visit, TIntermUnary* node)
-{
-    return true;
-}
-
-bool RewriteCSSFragmentShader::visitSelection(Visit visit, TIntermSelection* node)
-{
-    return true;
-}
-
-bool RewriteCSSFragmentShader::visitAggregate(Visit visit, TIntermAggregate* node)
-{
-    return true;
-}
-
-bool RewriteCSSFragmentShader::visitLoop(Visit visit, TIntermLoop* node)
-{
-    return true;
-}
-
-bool RewriteCSSFragmentShader::visitBranch(Visit visit, TIntermBranch* node)
-{
-    return true;
 }

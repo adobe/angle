@@ -163,12 +163,8 @@ bool TCompiler::compile(const char* const shaderStrings[],
         if (success && (compileOptions & SH_VALIDATE_LOOP_INDEXING))
             success = validateLimitations(root);
         
-        if (success && (compileOptions & SH_CSS_SHADER)) {
-            if (shaderType == SH_VERTEX_SHADER) 
-                success = rewriteCSSVertexShader(root);
-            else
-                success = rewriteCSSFragmentShader(root);
-        }
+        if (success && (compileOptions & SH_CSS_SHADER))
+            shaderType == SH_VERTEX_SHADER ? rewriteCSSVertexShader(root) : rewriteCSSFragmentShader(root);
 
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
@@ -244,18 +240,18 @@ bool TCompiler::detectRecursion(TIntermNode* root)
     }
 }
 
-bool TCompiler::rewriteCSSFragmentShader(TIntermNode* root)
+void TCompiler::rewriteCSSFragmentShader(TIntermNode* root)
 {
+    // TODO: Pass root.
     RewriteCSSFragmentShader rewriter(infoSink.info);
     rewriter.rewrite();
-    return rewriter.numErrors() == 0;    
 }
 
-bool TCompiler::rewriteCSSVertexShader(TIntermNode* root)
-{    
+void TCompiler::rewriteCSSVertexShader(TIntermNode* root)
+{
+    // TODO: Pass root.
     RewriteCSSVertexShader rewriter(infoSink.info);
     rewriter.rewrite();
-    return rewriter.numErrors() == 0;
 }
 
 bool TCompiler::validateLimitations(TIntermNode* root) {
