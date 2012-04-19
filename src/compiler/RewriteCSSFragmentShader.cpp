@@ -19,6 +19,7 @@ void RewriteCSSFragmentShader::rewrite()
     insertTextureUniform();
     insertTexCoordVarying();
     insertCSSFragColorDeclaration();
+    insertBlendingOp();
     
     // Replace all kGLFragColor with kCSSGLFragColor.
     GlobalParseContext->treeRoot->traverse(this);
@@ -37,11 +38,11 @@ void RewriteCSSFragmentShader::insertTextureUniform()
 
 // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
-void RewriteCSSFragmentShader::insertBlendingOp(TIntermAggregate* mainFunction)
+void RewriteCSSFragmentShader::insertBlendingOp()
 {
     TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSGLFragColor), createTexture2DCall(kCSSTextureUniformTexture, kCSSTexCoordVarying));
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kGLFragColor), rhs);
-    insertAtEndOfFunction(assign, mainFunction);
+    insertAtEndOfFunction(assign, findMainFunction());
 }
 
 void RewriteCSSFragmentShader::visitSymbol(TIntermSymbol* node)
@@ -70,9 +71,6 @@ bool RewriteCSSFragmentShader::visitSelection(Visit visit, TIntermSelection* nod
 
 bool RewriteCSSFragmentShader::visitAggregate(Visit visit, TIntermAggregate* node)
 {
-    if (isMainFunction(node))
-        insertBlendingOp(node);
-    
     return true;
 }
 

@@ -31,7 +31,7 @@ public:
 private:
     void insertCSSFragColorDeclaration();
     void insertTextureUniform();
-    void insertBlendingOp(TIntermAggregate* mainFunction);
+    void insertBlendingOp();
 };
 
 #endif  // COMPILER_REWRITE_CSS_FRAGMENT_SHADER

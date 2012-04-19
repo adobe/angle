@@ -22,7 +22,7 @@ public:
     virtual void rewrite() = 0;
     virtual int numErrors() = 0;
     
-protected:
+protected:    
     static const char* const kGLFragColor;
     static const char* const kCSSGLFragColor;
     static const char* const kCSSTextureUniformTexture;
@@ -47,7 +47,7 @@ protected:
     void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
     void insertTexCoordVarying();
     
-    bool isMainFunction(TIntermAggregate* node);
+    TIntermAggregate* findMainFunction();
     
     TInfoSinkBase& sink;
     

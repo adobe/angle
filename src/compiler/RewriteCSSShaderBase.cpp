@@ -132,7 +132,14 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
     return body;
 }
 
-bool RewriteCSSShaderBase::isMainFunction(TIntermAggregate* node)
+TIntermAggregate* RewriteCSSShaderBase::findMainFunction()
 {
-    return node->getOp() == EOpFunction && node->getName() == kMain;
+    TIntermSequence& rootSequence = GlobalParseContext->treeRoot->getAsAggregate()->getSequence();
+    for (TIntermSequence::const_iterator iter = rootSequence.begin(); iter != rootSequence.end(); ++iter) {
+        TIntermNode* node = *iter;
+        TIntermAggregate* aggregate = node->getAsAggregate();
+        if (aggregate && aggregate->getOp() == EOpFunction && aggregate->getName() == kMain)
+            return aggregate;
+    }
+    return NULL;
 }
