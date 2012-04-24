@@ -71,9 +71,9 @@ protected:
     // Return true if function recursion is detected.
     bool detectRecursion(TIntermNode* root);
     // TODO: Describe
-    bool rewriteCSSFragmentShader(TIntermNode* root);
+    bool rewriteCSSFragmentShader();
     // TODO: Describe
-    bool rewriteCSSVertexShader(TIntermNode* root);
+    bool rewriteCSSVertexShader();
     // Returns true if the given shader does not exceed the minimum
     // functionality mandated in GLSL 1.0 spec Appendix A.
     bool validateLimitations(TIntermNode* root);

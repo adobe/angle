@@ -16,9 +16,9 @@ class TInfoSinkBase;
 
 class RewriteCSSShaderBase {
 public:
-    RewriteCSSShaderBase(TIntermNode* treeRoot, TInfoSinkBase& infoSink) : sink(infoSink), root(treeRoot), numErrors(0) {}
+    RewriteCSSShaderBase(TInfoSinkBase& infoSink) : sink(infoSink), numErrors(0) {}
     virtual ~RewriteCSSShaderBase() {}
-    virtual void rewrite() = 0;
+    virtual void rewrite();
     int getNumErrors() { return numErrors; }
     
 protected:    
@@ -47,10 +47,10 @@ protected:
     void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
     void insertTexCoordVarying();
     
+    void createRootSequenceIfNeeded();
     TIntermAggregate* findMainFunction();
     
     TInfoSinkBase& sink;
-    TIntermNode* root;
     int numErrors;
     
 private:

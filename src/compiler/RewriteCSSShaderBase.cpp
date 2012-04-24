@@ -11,6 +11,11 @@
 // RewriteCSSShaderBase implementation
 //
 
+void RewriteCSSShaderBase::rewrite()
+{
+    createRootSequenceIfNeeded();
+}
+
 const char* const RewriteCSSShaderBase::kCSSPrefix = "css_";
 const char* const RewriteCSSShaderBase::kCSSTexCoordVarying = "css_v_texCoord";
 const char* const RewriteCSSShaderBase::kTexture2D = "texture2D(s21;vf2;";
@@ -123,7 +128,7 @@ void RewriteCSSShaderBase::insertTexCoordVarying()
 
 void RewriteCSSShaderBase::insertAtTopOfShader(TIntermNode* node)
 {
-    TIntermSequence& globalSequence = root->getAsAggregate()->getSequence();
+    TIntermSequence& globalSequence = GlobalParseContext->treeRoot->getAsAggregate()->getSequence();
     globalSequence.insert(globalSequence.begin(), node);
 }
 
@@ -136,6 +141,28 @@ void RewriteCSSShaderBase::insertAtTopOfFunction(TIntermNode* node, TIntermAggre
 void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function)
 {
     getOrCreateFunctionBody(function)->getSequence().push_back(node);
+}
+
+// If there is only a main() function in the global scope, the main function will be the tree root.
+// However, we'd like to insert declarations above the main function, so we must wrap it in a sequence.
+// The new tree root must be that root sequence.
+void RewriteCSSShaderBase::createRootSequenceIfNeeded()
+{
+    TIntermAggregate* root = GlobalParseContext->treeRoot->getAsAggregate();
+ 
+    // The root should be a sequence or a function declaration, both of which are aggregate nodes.
+    ASSERT(root);
+    ASSERT(root->getOp() == EOpSequence || root->getOp() == EOpFunction);
+    
+    if (root->getOp() == EOpFunction) {
+        // If the tree root is a function declaration, it should be the main function.
+        ASSERT(root->getName() == kMain);
+        
+        TIntermAggregate* newRoot = new TIntermAggregate(EOpSequence);
+        TIntermSequence& sequence = newRoot->getSequence();
+        sequence.push_back(root);
+        GlobalParseContext->treeRoot = newRoot;
+    }
 }
 
 // FIXME: Handle the case where main is alone in the shader. (Create a wrapping sequence, etc.)
@@ -164,7 +191,7 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
 // FIXME: Handle the case where main is alone in the shader. (Create a wrapping sequence, etc.)
 TIntermAggregate* RewriteCSSShaderBase::findMainFunction()
 {
-    TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();
+    TIntermSequence& rootSequence = GlobalParseContext->treeRoot->getAsAggregate()->getSequence();
     for (TIntermSequence::const_iterator iter = rootSequence.begin(); iter != rootSequence.end(); ++iter) {
         TIntermNode* node = *iter;
         TIntermAggregate* aggregate = node->getAsAggregate();

@@ -154,11 +154,13 @@ bool TCompiler::compile(const char* const shaderStrings[],
         (PaParseStrings(numStrings - firstSource, &shaderStrings[firstSource], NULL, &parseContext) == 0) &&
         (parseContext.treeRoot != NULL);
     if (success) {
-        TIntermNode* root = parseContext.treeRoot;
-        success = intermediate.postProcess(root);
+        success = intermediate.postProcess(parseContext.treeRoot);
 
+        // TODO: Structure this better. Rewriting can change the tree root.
         if (success && shaderSpec == SH_CSS_SHADERS_SPEC)
-            success = shaderType == SH_VERTEX_SHADER ? rewriteCSSVertexShader(root) : rewriteCSSFragmentShader(root);
+            success = shaderType == SH_VERTEX_SHADER ? rewriteCSSVertexShader() : rewriteCSSFragmentShader();
+
+        TIntermNode* root = parseContext.treeRoot;
         
         if (success)
             success = detectRecursion(root);
@@ -240,16 +242,16 @@ bool TCompiler::detectRecursion(TIntermNode* root)
     }
 }
 
-bool TCompiler::rewriteCSSFragmentShader(TIntermNode* root)
+bool TCompiler::rewriteCSSFragmentShader()
 {
-    RewriteCSSFragmentShader rewriter(root, infoSink.info);
+    RewriteCSSFragmentShader rewriter(infoSink.info);
     rewriter.rewrite();
     return rewriter.getNumErrors() == 0;
 }
 
-bool TCompiler::rewriteCSSVertexShader(TIntermNode* root)
+bool TCompiler::rewriteCSSVertexShader()
 {
-    RewriteCSSVertexShader rewriter(root, infoSink.info);
+    RewriteCSSVertexShader rewriter(infoSink.info);
     rewriter.rewrite();
     return rewriter.getNumErrors() == 0;
 }
