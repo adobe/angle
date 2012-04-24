@@ -18,13 +18,21 @@ class TInfoSinkBase;
 class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSVertexShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
-        : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink) {}
+        : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink)
+    {
+        texCoordAttributeName = kTexCoordAttributePrefix;
+        texCoordAttributeName.append(hiddenSymbolSuffix);
+    }
     
     void rewrite();
     
 private:
+    static const char* const kTexCoordAttributePrefix;
+    
     void insertTexCoordAttribute();
     void insertCSSTexCoordVaryingAssignment(TIntermAggregate* mainFunction);
+    
+    TString texCoordAttributeName;
 };
 
 #endif  // COMPILER_REWRITE_CSS_VERTEX_SHADER

@@ -20,6 +20,7 @@ void RewriteCSSFragmentShader::rewrite()
     if (numErrors > 0)
         return;
     
+    // TODO: Combine both blend symbols.
     DetermineBlendSymbol determineBlendSymbol(this);
     root->traverse(&determineBlendSymbol);
     ASSERT(blendSymbol);

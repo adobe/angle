@@ -7,7 +7,7 @@
 #include "compiler/RewriteCSSVertexShader.h"
 #include "ParseHelper.h"
 
-const char* kTexCoordAttribute = "css_a_texCoord";
+const char* const RewriteCSSVertexShader::kTexCoordAttributePrefix = "css_a_texCoord_";
 
 void RewriteCSSVertexShader::rewrite()
 {
@@ -20,10 +20,10 @@ void RewriteCSSVertexShader::rewrite()
 
 void RewriteCSSVertexShader::insertTexCoordAttribute()
 {
-    insertAtTopOfShader(createDeclaration(createAttributeVec2(kTexCoordAttribute)));
+    insertAtTopOfShader(createDeclaration(createAttributeVec2(texCoordAttributeName)));
 }
 
 void RewriteCSSVertexShader::insertCSSTexCoordVaryingAssignment(TIntermAggregate* mainFunction)
 {
-    insertAtTopOfFunction(createBinary(EOpAssign, createVaryingVec2(texCoordVaryingName), createAttributeVec2(kTexCoordAttribute)), findMainFunction());
+    insertAtTopOfFunction(createBinary(EOpAssign, createVaryingVec2(texCoordVaryingName), createAttributeVec2(texCoordAttributeName)), findMainFunction());
 }

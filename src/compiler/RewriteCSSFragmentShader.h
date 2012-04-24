@@ -22,7 +22,7 @@ public:
         , blendSymbol(NULL)
     {
         textureUniformName = kTextureUniformPrefix;
-        textureUniformName.append(suffix);
+        textureUniformName.append(hiddenSymbolSuffix);
     }
     
     virtual void rewrite();
@@ -36,14 +36,13 @@ private:
     // Blend symbols.
     static const char* const kBlendColor;
     static const char* const kColorMatrix;
-    
-    const char* blendSymbol;
-    
-    TString textureUniformName;
-    
+        
     void insertBlendSymbolDeclaration();
     void insertTextureUniform();
     void insertBlendingOp();
+    
+    TString textureUniformName;
+    const char* blendSymbol;
     
     //
     // Generates errors for references to gl_FragColor.
