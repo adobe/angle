@@ -28,7 +28,9 @@ protected:
     static const char* const kMain;
     
     TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
+    TIntermConstantUnion* createMat4IdentityConstant();
     TIntermSymbol* createGlobalVec4(const TString& name);
+    TIntermSymbol* createGlobalMat4(const TString& name);
     TIntermSymbol* createUniformSampler2D(const TString& name);
     TIntermSymbol* createVaryingVec2(const TString& name);
     TIntermSymbol* createAttributeVec2(const TString& name);
@@ -38,6 +40,7 @@ protected:
     TIntermAggregate* createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName);
     TIntermAggregate* createDeclaration(TIntermNode* child);
     TIntermBinary* createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs);
+    TIntermBinary* createGlobalMat4Initialization(const TString& symbolName, TIntermTyped* rhs);
     
     void insertAtTopOfShader(TIntermNode* node);
     void insertAtTopOfFunction(TIntermNode* node, TIntermAggregate* function);

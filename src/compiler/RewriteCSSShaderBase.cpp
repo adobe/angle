@@ -28,10 +28,29 @@ TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y,
     return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4));    
 }
 
-// TODO: Is symbol id 0 ok?
+TIntermConstantUnion* RewriteCSSShaderBase::createMat4IdentityConstant()
+{
+    ConstantUnion* constantArray = new ConstantUnion[4 * 4];
+    for (int i = 0; i < 4 * 4; i++)
+        constantArray[i].setFConst(0.0);
+    
+    constantArray[0].setFConst(1.0);
+    constantArray[5].setFConst(1.0);
+    constantArray[10].setFConst(1.0);
+    constantArray[15].setFConst(1.0);
+    
+    return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4, true));    
+}
+
+// TODO: Is symbol id 0 ok? Or do we need to to insert these in the symbol table?
 TIntermSymbol* RewriteCSSShaderBase::createGlobalVec4(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
+}
+
+TIntermSymbol* RewriteCSSShaderBase::createGlobalMat4(const TString& name)
+{
+    return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4, true));
 }
 
 TIntermSymbol* RewriteCSSShaderBase::createUniformSampler2D(const TString& name)
@@ -83,6 +102,13 @@ TIntermBinary* RewriteCSSShaderBase::createGlobalVec4Initialization(const TStrin
 {
     TIntermBinary* initialization = createBinary(EOpInitialize, createGlobalVec4(symbolName), rhs);
     initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4)); // TODO: What precision?
+    return initialization;
+}
+
+TIntermBinary* RewriteCSSShaderBase::createGlobalMat4Initialization(const TString& symbolName, TIntermTyped* rhs)
+{
+    TIntermBinary* initialization = createBinary(EOpInitialize, createGlobalMat4(symbolName), rhs);
+    initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4, true));
     return initialization;
 }
 

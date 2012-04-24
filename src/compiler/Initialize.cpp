@@ -532,9 +532,11 @@ void IdentifyBuiltIns(ShShaderType type, ShShaderSpec spec,
         symbolTable.insert(*new TVariable(NewPoolTString("gl_FragData[gl_MaxDrawBuffers]"), TType(EbtFloat, EbpMedium, EvqFragData,    4)));
         symbolTable.insert(*new TVariable(NewPoolTString("gl_PointCoord"),                  TType(EbtFloat, EbpMedium, EvqPointCoord,  2)));
             
-        if (spec == SH_CSS_SHADERS_SPEC)
-            symbolTable.insert(*new TVariable(NewPoolTString("css_BlendColor"),             TType(EbtFloat, EbpMedium, EvqFragColor,   4)));
-        
+        if (spec == SH_CSS_SHADERS_SPEC) {
+            symbolTable.insert(*new TVariable(NewPoolTString("css_BlendColor"),             TType(EbtFloat, EbpHigh, EvqGlobal,      4)));
+            symbolTable.insert(*new TVariable(NewPoolTString("css_ColorMatrix"),            TType(EbtFloat, EbpHigh, EvqGlobal,      4, true)));
+        }
+            
         break;
 
     case SH_VERTEX_SHADER:

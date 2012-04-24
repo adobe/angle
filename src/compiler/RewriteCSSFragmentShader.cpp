@@ -21,12 +21,28 @@ void RewriteCSSFragmentShader::RestrictGLFragColor::visitSymbol(TIntermSymbol* n
 }
 
 //
+// DetermineBlendSymbol implementation
+//
+
+// Color matrix overrides blend color. Blend color is the default blend symbol.
+void RewriteCSSFragmentShader::DetermineBlendSymbol::visitSymbol(TIntermSymbol* node)
+{    
+    const TString& symbol = node->getSymbol();
+    if (symbol == kCSSColorMatrix) 
+        mRewriter->blendSymbol = kCSSColorMatrix;
+    else
+        mRewriter->blendSymbol = kCSSBlendColor;
+}
+
+//
 // RewriteCSSFragmentShader implementation
 //
 
 const char* const RewriteCSSFragmentShader::kGLFragColor = "gl_FragColor";
-const char* const RewriteCSSFragmentShader::kCSSBlendColor = "css_BlendColor";
 const char* const RewriteCSSFragmentShader::kCSSTextureUniform = "css_u_texture";
+
+const char* const RewriteCSSFragmentShader::kCSSBlendColor = "css_BlendColor";
+const char* const RewriteCSSFragmentShader::kCSSColorMatrix = "css_ColorMatrix";
 
 void RewriteCSSFragmentShader::rewrite()
 {
@@ -35,15 +51,23 @@ void RewriteCSSFragmentShader::rewrite()
     if (numErrors > 0)
         return;
     
+    DetermineBlendSymbol determineBlendSymbol(this);
+    root->traverse(&determineBlendSymbol);
+    ASSERT(blendSymbol);
+    
     insertTextureUniform();
     insertTexCoordVarying();
-    insertCSSFragColorDeclaration();
+    insertBlendSymbolDeclaration();
     insertBlendingOp();
 }
 
-void RewriteCSSFragmentShader::insertCSSFragColorDeclaration()
+// Inserts something like "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0)".
+void RewriteCSSFragmentShader::insertBlendSymbolDeclaration()
 {
-    insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kCSSBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+    if (blendSymbol == kCSSColorMatrix)
+        insertAtTopOfShader(createDeclaration(createGlobalMat4Initialization(kCSSColorMatrix, createMat4IdentityConstant())));
+    else
+        insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kCSSBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
 // Inserts "uniform sampler2D css_u_texture".
@@ -52,10 +76,10 @@ void RewriteCSSFragmentShader::insertTextureUniform()
     insertAtTopOfShader(createDeclaration(createUniformSampler2D(kCSSTextureUniform)));
 }
 
-// TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
 void RewriteCSSFragmentShader::insertBlendingOp()
 {
+    // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
     TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSBlendColor), createTexture2DCall(kCSSTextureUniform, kCSSTexCoordVarying));
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kGLFragColor), rhs);
     insertAtEndOfFunction(assign, findMainFunction());
