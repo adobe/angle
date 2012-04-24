@@ -17,7 +17,10 @@ class TInfoSinkBase;
 
 class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
 public:
-    RewriteCSSFragmentShader(TInfoSinkBase& infoSink) : RewriteCSSShaderBase(infoSink), blendSymbol(NULL) {}
+    RewriteCSSFragmentShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink) 
+        : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink)
+        , blendSymbol(NULL) {}
+    
     virtual void rewrite();
     
 private:  

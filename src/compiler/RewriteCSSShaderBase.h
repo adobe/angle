@@ -16,10 +16,17 @@ class TInfoSinkBase;
 
 class RewriteCSSShaderBase {
 public:
-    RewriteCSSShaderBase(TInfoSinkBase& infoSink) : sink(infoSink), numErrors(0) {}
-    virtual ~RewriteCSSShaderBase() {}
+    RewriteCSSShaderBase(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
+        : root(treeRoot)
+        , suffix(hiddenSymbolSuffix)
+        , sink(infoSink)
+        , numErrors(0) {}
+    
     virtual void rewrite();
+    TIntermNode* getNewTreeRoot() { return root; }
     int getNumErrors() { return numErrors; }
+    
+    virtual ~RewriteCSSShaderBase() {}
     
 protected:    
     static const char* const kCSSPrefix;
@@ -50,6 +57,8 @@ protected:
     void createRootSequenceIfNeeded();
     TIntermAggregate* findMainFunction();
     
+    TIntermNode* root;
+    const TString& suffix;
     TInfoSinkBase& sink;
     int numErrors;
     

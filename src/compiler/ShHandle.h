@@ -72,9 +72,7 @@ protected:
     bool detectRecursion(TIntermNode* root);
     // Return true if the CSS shader's intermediate tree 
     // could be rewritten into a valid GLSL shader.
-    bool rewriteCSSShader();
-    bool rewriteCSSFragmentShader();
-    bool rewriteCSSVertexShader();
+    bool rewriteCSSShader(TIntermNode* root);
     // Returns true if the given shader does not exceed the minimum
     // functionality mandated in GLSL 1.0 spec Appendix A.
     bool validateLimitations(TIntermNode* root);
@@ -88,6 +86,14 @@ protected:
     const TExtensionBehavior& getExtensionBehavior() const;
 
     const BuiltInFunctionEmulator& getBuiltInFunctionEmulator() const;
+
+    // Returns an empty string if something went wrong.
+    // This method creates a random suffix to append to "hidden"
+    // generated symbols to make it harder to access them in case
+    // there is a bug in ANGLE.
+    // First and foremost, however, these symbols should be inaccessible
+    // behind a reserved prefix.
+    const TString& getRandomSuffix();
 
 private:
     ShShaderType shaderType;
@@ -109,8 +115,6 @@ private:
     // Cached copy of the ref-counted singleton.
     LongNameMap* longNameMap;
     
-    // A random suffix to append to security-sensitive generated symbols
-    // to make it harder to access them in case ANGLE fails.
     TString randomSuffix;
 };
 

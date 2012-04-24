@@ -157,7 +157,7 @@ bool TCompiler::compile(const char* const shaderStrings[],
     if (success) {
         // The CSS Shaders spec requires rewriting shaders. Note that GlobalParseContext->treeRoot may change as a side effect.
         if (shaderSpec == SH_CSS_SHADERS_SPEC)
-            success = rewriteCSSShader();
+            success = rewriteCSSShader(parseContext.treeRoot);
 
         TIntermNode* root = parseContext.treeRoot;
         
@@ -241,38 +241,29 @@ bool TCompiler::detectRecursion(TIntermNode* root)
     }
 }
 
-bool TCompiler::rewriteCSSShader()
+bool TCompiler::rewriteCSSShader(TIntermNode* root)
 {
-    // Generate a random suffix if we don't have one already.
-    if (randomSuffix == "") {
-        time_t now = time(NULL);
-        if (now < 0) {
-            infoSink.info.prefix(EPrefixInternalError);
-            infoSink.info << "Unable to query system time.";
-            return false;
+    const TString& suffix = getRandomSuffix();
+    if (suffix == "")
+        return false;
+
+    if (shaderType == SH_VERTEX_SHADER) {
+        RewriteCSSFragmentShader rewriter(root, suffix, infoSink.info);
+        rewriter.rewrite();
+        if (rewriter.getNumErrors() == 0) {
+            GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
+            return true;
         }
-        
-        std::ostringstream converter;
-        srandom(now);
-        converter << random();
-        randomSuffix = converter.str().c_str();
+        return false;
+    } else {
+        RewriteCSSVertexShader rewriter(root, suffix, infoSink.info);
+        rewriter.rewrite();
+        if (rewriter.getNumErrors() == 0) {
+            GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
+            return true;
+        }
+        return false;
     }
-    
-    return shaderType == SH_VERTEX_SHADER ? rewriteCSSVertexShader() : rewriteCSSFragmentShader();
-}
-
-bool TCompiler::rewriteCSSFragmentShader()
-{
-    RewriteCSSFragmentShader rewriter(infoSink.info);
-    rewriter.rewrite();
-    return rewriter.getNumErrors() == 0;
-}
-
-bool TCompiler::rewriteCSSVertexShader()
-{
-    RewriteCSSVertexShader rewriter(infoSink.info);
-    rewriter.rewrite();
-    return rewriter.getNumErrors() == 0;
 }
 
 bool TCompiler::validateLimitations(TIntermNode* root) {
@@ -307,4 +298,24 @@ const TExtensionBehavior& TCompiler::getExtensionBehavior() const
 const BuiltInFunctionEmulator& TCompiler::getBuiltInFunctionEmulator() const
 {
     return builtInFunctionEmulator;
+}
+
+const TString& TCompiler::getRandomSuffix()
+{
+    // Lazy initialization.
+    if (randomSuffix == "") {  
+        time_t now = time(NULL);
+        if (now < 0) {
+            infoSink.info.prefix(EPrefixInternalError);
+            infoSink.info << "Unable to query system time.";
+            return randomSuffix;
+        }
+        
+        std::ostringstream converter;
+        srandom(now);
+        converter << random();
+        randomSuffix = converter.str().c_str();
+    }
+ 
+    return randomSuffix;
 }

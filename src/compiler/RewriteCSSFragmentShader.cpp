@@ -16,12 +16,12 @@ void RewriteCSSFragmentShader::rewrite()
     RewriteCSSShaderBase::rewrite();
     
     RestrictGLFragColor restrictGLFragColor(this);
-    GlobalParseContext->treeRoot->traverse(&restrictGLFragColor);
+    root->traverse(&restrictGLFragColor);
     if (numErrors > 0)
         return;
     
     DetermineBlendSymbol determineBlendSymbol(this);
-    GlobalParseContext->treeRoot->traverse(&determineBlendSymbol);
+    root->traverse(&determineBlendSymbol);
     ASSERT(blendSymbol);
     
     insertTextureUniform();

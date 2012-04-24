@@ -128,7 +128,7 @@ void RewriteCSSShaderBase::insertTexCoordVarying()
 
 void RewriteCSSShaderBase::insertAtTopOfShader(TIntermNode* node)
 {
-    TIntermSequence& globalSequence = GlobalParseContext->treeRoot->getAsAggregate()->getSequence();
+    TIntermSequence& globalSequence = root->getAsAggregate()->getSequence();
     globalSequence.insert(globalSequence.begin(), node);
 }
 
@@ -148,20 +148,20 @@ void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermNode* node, TIntermAggre
 // The new tree root must be that root sequence.
 void RewriteCSSShaderBase::createRootSequenceIfNeeded()
 {
-    TIntermAggregate* root = GlobalParseContext->treeRoot->getAsAggregate();
+    TIntermAggregate* rootAggregate = root->getAsAggregate();
  
     // The root should be a sequence or a function declaration, both of which are aggregate nodes.
-    ASSERT(root);
-    ASSERT(root->getOp() == EOpSequence || root->getOp() == EOpFunction);
+    ASSERT(rootAggregate);
+    ASSERT(rootAggregate->getOp() == EOpSequence || rootAggregate->getOp() == EOpFunction);
     
-    if (root->getOp() == EOpFunction) {
+    if (rootAggregate->getOp() == EOpFunction) {
         // If the tree root is a function declaration, it should be the main function.
-        ASSERT(root->getName() == kMain);
+        ASSERT(rootAggregate->getName() == kMain);
         
         TIntermAggregate* newRoot = new TIntermAggregate(EOpSequence);
         TIntermSequence& sequence = newRoot->getSequence();
         sequence.push_back(root);
-        GlobalParseContext->treeRoot = newRoot;
+        root = newRoot;
     }
 }
 
@@ -191,7 +191,7 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
 // FIXME: Handle the case where main is alone in the shader. (Create a wrapping sequence, etc.)
 TIntermAggregate* RewriteCSSShaderBase::findMainFunction()
 {
-    TIntermSequence& rootSequence = GlobalParseContext->treeRoot->getAsAggregate()->getSequence();
+    TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();
     for (TIntermSequence::const_iterator iter = rootSequence.begin(); iter != rootSequence.end(); ++iter) {
         TIntermNode* node = *iter;
         TIntermAggregate* aggregate = node->getAsAggregate();
