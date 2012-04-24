@@ -242,15 +242,13 @@ bool TCompiler::detectRecursion(TIntermNode* root)
 
 void TCompiler::rewriteCSSFragmentShader(TIntermNode* root)
 {
-    // TODO: Pass root.
-    RewriteCSSFragmentShader rewriter(infoSink.info);
+    RewriteCSSFragmentShader rewriter(root, infoSink.info);
     rewriter.rewrite();
 }
 
 void TCompiler::rewriteCSSVertexShader(TIntermNode* root)
 {
-    // TODO: Pass root.
-    RewriteCSSVertexShader rewriter(infoSink.info);
+    RewriteCSSVertexShader rewriter(root, infoSink.info);
     rewriter.rewrite();
 }
 

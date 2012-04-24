@@ -17,7 +17,7 @@ class TInfoSinkBase;
 
 class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
-    RewriteCSSVertexShader(TInfoSinkBase& infoSink) : RewriteCSSShaderBase(infoSink) {}
+    RewriteCSSVertexShader(TIntermNode* treeRoot, TInfoSinkBase& infoSink) : RewriteCSSShaderBase(treeRoot, infoSink) {}
     void rewrite();
     
 private:

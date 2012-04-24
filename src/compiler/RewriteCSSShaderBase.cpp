@@ -38,7 +38,7 @@ const char* const RewriteCSSShaderBase::kMain = "main(";
 void RewriteCSSShaderBase::rewrite()
 {
     RewriteCollidingNames rewriteCollidingNames;
-    GlobalParseContext->treeRoot->traverse(&rewriteCollidingNames);
+    root->traverse(&rewriteCollidingNames);
 }
 
 TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y, float z, float w)
@@ -122,7 +122,7 @@ void RewriteCSSShaderBase::insertTexCoordVarying()
 
 void RewriteCSSShaderBase::insertAtTopOfShader(TIntermNode* node)
 {
-    TIntermSequence& globalSequence = GlobalParseContext->treeRoot->getAsAggregate()->getSequence();
+    TIntermSequence& globalSequence = root->getAsAggregate()->getSequence();
     globalSequence.insert(globalSequence.begin(), node);
 }
 
@@ -161,7 +161,7 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
 
 TIntermAggregate* RewriteCSSShaderBase::findMainFunction()
 {
-    TIntermSequence& rootSequence = GlobalParseContext->treeRoot->getAsAggregate()->getSequence();
+    TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();
     for (TIntermSequence::const_iterator iter = rootSequence.begin(); iter != rootSequence.end(); ++iter) {
         TIntermNode* node = *iter;
         TIntermAggregate* aggregate = node->getAsAggregate();

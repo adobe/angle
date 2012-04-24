@@ -16,10 +16,10 @@ class TInfoSinkBase;
 
 class RewriteCSSShaderBase {
 public:
-    RewriteCSSShaderBase(TInfoSinkBase& infoSink) : sink(infoSink) {}
+    RewriteCSSShaderBase(TIntermNode* treeRoot, TInfoSinkBase& infoSink) : sink(infoSink), root(treeRoot), numErrors(0) {}
     virtual ~RewriteCSSShaderBase() {}
-    
     virtual void rewrite();
+    int getNumErrors() { return numErrors; }
     
 protected:    
     static const char* const kCSSPrefix;
@@ -51,6 +51,8 @@ protected:
     TIntermAggregate* findMainFunction();
     
     TInfoSinkBase& sink;
+    TIntermNode* root;
+    int numErrors;
     
     class RewriteCollidingNames : public TIntermTraverser
     {

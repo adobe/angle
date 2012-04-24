@@ -17,7 +17,7 @@ class TInfoSinkBase;
 
 class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
 public:
-    RewriteCSSFragmentShader(TInfoSinkBase& infoSink) : RewriteCSSShaderBase(infoSink) {}
+    RewriteCSSFragmentShader(TIntermNode* treeRoot, TInfoSinkBase& infoSink) : RewriteCSSShaderBase(treeRoot, infoSink) {}
     virtual void rewrite();
     
 private:    
