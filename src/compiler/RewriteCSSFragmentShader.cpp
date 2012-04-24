@@ -54,7 +54,7 @@ void RewriteCSSFragmentShader::insertTextureUniform()
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
 void RewriteCSSFragmentShader::insertBlendingOp()
 {
-    // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
+    // TODO(mvujovic): Maybe I should add types to the binary ops. They don't seem to be necessary, but maybe I'm missing something.
     TIntermSymbol* multiplySymbol = NULL;
     if (blendSymbol == kCSSColorMatrix)
         multiplySymbol = createGlobalMat4(kCSSColorMatrix);

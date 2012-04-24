@@ -70,9 +70,10 @@ protected:
     void clearResults();
     // Return true if function recursion is detected.
     bool detectRecursion(TIntermNode* root);
-    // TODO: Describe
+    // Return true if the CSS shader's intermediate tree 
+    // could be rewritten into a valid GLSL shader.
+    bool rewriteCSSShader();
     bool rewriteCSSFragmentShader();
-    // TODO: Describe
     bool rewriteCSSVertexShader();
     // Returns true if the given shader does not exceed the minimum
     // functionality mandated in GLSL 1.0 spec Appendix A.
@@ -107,6 +108,10 @@ private:
 
     // Cached copy of the ref-counted singleton.
     LongNameMap* longNameMap;
+    
+    // A random suffix to append to security-sensitive generated symbols
+    // to make it harder to access them in case ANGLE fails.
+    TString randomSuffix;
 };
 
 //

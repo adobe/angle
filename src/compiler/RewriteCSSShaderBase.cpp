@@ -45,7 +45,7 @@ TIntermConstantUnion* RewriteCSSShaderBase::createMat4IdentityConstant()
     return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4, true));    
 }
 
-// TODO: Is symbol id 0 ok? Or do we need to to insert these in the symbol table?
+// TODO(mvujovic): Is symbol id 0 ok? Or do we need to to insert these in the symbol table?
 TIntermSymbol* RewriteCSSShaderBase::createGlobalVec4(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
@@ -88,7 +88,7 @@ TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* le
 
 TIntermAggregate* RewriteCSSShaderBase::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
 {
-    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D); // TODO: Maybe pool allocate strings?
+    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D); // TODO(mvujovic): Should I be pool allocating strings?
     addArgument(createUniformSampler2D(textureUniformName), texture2DCall);
     addArgument(createVaryingVec2(texCoordVaryingName), texture2DCall);
     return texture2DCall;
@@ -104,7 +104,7 @@ TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
 TIntermBinary* RewriteCSSShaderBase::createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs)
 {
     TIntermBinary* initialization = createBinary(EOpInitialize, createGlobalVec4(symbolName), rhs);
-    initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4)); // TODO: What precision?
+    initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4)); // TODO(mvujovic): What precision?
     return initialization;
 }
 

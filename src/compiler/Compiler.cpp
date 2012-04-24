@@ -152,13 +152,12 @@ bool TCompiler::compile(const char* const shaderStrings[],
     // Parse shader.
     bool success =
         (PaParseStrings(numStrings - firstSource, &shaderStrings[firstSource], NULL, &parseContext) == 0) &&
-        (parseContext.treeRoot != NULL);
+        (parseContext.treeRoot != NULL) &&
+        intermediate.postProcess(parseContext.treeRoot);
     if (success) {
-        success = intermediate.postProcess(parseContext.treeRoot);
-
-        // TODO: Structure this better. Rewriting can change the tree root.
-        if (success && shaderSpec == SH_CSS_SHADERS_SPEC)
-            success = shaderType == SH_VERTEX_SHADER ? rewriteCSSVertexShader() : rewriteCSSFragmentShader();
+        // The CSS Shaders spec requires rewriting shaders. Note that GlobalParseContext->treeRoot may change as a side effect.
+        if (shaderSpec == SH_CSS_SHADERS_SPEC)
+            success = rewriteCSSShader();
 
         TIntermNode* root = parseContext.treeRoot;
         
@@ -240,6 +239,26 @@ bool TCompiler::detectRecursion(TIntermNode* root)
             UNREACHABLE();
             return false;
     }
+}
+
+bool TCompiler::rewriteCSSShader()
+{
+    // Generate a random suffix if we don't have one already.
+    if (randomSuffix == "") {
+        time_t now = time(NULL);
+        if (now < 0) {
+            infoSink.info.prefix(EPrefixInternalError);
+            infoSink.info << "Unable to query system time.";
+            return false;
+        }
+        
+        std::ostringstream converter;
+        srandom(now);
+        converter << random();
+        randomSuffix = converter.str().c_str();
+    }
+    
+    return shaderType == SH_VERTEX_SHADER ? rewriteCSSVertexShader() : rewriteCSSFragmentShader();
 }
 
 bool TCompiler::rewriteCSSFragmentShader()
