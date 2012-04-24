@@ -16,8 +16,7 @@ void RewriteCSSShaderBase::rewrite()
     createRootSequenceIfNeeded();
 }
 
-const char* const RewriteCSSShaderBase::kCSSPrefix = "css_";
-const char* const RewriteCSSShaderBase::kCSSTexCoordVarying = "css_v_texCoord";
+const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_v_texCoord_";
 const char* const RewriteCSSShaderBase::kTexture2D = "texture2D(s21;vf2;";
 const char* const RewriteCSSShaderBase::kMain = "main(";
 
@@ -123,7 +122,7 @@ void RewriteCSSShaderBase::addArgument(TIntermNode* argument, TIntermAggregate* 
 // Inserts "varying vec2 css_v_texCoord".
 void RewriteCSSShaderBase::insertTexCoordVarying()
 {
-    insertAtTopOfShader(createDeclaration(createVaryingVec2(kCSSTexCoordVarying)));
+    insertAtTopOfShader(createDeclaration(createVaryingVec2(texCoordVaryingName)));
 }
 
 void RewriteCSSShaderBase::insertAtTopOfShader(TIntermNode* node)

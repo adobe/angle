@@ -108,6 +108,11 @@ typedef enum {
   SH_EMULATE_BUILT_IN_FUNCTIONS = 0x0100,
 } ShCompileOptions;
 
+typedef enum {
+    SH_TEXCOORD_ATTRIBUTE_NAME = 1,
+    SH_TEXTURE_UNIFORM_NAME = 2
+} ShCSSShaderInfo;
+    
 //
 // Driver must call this first, once, before doing any other
 // compiler operations.
@@ -150,7 +155,7 @@ COMPILER_EXPORT void ShInitBuiltInResources(ShBuiltInResources* resources);
 
 //
 // ShHandle held by but opaque to the driver.  It is allocated,
-// managed, and de-allocated by the compiler. It's contents 
+// managed, and de-allocated by the compiler. It's contents
 // are defined by and used by the compiler.
 //
 // If handle creation fails, 0 will be returned.
@@ -227,7 +232,7 @@ COMPILER_EXPORT int ShCompile(
 //                               termination character.
 // SH_MAPPED_NAME_MAX_LENGTH: the length of the mapped variable name including
 //                            the null termination character.
-// 
+//
 // params: Requested parameter
 COMPILER_EXPORT void ShGetInfo(const ShHandle handle,
                                ShShaderInfo pname,

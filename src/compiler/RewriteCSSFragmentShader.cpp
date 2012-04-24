@@ -15,7 +15,7 @@ void RewriteCSSFragmentShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
     
-    RestrictGLFragColor restrictGLFragColor(this);
+    RestrictFragColor restrictGLFragColor(this);
     root->traverse(&restrictGLFragColor);
     if (numErrors > 0)
         return;
@@ -30,25 +30,25 @@ void RewriteCSSFragmentShader::rewrite()
     insertBlendingOp();
 }
 
-const char* const RewriteCSSFragmentShader::kGLFragColor = "gl_FragColor";
-const char* const RewriteCSSFragmentShader::kCSSTextureUniform = "css_u_texture";
+const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
+const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_u_texture_";
 
-const char* const RewriteCSSFragmentShader::kCSSBlendColor = "css_BlendColor";
-const char* const RewriteCSSFragmentShader::kCSSColorMatrix = "css_ColorMatrix";
+const char* const RewriteCSSFragmentShader::kBlendColor = "css_BlendColor";
+const char* const RewriteCSSFragmentShader::kColorMatrix = "css_ColorMatrix";
 
 // Inserts something like "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0)".
 void RewriteCSSFragmentShader::insertBlendSymbolDeclaration()
 {
-    if (blendSymbol == kCSSColorMatrix)
-        insertAtTopOfShader(createDeclaration(createGlobalMat4Initialization(kCSSColorMatrix, createMat4IdentityConstant())));
+    if (blendSymbol == kColorMatrix)
+        insertAtTopOfShader(createDeclaration(createGlobalMat4Initialization(kColorMatrix, createMat4IdentityConstant())));
     else
-        insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kCSSBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+        insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
-// Inserts "uniform sampler2D css_u_texture".
+// Inserts "uniform sampler2D css_u_texture_XXX".
 void RewriteCSSFragmentShader::insertTextureUniform()
 {
-    insertAtTopOfShader(createDeclaration(createUniformSampler2D(kCSSTextureUniform)));
+    insertAtTopOfShader(createDeclaration(createUniformSampler2D(textureUniformName)));
 }
 
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
@@ -56,26 +56,26 @@ void RewriteCSSFragmentShader::insertBlendingOp()
 {
     // TODO(mvujovic): Maybe I should add types to the binary ops. They don't seem to be necessary, but maybe I'm missing something.
     TIntermSymbol* multiplySymbol = NULL;
-    if (blendSymbol == kCSSColorMatrix)
-        multiplySymbol = createGlobalMat4(kCSSColorMatrix);
+    if (blendSymbol == kColorMatrix)
+        multiplySymbol = createGlobalMat4(kColorMatrix);
     else
-        multiplySymbol = createGlobalVec4(kCSSBlendColor);
+        multiplySymbol = createGlobalVec4(kBlendColor);
     
-    TIntermBinary* rhs = createBinary(EOpMul, multiplySymbol, createTexture2DCall(kCSSTextureUniform, kCSSTexCoordVarying));
-    TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kGLFragColor), rhs);
+    TIntermBinary* rhs = createBinary(EOpMul, multiplySymbol, createTexture2DCall(textureUniformName, texCoordVaryingName));
+    TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kFragColor), rhs);
     insertAtEndOfFunction(assign, findMainFunction());
 }
 
 //
-// RestrictGLFragColor implementation
+// RestrictFragColor implementation
 //
 
-void RewriteCSSFragmentShader::RestrictGLFragColor::visitSymbol(TIntermSymbol* node)
+void RewriteCSSFragmentShader::RestrictFragColor::visitSymbol(TIntermSymbol* node)
 {
-    if (node->getSymbol() == kGLFragColor) {
+    if (node->getSymbol() == kFragColor) {
         ++mRewriter->numErrors;
         mRewriter->sink.prefix(EPrefixError);
-        mRewriter->sink << "'" << kGLFragColor << "' access is not permitted.\n";
+        mRewriter->sink << "'" << kFragColor << "' access is not permitted.\n";
     }
 }
 
@@ -87,8 +87,8 @@ void RewriteCSSFragmentShader::RestrictGLFragColor::visitSymbol(TIntermSymbol* n
 void RewriteCSSFragmentShader::DetermineBlendSymbol::visitSymbol(TIntermSymbol* node)
 {    
     const TString& symbol = node->getSymbol();
-    if (symbol == kCSSColorMatrix) 
-        mRewriter->blendSymbol = kCSSColorMatrix;
+    if (symbol == kColorMatrix) 
+        mRewriter->blendSymbol = kColorMatrix;
     else
-        mRewriter->blendSymbol = kCSSBlendColor;
+        mRewriter->blendSymbol = kBlendColor;
 }

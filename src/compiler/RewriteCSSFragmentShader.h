@@ -19,19 +19,27 @@ class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSFragmentShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink) 
         : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink)
-        , blendSymbol(NULL) {}
+        , blendSymbol(NULL)
+    {
+        textureUniformName = kTextureUniformPrefix;
+        textureUniformName.append(suffix);
+    }
     
     virtual void rewrite();
     
+    const TString& getTextureUniformName() { return textureUniformName; } 
+    
 private:  
-    static const char* const kGLFragColor;
-    static const char* const kCSSTextureUniform;
+    static const char* const kFragColor;
+    static const char* const kTextureUniformPrefix;
 
     // Blend symbols.
-    static const char* const kCSSBlendColor;
-    static const char* const kCSSColorMatrix;
+    static const char* const kBlendColor;
+    static const char* const kColorMatrix;
     
     const char* blendSymbol;
+    
+    TString textureUniformName;
     
     void insertBlendSymbolDeclaration();
     void insertTextureUniform();
@@ -40,10 +48,10 @@ private:
     //
     // Generates errors for references to gl_FragColor.
     //
-    class RestrictGLFragColor : public TIntermTraverser
+    class RestrictFragColor : public TIntermTraverser
     {
     public:
-        RestrictGLFragColor(RewriteCSSFragmentShader* rewriter) : TIntermTraverser(true, false, false), mRewriter(rewriter) {}
+        RestrictFragColor(RewriteCSSFragmentShader* rewriter) : TIntermTraverser(true, false, false), mRewriter(rewriter) {}
         virtual void visitSymbol(TIntermSymbol*);
     private:
         RewriteCSSFragmentShader* mRewriter;

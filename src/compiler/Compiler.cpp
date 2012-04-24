@@ -248,7 +248,7 @@ bool TCompiler::rewriteCSSShader(TIntermNode* root)
         return false;
 
     if (shaderType == SH_VERTEX_SHADER) {
-        RewriteCSSFragmentShader rewriter(root, suffix, infoSink.info);
+        RewriteCSSVertexShader rewriter(root, suffix, infoSink.info);
         rewriter.rewrite();
         if (rewriter.getNumErrors() == 0) {
             GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
@@ -256,7 +256,7 @@ bool TCompiler::rewriteCSSShader(TIntermNode* root)
         }
         return false;
     } else {
-        RewriteCSSVertexShader rewriter(root, suffix, infoSink.info);
+        RewriteCSSFragmentShader rewriter(root, suffix, infoSink.info);
         rewriter.rewrite();
         if (rewriter.getNumErrors() == 0) {
             GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
@@ -318,4 +318,13 @@ const TString& TCompiler::getRandomSuffix()
     }
  
     return randomSuffix;
+}
+
+const TString TCompiler::getCSSShaderInfo(ShCSSShaderInfo info) const
+{
+    switch (info) {
+        case SH_TEXCOORD_ATTRIBUTE_NAME: return ""; break;
+        case SH_TEXTURE_UNIFORM_NAME: return ""; break;
+        default: return "";
+    }
 }

@@ -20,7 +20,11 @@ public:
         : root(treeRoot)
         , suffix(hiddenSymbolSuffix)
         , sink(infoSink)
-        , numErrors(0) {}
+        , numErrors(0)
+    {
+        texCoordVaryingName = kTexCoordVaryingPrefix;
+        texCoordVaryingName.append(suffix);
+    }
     
     virtual void rewrite();
     TIntermNode* getNewTreeRoot() { return root; }
@@ -28,9 +32,8 @@ public:
     
     virtual ~RewriteCSSShaderBase() {}
     
-protected:    
-    static const char* const kCSSPrefix;
-    static const char* const kCSSTexCoordVarying;
+protected:
+    static const char* const kTexCoordVaryingPrefix;
     static const char* const kTexture2D;
     static const char* const kMain;
     
@@ -54,15 +57,16 @@ protected:
     void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
     void insertTexCoordVarying();
     
-    void createRootSequenceIfNeeded();
-    TIntermAggregate* findMainFunction();
+    TIntermAggregate* findMainFunction();   // TODO: Find the main function once and cache it.
     
     TIntermNode* root;
-    const TString& suffix;
+    TString texCoordVaryingName;
+    const TString& suffix;  // TODO: Remove?
     TInfoSinkBase& sink;
     int numErrors;
     
 private:
+    void createRootSequenceIfNeeded();
     TIntermAggregate* getOrCreateFunctionBody(TIntermAggregate* function);
 };
 

@@ -60,6 +60,8 @@ public:
     const TVariableInfoList& getAttribs() const { return attribs; }
     const TVariableInfoList& getUniforms() const { return uniforms; }
     int getMappedNameMaxLength() const;
+    
+    const TString getCSSShaderInfo(ShCSSShaderInfo info) const;
 
 protected:
     ShShaderType getShaderType() const { return shaderType; }
