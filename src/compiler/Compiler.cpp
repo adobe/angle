@@ -157,15 +157,15 @@ bool TCompiler::compile(const char* const shaderStrings[],
         TIntermNode* root = parseContext.treeRoot;
         success = intermediate.postProcess(root);
 
+        if (success && shaderSpec == SH_CSS_SHADERS_SPEC)
+            success = shaderType == SH_VERTEX_SHADER ? rewriteCSSVertexShader(root) : rewriteCSSFragmentShader(root);
+        
         if (success)
             success = detectRecursion(root);
 
         if (success && (compileOptions & SH_VALIDATE_LOOP_INDEXING))
             success = validateLimitations(root);
         
-        if (success && (compileOptions & SH_CSS_SHADER))
-            shaderType == SH_VERTEX_SHADER ? rewriteCSSVertexShader(root) : rewriteCSSFragmentShader(root);
-
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
             ForLoopUnroll::MarkForLoopsWithIntegerIndicesForUnrolling(root);
@@ -240,16 +240,18 @@ bool TCompiler::detectRecursion(TIntermNode* root)
     }
 }
 
-void TCompiler::rewriteCSSFragmentShader(TIntermNode* root)
+bool TCompiler::rewriteCSSFragmentShader(TIntermNode* root)
 {
     RewriteCSSFragmentShader rewriter(root, infoSink.info);
     rewriter.rewrite();
+    return rewriter.getNumErrors() == 0;
 }
 
-void TCompiler::rewriteCSSVertexShader(TIntermNode* root)
+bool TCompiler::rewriteCSSVertexShader(TIntermNode* root)
 {
     RewriteCSSVertexShader rewriter(root, infoSink.info);
     rewriter.rewrite();
+    return rewriter.getNumErrors() == 0;
 }
 
 bool TCompiler::validateLimitations(TIntermNode* root) {

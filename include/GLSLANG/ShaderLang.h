@@ -106,8 +106,6 @@ typedef enum {
 
   // This is needed only as a workaround for certain OpenGL driver bugs.
   SH_EMULATE_BUILT_IN_FUNCTIONS = 0x0100,
-  
-  SH_CSS_SHADER = 0x0200
 } ShCompileOptions;
 
 //

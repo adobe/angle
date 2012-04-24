@@ -8,15 +8,15 @@
 #include "ParseHelper.h"
 
 //
-// ReplaceGLFragColor implementation
+// RestrictGLFragColor implementation
 //
 
-void RewriteCSSFragmentShader::ReplaceGLFragColor::visitSymbol(TIntermSymbol* node)
+void RewriteCSSFragmentShader::RestrictGLFragColor::visitSymbol(TIntermSymbol* node)
 {
-    if (node->getSymbol() == kGLFragColor) {  
-        node->setId(0);
-        node->getTypePointer()->setQualifier(EvqGlobal);
-        node->setSymbol(kCSSGLFragColor);
+    if (node->getSymbol() == kGLFragColor) {
+        ++mRewriter->numErrors;
+        mRewriter->sink.prefix(EPrefixError);
+        mRewriter->sink << "'" << kGLFragColor << "' access is not permitted.\n";
     }
 }
 
@@ -24,12 +24,16 @@ void RewriteCSSFragmentShader::ReplaceGLFragColor::visitSymbol(TIntermSymbol* no
 // RewriteCSSFragmentShader implementation
 //
 
+const char* const RewriteCSSFragmentShader::kGLFragColor = "gl_FragColor";
+const char* const RewriteCSSFragmentShader::kCSSBlendColor = "css_BlendColor";
+const char* const RewriteCSSFragmentShader::kCSSTextureUniform = "css_u_texture";
+
 void RewriteCSSFragmentShader::rewrite()
 {
-    RewriteCSSShaderBase::rewrite();
-    
-    ReplaceGLFragColor replaceGLFragColor;
-    GlobalParseContext->treeRoot->traverse(&replaceGLFragColor);
+    RestrictGLFragColor restrictGLFragColor(this);
+    root->traverse(&restrictGLFragColor);
+    if (numErrors > 0)
+        return;
     
     insertTextureUniform();
     insertTexCoordVarying();
@@ -39,20 +43,20 @@ void RewriteCSSFragmentShader::rewrite()
 
 void RewriteCSSFragmentShader::insertCSSFragColorDeclaration()
 {
-    insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kCSSGLFragColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+    insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kCSSBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
 // Inserts "uniform sampler2D css_u_texture".
 void RewriteCSSFragmentShader::insertTextureUniform()
 {
-    insertAtTopOfShader(createDeclaration(createUniformSampler2D(kCSSTextureUniformTexture)));
+    insertAtTopOfShader(createDeclaration(createUniformSampler2D(kCSSTextureUniform)));
 }
 
 // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
 void RewriteCSSFragmentShader::insertBlendingOp()
 {
-    TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSGLFragColor), createTexture2DCall(kCSSTextureUniformTexture, kCSSTexCoordVarying));
+    TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSBlendColor), createTexture2DCall(kCSSTextureUniform, kCSSTexCoordVarying));
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kGLFragColor), rhs);
     insertAtEndOfFunction(assign, findMainFunction());
 }

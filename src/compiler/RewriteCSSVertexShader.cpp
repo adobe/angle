@@ -11,8 +11,6 @@ const char* kCSSTexCoordAttribute = "css_a_texCoord";
 
 void RewriteCSSVertexShader::rewrite()
 {
-    RewriteCSSShaderBase::rewrite();
-    
     insertTexCoordVarying();
     insertTexCoordAttribute();
     insertCSSTexCoordVaryingAssignment(findMainFunction());

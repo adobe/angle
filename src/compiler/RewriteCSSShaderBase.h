@@ -18,15 +18,11 @@ class RewriteCSSShaderBase {
 public:
     RewriteCSSShaderBase(TIntermNode* treeRoot, TInfoSinkBase& infoSink) : sink(infoSink), root(treeRoot), numErrors(0) {}
     virtual ~RewriteCSSShaderBase() {}
-    virtual void rewrite();
+    virtual void rewrite() = 0;
     int getNumErrors() { return numErrors; }
     
 protected:    
     static const char* const kCSSPrefix;
-    static const char* const kUserPrefix;
-    static const char* const kGLFragColor;
-    static const char* const kCSSGLFragColor;
-    static const char* const kCSSTextureUniformTexture;
     static const char* const kCSSTexCoordVarying;
     static const char* const kTexture2D;
     static const char* const kMain;
@@ -53,15 +49,6 @@ protected:
     TInfoSinkBase& sink;
     TIntermNode* root;
     int numErrors;
-    
-    class RestrictCSSPrefix : public TIntermTraverser
-    {
-    public:
-        RestrictCSSPrefix(RewriteCSSShaderBase* rewriter) : TIntermTraverser(true, false, false), mRewriter(rewriter) {}
-        virtual void visitSymbol(TIntermSymbol*);
-    private:
-        RewriteCSSShaderBase* mRewriter;
-    };
     
 private:
     TIntermAggregate* getOrCreateFunctionBody(TIntermAggregate* function);

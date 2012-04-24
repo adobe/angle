@@ -20,19 +20,25 @@ public:
     RewriteCSSFragmentShader(TIntermNode* treeRoot, TInfoSinkBase& infoSink) : RewriteCSSShaderBase(treeRoot, infoSink) {}
     virtual void rewrite();
     
-private:    
+private:  
+    static const char* const kGLFragColor;
+    static const char* const kCSSBlendColor;
+    static const char* const kCSSTextureUniform;
+    
     void insertCSSFragColorDeclaration();
     void insertTextureUniform();
     void insertBlendingOp();
     
     //
-    // Replaces all instances of kGLFragColor with kCSSGLFragColor.
+    // Replaces all instances of kGLFragColor with kCSSBlendColor.
     //
-    class ReplaceGLFragColor : public TIntermTraverser
+    class RestrictGLFragColor : public TIntermTraverser
     {
     public:
-        ReplaceGLFragColor() : TIntermTraverser(true, false, false) {}
+        RestrictGLFragColor(RewriteCSSFragmentShader* rewriter) : TIntermTraverser(true, false, false), mRewriter(rewriter) {}
         virtual void visitSymbol(TIntermSymbol*);
+    private:
+        RewriteCSSFragmentShader* mRewriter;
     };
 };
 

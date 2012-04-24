@@ -7,40 +7,16 @@
 #include "compiler/RewriteCSSShaderBase.h"
 #include "ParseHelper.h"
 
-// TODO: Try empty shader.
-
-//
-// RestrictCSSPrefix implementation
-//
-
-// TODO: Maybe we should create a SH_CSS_SHADER_SPEC enum and put this check in TParseContext::reservedErrorCheck?
-void RewriteCSSShaderBase::RestrictCSSPrefix::visitSymbol(TIntermSymbol* node)
-{
-    // TODO: Use std string methods.
-    if (node->getSymbol().compare(0, strlen(kCSSPrefix), kCSSPrefix) == 0) {
-        mRewriter->sink.prefix(EPrefixError);
-        mRewriter->sink << "'" << kCSSPrefix << "' : reserved build-in name\n";
-        mRewriter->numErrors++;
-    }
-}
+// TODO: Try an empty shader and see what happens.
 
 //
 // RewriteCSSShaderBase implementation
 //
 
 const char* const RewriteCSSShaderBase::kCSSPrefix = "css_";
-const char* const RewriteCSSShaderBase::kGLFragColor = "gl_FragColor";
-const char* const RewriteCSSShaderBase::kCSSGLFragColor = "css_gl_FragColor";
-const char* const RewriteCSSShaderBase::kCSSTextureUniformTexture = "css_u_texture";
 const char* const RewriteCSSShaderBase::kCSSTexCoordVarying = "css_v_texCoord";
 const char* const RewriteCSSShaderBase::kTexture2D = "texture2D(s21;vf2;";
 const char* const RewriteCSSShaderBase::kMain = "main(";
-
-void RewriteCSSShaderBase::rewrite()
-{
-    RestrictCSSPrefix restrictCSSPrefix(this);
-    root->traverse(&restrictCSSPrefix);
-}
 
 TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y, float z, float w)
 {
