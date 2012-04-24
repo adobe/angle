@@ -461,6 +461,11 @@ bool TParseContext::reservedErrorCheck(int line, const TString& identifier)
                 error(line, reservedErrMsg, "_webgl_", "");
                 return true;
             }
+        } else if (shaderSpec == SH_CSS_SHADERS_SPEC) {
+            if (identifier.compare(0, 4, "css_") == 0) {
+                error(line, reservedErrMsg, "css_", "");
+                return true;
+            }
         }
         if (identifier.find("__") != TString::npos) {
             error(line, "identifiers containing two consecutive underscores (__) are reserved as possible future keywords", identifier.c_str(), "", "");

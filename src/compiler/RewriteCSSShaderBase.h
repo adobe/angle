@@ -54,11 +54,13 @@ protected:
     TIntermNode* root;
     int numErrors;
     
-    class RewriteCollidingNames : public TIntermTraverser
+    class RestrictCSSPrefix : public TIntermTraverser
     {
     public:
-        RewriteCollidingNames() : TIntermTraverser(true, false, false) {}
+        RestrictCSSPrefix(RewriteCSSShaderBase* rewriter) : TIntermTraverser(true, false, false), mRewriter(rewriter) {}
         virtual void visitSymbol(TIntermSymbol*);
+    private:
+        RewriteCSSShaderBase* mRewriter;
     };
     
 private:

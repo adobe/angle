@@ -49,7 +49,8 @@ typedef enum {
 
 typedef enum {
   SH_GLES2_SPEC = 0x8B40,
-  SH_WEBGL_SPEC = 0x8B41
+  SH_WEBGL_SPEC = 0x8B41,
+  SH_CSS_SHADERS_SPEC = 0x8B42
 } ShShaderSpec;
 
 typedef enum {
