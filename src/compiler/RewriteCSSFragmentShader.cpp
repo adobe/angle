@@ -80,7 +80,13 @@ void RewriteCSSFragmentShader::insertTextureUniform()
 void RewriteCSSFragmentShader::insertBlendingOp()
 {
     // TODO: Maybe add types to the function call, multiply, assign, etc. They don't seem to be necessary, but it might be good.
-    TIntermBinary* rhs = createBinary(EOpMul, createGlobalVec4(kCSSBlendColor), createTexture2DCall(kCSSTextureUniform, kCSSTexCoordVarying));
+    TIntermSymbol* multiplySymbol = NULL;
+    if (blendSymbol == kCSSColorMatrix)
+        multiplySymbol = createGlobalMat4(kCSSColorMatrix);
+    else
+        multiplySymbol = createGlobalVec4(kCSSBlendColor);
+    
+    TIntermBinary* rhs = createBinary(EOpMul, multiplySymbol, createTexture2DCall(kCSSTextureUniform, kCSSTexCoordVarying));
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kGLFragColor), rhs);
     insertAtEndOfFunction(assign, findMainFunction());
 }

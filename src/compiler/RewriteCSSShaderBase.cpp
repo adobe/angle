@@ -7,8 +7,6 @@
 #include "compiler/RewriteCSSShaderBase.h"
 #include "ParseHelper.h"
 
-// TODO: Try an empty shader and see what happens.
-
 //
 // RewriteCSSShaderBase implementation
 //
@@ -140,6 +138,7 @@ void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermNode* node, TIntermAggre
     getOrCreateFunctionBody(function)->getSequence().push_back(node);
 }
 
+// FIXME: Handle the case where main is alone in the shader. (Create a wrapping sequence, etc.)
 TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate* function)
 {
     TIntermAggregate* body = NULL;
@@ -162,6 +161,7 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
     return body;
 }
 
+// FIXME: Handle the case where main is alone in the shader. (Create a wrapping sequence, etc.)
 TIntermAggregate* RewriteCSSShaderBase::findMainFunction()
 {
     TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();
