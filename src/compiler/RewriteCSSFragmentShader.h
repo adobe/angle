@@ -51,20 +51,7 @@ private:
         virtual void visitSymbol(TIntermSymbol*);
     private:
         RewriteCSSFragmentShader* mRewriter;
-    };
-    
-    //
-    // Determines which blend symbol is used. 
-    // If multiple blend symbols are used, chooses one of them according to a precedence order.
-    //
-    class DetermineBlendSymbol : public TIntermTraverser
-    {
-    public:
-        DetermineBlendSymbol(RewriteCSSFragmentShader* rewriter) : TIntermTraverser(true, false, false), mRewriter(rewriter) {}
-        virtual void visitSymbol(TIntermSymbol*);
-    private:
-        RewriteCSSFragmentShader* mRewriter;
-    };
+    };    
 };
 
 #endif  // COMPILER_REWRITE_CSS_FRAGMENT_SHADER

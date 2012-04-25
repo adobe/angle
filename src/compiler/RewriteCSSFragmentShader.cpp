@@ -19,12 +19,7 @@ void RewriteCSSFragmentShader::rewrite()
     root->traverse(&restrictGLFragColor);
     if (numErrors > 0)
         return;
-    
-    // TODO: Combine both blend symbols.
-    DetermineBlendSymbol determineBlendSymbol(this);
-    root->traverse(&determineBlendSymbol);
-    ASSERT(blendSymbol);
-    
+        
     insertTextureUniform();
     insertTexCoordVarying();
     insertBlendSymbolDeclaration();
@@ -78,18 +73,4 @@ void RewriteCSSFragmentShader::RestrictFragColor::visitSymbol(TIntermSymbol* nod
         mRewriter->sink.prefix(EPrefixError);
         mRewriter->sink << "'" << kFragColor << "' access is not permitted.\n";
     }
-}
-
-//
-// DetermineBlendSymbol implementation
-//
-
-// Color matrix overrides blend color. Blend color is the default blend symbol.
-void RewriteCSSFragmentShader::DetermineBlendSymbol::visitSymbol(TIntermSymbol* node)
-{    
-    const TString& symbol = node->getSymbol();
-    if (symbol == kColorMatrix) 
-        mRewriter->blendSymbol = kColorMatrix;
-    else
-        mRewriter->blendSymbol = kBlendColor;
 }
