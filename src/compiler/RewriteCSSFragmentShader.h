@@ -34,7 +34,9 @@ private:
     static const char* const kColorMatrix;
         
     void insertBlendSymbolDeclaration();
-    void insertTextureUniform();
+    void insertTextureUniformDeclaration();
+    void insertNewMainFunction();
+    void insertCSSMainCall();
     void insertBlendOp();
     
     TString textureUniformName;

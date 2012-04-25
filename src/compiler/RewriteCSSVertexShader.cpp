@@ -13,7 +13,7 @@ void RewriteCSSVertexShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
     
-    insertTexCoordVarying();
+    insertTexCoordVaryingDeclaration();
     insertTexCoordAttribute();
     insertCSSTexCoordVaryingAssignment(findFunction(kMain));
 }

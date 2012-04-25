@@ -49,13 +49,17 @@ protected:
     TIntermAggregate* createDeclaration(TIntermNode* child);
     TIntermBinary* createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs);
     TIntermBinary* createGlobalMat4Initialization(const TString& symbolName, TIntermTyped* rhs);
+    TIntermAggregate* createVoidFunction(const TString& name);
     
     void insertAtTopOfShader(TIntermNode* node);
+    void insertAtEndOfShader(TIntermNode* node);
     void insertAtTopOfFunction(TIntermNode* node, TIntermAggregate* function);
     void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
-    void insertTexCoordVarying();
+    void insertTexCoordVaryingDeclaration();
     
-    TIntermAggregate* findFunction(const TString& name);   // TODO: Find the main function once and cache it.
+    TIntermAggregate* findFunction(const TString& name);
+    void renameFunction(const TString& oldFunctionName, const TString& newFunctionName);
+    bool isSymbolUsed(const TString& symbolName);
     
     TIntermNode* root;
     TString texCoordVaryingName;

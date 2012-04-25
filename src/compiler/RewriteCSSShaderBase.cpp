@@ -8,6 +8,76 @@
 #include "ParseHelper.h"
 
 //
+// Determines if a symbol is used.
+//
+class FindSymbolUsage : public TIntermTraverser
+{
+public:
+    FindSymbolUsage(const TString& symbolName)
+    : TIntermTraverser(true, false, false)
+    , mSymbolName(symbolName)
+    , mSymbolUsageFound(false) {}
+    
+    bool symbolUsageFound() { return mSymbolUsageFound; }
+    
+    virtual void visitSymbol(TIntermSymbol* node)
+    {
+        if (node->getSymbol() == mSymbolName)
+            mSymbolUsageFound = true;
+    }
+    
+    virtual bool visitBinary(Visit visit, TIntermBinary*) {return shouldKeepLooking();}
+    virtual bool visitUnary(Visit visit, TIntermUnary*) {return shouldKeepLooking();}
+    virtual bool visitSelection(Visit visit, TIntermSelection*) {return shouldKeepLooking();}
+    virtual bool visitAggregate(Visit visit, TIntermAggregate*) {return shouldKeepLooking();}
+    virtual bool visitLoop(Visit visit, TIntermLoop*) {return shouldKeepLooking();}
+    virtual bool visitBranch(Visit visit, TIntermBranch*) {return shouldKeepLooking();}
+    
+private:
+    bool shouldKeepLooking() { return !mSymbolUsageFound; }
+    
+    const TString& mSymbolName;
+    bool mSymbolUsageFound;
+};    
+
+bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
+{
+    FindSymbolUsage findSymbolUsage(symbolName);
+    root->traverse(&findSymbolUsage);
+    return findSymbolUsage.symbolUsageFound();
+}
+
+//
+// Renames a function, including its declaration and any calls to it. 
+//
+class RenameFunction : public TIntermTraverser
+{
+public:
+    RenameFunction(const TString& oldFunctionName, const TString& newFunctionName)
+    : TIntermTraverser(true, false, false)
+    , mOldFunctionName(oldFunctionName)
+    , mNewFunctionName(newFunctionName) {}
+    
+    virtual bool visitAggregate(Visit visit, TIntermAggregate* node)
+    {
+        TOperator op = node->getOp();
+        if ((op == EOpFunction || op == EOpFunctionCall) && node->getName() == mOldFunctionName)
+            node->setName(mNewFunctionName);
+        return true;
+    }
+    
+private:
+    const TString& mOldFunctionName;
+    const TString& mNewFunctionName;
+};
+
+void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const TString& newFunctionName)
+{
+    RenameFunction renameFunction(oldFunctionName, newFunctionName);
+    root->traverse(&renameFunction);
+}
+
+//
 // RewriteCSSShaderBase implementation
 //
 
@@ -114,13 +184,30 @@ TIntermBinary* RewriteCSSShaderBase::createGlobalMat4Initialization(const TStrin
     return initialization;
 }
 
+TIntermAggregate* RewriteCSSShaderBase::createVoidFunction(const TString& name)
+{
+    TIntermAggregate* function = new TIntermAggregate(EOpFunction);
+    function->setName(name);
+    function->setType(TType(EbtVoid, EbpUndefined, EvqGlobal));
+    
+    TIntermSequence& paramsAndBody = function->getSequence();
+    
+    TIntermAggregate* parameters = new TIntermAggregate(EOpParameters);
+    paramsAndBody.push_back(parameters);
+    
+    TIntermAggregate* body = new TIntermAggregate(EOpSequence);
+    paramsAndBody.push_back(body);
+    
+    return function;
+}
+
 void RewriteCSSShaderBase::addArgument(TIntermNode* argument, TIntermAggregate* functionCall)
 {
     functionCall->getSequence().push_back(argument);
 }
 
 // Inserts "varying vec2 css_v_texCoord".
-void RewriteCSSShaderBase::insertTexCoordVarying()
+void RewriteCSSShaderBase::insertTexCoordVaryingDeclaration()
 {
     insertAtTopOfShader(createDeclaration(createVaryingVec2(texCoordVaryingName)));
 }
@@ -129,6 +216,11 @@ void RewriteCSSShaderBase::insertAtTopOfShader(TIntermNode* node)
 {
     TIntermSequence& globalSequence = root->getAsAggregate()->getSequence();
     globalSequence.insert(globalSequence.begin(), node);
+}
+
+void RewriteCSSShaderBase::insertAtEndOfShader(TIntermNode* node)
+{
+    root->getAsAggregate()->getSequence().push_back(node);
 }
 
 void RewriteCSSShaderBase::insertAtTopOfFunction(TIntermNode* node, TIntermAggregate* function)
@@ -164,7 +256,6 @@ void RewriteCSSShaderBase::createRootSequenceIfNeeded()
     }
 }
 
-// FIXME: Handle the case where main is alone in the shader. (Create a wrapping sequence, etc.)
 TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate* function)
 {
     TIntermAggregate* body = NULL;
@@ -187,7 +278,7 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
     return body;
 }
 
-// FIXME: Handle the case where main is alone in the shader. (Create a wrapping sequence, etc.)
+// TODO: Maybe find the main function once and cache it.
 TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name)
 {
     TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();
