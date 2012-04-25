@@ -15,7 +15,7 @@ void RewriteCSSVertexShader::rewrite()
     
     insertTexCoordVarying();
     insertTexCoordAttribute();
-    insertCSSTexCoordVaryingAssignment(findMainFunction());
+    insertCSSTexCoordVaryingAssignment(findFunction(kMain));
 }
 
 void RewriteCSSVertexShader::insertTexCoordAttribute()
@@ -25,5 +25,5 @@ void RewriteCSSVertexShader::insertTexCoordAttribute()
 
 void RewriteCSSVertexShader::insertCSSTexCoordVaryingAssignment(TIntermAggregate* mainFunction)
 {
-    insertAtTopOfFunction(createBinary(EOpAssign, createVaryingVec2(texCoordVaryingName), createAttributeVec2(texCoordAttributeName)), findMainFunction());
+    insertAtTopOfFunction(createBinary(EOpAssign, createVaryingVec2(texCoordVaryingName), createAttributeVec2(texCoordAttributeName)), findFunction(kMain));
 }

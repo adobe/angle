@@ -27,6 +27,7 @@ public:
     const TString& getTextureUniformName() { return textureUniformName; } 
     
 private:  
+    static const char* const kCSSMain;
     static const char* const kFragColor;
     static const char* const kTextureUniformPrefix;
     static const char* const kBlendColor;

@@ -8,21 +8,21 @@
 #include "ParseHelper.h"
 
 //
-// Generates errors for references to gl_FragColor.
+// Determines if a symbol is used.
 //
 class FindSymbolUsage : public TIntermTraverser
 {
 public:
-    FindSymbolUsage(const TString& symbol)
+    FindSymbolUsage(const TString& symbolName)
         : TIntermTraverser(true, false, false)
-        , mSymbol(symbol)
+        , mSymbolName(symbolName)
         , mSymbolUsageFound(false) {}
 
     bool symbolUsageFound() { return mSymbolUsageFound; }
     
     virtual void visitSymbol(TIntermSymbol* node)
     {
-        if (node->getSymbol() == mSymbol)
+        if (node->getSymbol() == mSymbolName)
             mSymbolUsageFound = true;
     }
     
@@ -36,10 +36,33 @@ public:
 private:
     bool shouldKeepLooking() { return !mSymbolUsageFound; }
     
-    const TString& mSymbol;
+    const TString& mSymbolName;
     bool mSymbolUsageFound;
 };    
 
+//
+// Renames a function, including its declaration and any calls to it. 
+//
+class RenameFunction : public TIntermTraverser
+{
+public:
+    RenameFunction(const TString& oldFunctionName, const TString& newFunctionName)
+        : TIntermTraverser(true, false, false)
+        , mOldFunctionName(oldFunctionName)
+        , mNewFunctionName(newFunctionName) {}
+    
+    virtual bool visitAggregate(Visit visit, TIntermAggregate* node)
+    {
+        TOperator op = node->getOp();
+        if ((op == EOpFunction || op == EOpFunctionCall) && node->getName() == mOldFunctionName)
+            node->setName(mNewFunctionName);
+        return true;
+    }
+    
+private:
+    const TString& mOldFunctionName;
+    const TString& mNewFunctionName;
+};
 
 //
 // RewriteCSSFragmentShader implementation
@@ -53,12 +76,16 @@ void RewriteCSSFragmentShader::rewrite()
     root->traverse(&findColorMatrixUsage);
     useColorMatrix = findColorMatrixUsage.symbolUsageFound();
     
+    RenameFunction renameMain(kMain, kCSSMain);
+    root->traverse(&renameMain);
+    
     insertTextureUniform();
     insertTexCoordVarying();
     insertBlendSymbolDeclaration();
     insertBlendOp();
 }
 
+const char* const RewriteCSSFragmentShader::kCSSMain = "css_main(";
 const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
 const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_TextureUniform";
 const char* const RewriteCSSFragmentShader::kBlendColor = "css_BlendColor";
@@ -86,5 +113,5 @@ void RewriteCSSFragmentShader::insertBlendOp()
     TIntermSymbol* multiplySymbol = useColorMatrix ? createGlobalMat4(kColorMatrix) : createGlobalVec4(kBlendColor);
     TIntermBinary* rhs = createBinary(EOpMul, multiplySymbol, createTexture2DCall(textureUniformName, texCoordVaryingName));
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kFragColor), rhs);
-    insertAtEndOfFunction(assign, findMainFunction());
+    insertAtEndOfFunction(assign, findFunction(kCSSMain));
 }

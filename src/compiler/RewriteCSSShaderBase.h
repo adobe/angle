@@ -24,6 +24,8 @@ public:
     
     virtual void rewrite();
     TIntermNode* getNewTreeRoot() { return root; }
+    
+    // TODO: Remove.
     int getNumErrors() { return numErrors; }
     
     virtual ~RewriteCSSShaderBase() {}
@@ -53,7 +55,7 @@ protected:
     void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
     void insertTexCoordVarying();
     
-    TIntermAggregate* findMainFunction();   // TODO: Find the main function once and cache it.
+    TIntermAggregate* findFunction(const TString& name);   // TODO: Find the main function once and cache it.
     
     TIntermNode* root;
     TString texCoordVaryingName;

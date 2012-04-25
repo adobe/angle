@@ -188,13 +188,13 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
 }
 
 // FIXME: Handle the case where main is alone in the shader. (Create a wrapping sequence, etc.)
-TIntermAggregate* RewriteCSSShaderBase::findMainFunction()
+TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name)
 {
     TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();
     for (TIntermSequence::const_iterator iter = rootSequence.begin(); iter != rootSequence.end(); ++iter) {
         TIntermNode* node = *iter;
         TIntermAggregate* aggregate = node->getAsAggregate();
-        if (aggregate && aggregate->getOp() == EOpFunction && aggregate->getName() == kMain)
+        if (aggregate && aggregate->getOp() == EOpFunction && aggregate->getName() == name)
             return aggregate;
     }
     return NULL;
