@@ -18,12 +18,9 @@ class RewriteCSSShaderBase {
 public:
     RewriteCSSShaderBase(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
         : root(treeRoot)
+        , texCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix)
         , sink(infoSink)
-        , numErrors(0)
-    {
-        texCoordVaryingName = kTexCoordVaryingPrefix;
-        texCoordVaryingName.append(hiddenSymbolSuffix);
-    }
+        , numErrors(0) {}
     
     virtual void rewrite();
     TIntermNode* getNewTreeRoot() { return root; }

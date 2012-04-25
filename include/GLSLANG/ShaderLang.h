@@ -182,6 +182,11 @@ COMPILER_EXPORT ShHandle ShConstructCompiler(
 COMPILER_EXPORT void ShDestruct(ShHandle handle);
 
 //
+// TODO: Document.
+//
+COMPILER_EXPORT void ShSetHiddenSymbolSuffix(const ShHandle handle, const char* const suffix);
+
+//
 // Compiles the given shader source.
 // If the function succeeds, the return value is nonzero, else zero.
 // Parameters:

@@ -155,9 +155,9 @@ bool TCompiler::compile(const char* const shaderStrings[],
         (parseContext.treeRoot != NULL) &&
         intermediate.postProcess(parseContext.treeRoot);
     if (success) {
-        // The CSS Shaders spec requires rewriting shaders. Note that GlobalParseContext->treeRoot may change as a side effect.
+        // The CSS Shaders spec requires rewriting shaders. Note that the tree root may change as a side effect.
         if (shaderSpec == SH_CSS_SHADERS_SPEC)
-            success = rewriteCSSShader(parseContext.treeRoot);
+            success = rewriteCSSShader();
 
         TIntermNode* root = parseContext.treeRoot;
         
@@ -241,14 +241,10 @@ bool TCompiler::detectRecursion(TIntermNode* root)
     }
 }
 
-bool TCompiler::rewriteCSSShader(TIntermNode* root)
+bool TCompiler::rewriteCSSShader()
 {
-    const TString& suffix = getRandomSuffix();
-    if (suffix == "")
-        return false;
-
     if (shaderType == SH_VERTEX_SHADER) {
-        RewriteCSSVertexShader rewriter(root, suffix, infoSink.info);
+        RewriteCSSVertexShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix, infoSink.info);
         rewriter.rewrite();
         if (rewriter.getNumErrors() == 0) {
             GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
@@ -256,7 +252,7 @@ bool TCompiler::rewriteCSSShader(TIntermNode* root)
         }
         return false;
     } else {
-        RewriteCSSFragmentShader rewriter(root, suffix, infoSink.info);
+        RewriteCSSFragmentShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix, infoSink.info);
         rewriter.rewrite();
         if (rewriter.getNumErrors() == 0) {
             GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
@@ -298,26 +294,6 @@ const TExtensionBehavior& TCompiler::getExtensionBehavior() const
 const BuiltInFunctionEmulator& TCompiler::getBuiltInFunctionEmulator() const
 {
     return builtInFunctionEmulator;
-}
-
-const TString& TCompiler::getRandomSuffix()
-{
-    // Lazy initialization.
-    if (randomSuffix == "") {  
-        time_t now = time(NULL);
-        if (now < 0) {
-            infoSink.info.prefix(EPrefixInternalError);
-            infoSink.info << "Unable to query system time.";
-            return randomSuffix;
-        }
-        
-        std::ostringstream converter;
-        srandom(now);
-        converter << random();
-        randomSuffix = converter.str().c_str();
-    }
- 
-    return randomSuffix;
 }
 
 const TString TCompiler::getCSSShaderInfo(ShCSSShaderInfo info) const

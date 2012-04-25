@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
     GenerateResources(&resources);
 
     ShShaderSpec spec = SH_GLES2_SPEC;
+    const char* hiddenSymbolSuffix = "";
     
     argc--;
     argv++;
@@ -82,6 +83,12 @@ int main(int argc, char* argv[])
         if (argv[0][0] == '-') {
             switch (argv[0][1]) {
             case 'c': spec = SH_CSS_SHADERS_SPEC; break;
+            case 's': 
+                if (argv[0][2] == '=')
+                    hiddenSymbolSuffix = &argv[0][3];
+                else 
+                    failCode = EFailUsage;
+                break;
             case 'i': compileOptions |= SH_INTERMEDIATE_TREE; break;
             case 'm': compileOptions |= SH_MAP_LONG_VARIABLE_NAMES; break;
             case 'o': compileOptions |= SH_OBJECT_CODE; break;
@@ -131,6 +138,9 @@ int main(int argc, char* argv[])
             default: break;
             }
             if (compiler) {
+              if (strlen(hiddenSymbolSuffix) > 0)
+                  ShSetHiddenSymbolSuffix(compiler, hiddenSymbolSuffix);
+                
               bool compiled = CompileFile(argv[0], compiler, compileOptions);
 
               LogMsg("BEGIN", "COMPILER", numCompiles, "INFO LOG");

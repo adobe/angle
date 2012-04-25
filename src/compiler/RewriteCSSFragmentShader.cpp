@@ -32,7 +32,7 @@ void RewriteCSSFragmentShader::rewrite()
 }
 
 const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
-const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_u_texture_";
+const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_TextureUniform";
 
 const char* const RewriteCSSFragmentShader::kBlendColor = "css_BlendColor";
 const char* const RewriteCSSFragmentShader::kColorMatrix = "css_ColorMatrix";

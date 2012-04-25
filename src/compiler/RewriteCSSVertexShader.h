@@ -19,11 +19,7 @@ class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSVertexShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
         : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink)
-    {
-        texCoordAttributeName = kTexCoordAttributePrefix;
-        texCoordAttributeName.append(hiddenSymbolSuffix);
-    }
-    
+        , texCoordAttributeName(kTexCoordAttributePrefix + hiddenSymbolSuffix) {}    
     void rewrite();
     
 private:

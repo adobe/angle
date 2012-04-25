@@ -16,7 +16,7 @@ void RewriteCSSShaderBase::rewrite()
     createRootSequenceIfNeeded();
 }
 
-const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_v_texCoord_";
+const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_TexCoordVarying";
 const char* const RewriteCSSShaderBase::kTexture2D = "texture2D(s21;vf2;";
 const char* const RewriteCSSShaderBase::kMain = "main(";
 
