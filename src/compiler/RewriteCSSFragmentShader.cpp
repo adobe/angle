@@ -20,13 +20,13 @@ void RewriteCSSFragmentShader::rewrite()
     insertTextureUniformDeclaration();
     insertTexCoordVaryingDeclaration();
     insertBlendSymbolDeclaration();
-    renameFunction(kMain, kCSSMain);
+    renameFunction(kMain, cssMainFunctionName);
     insertNewMainFunction();
     insertCSSMainCall();
     insertBlendOp();
 }
 
-const char* const RewriteCSSFragmentShader::kCSSMain = "css_main(";
+const char* const RewriteCSSFragmentShader::kCSSMainPrefix = "css_Main";
 const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
 const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_TextureUniform";
 const char* const RewriteCSSFragmentShader::kBlendColor = "css_BlendColor";
@@ -55,7 +55,7 @@ void RewriteCSSFragmentShader::insertNewMainFunction()
 
 void RewriteCSSFragmentShader::insertCSSMainCall()
 {
-    insertAtTopOfFunction(createFunctionCall(kCSSMain), findFunction(kMain));
+    insertAtTopOfFunction(createFunctionCall(cssMainFunctionName), findFunction(kMain));
 }
 
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"

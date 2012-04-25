@@ -20,6 +20,7 @@ public:
     RewriteCSSFragmentShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink) 
         : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink)
         , textureUniformName(kTextureUniformPrefix + hiddenSymbolSuffix)
+        , cssMainFunctionName(kCSSMainPrefix + hiddenSymbolSuffix + "(")
         , useColorMatrix(false) {}
     
     virtual void rewrite();
@@ -27,7 +28,7 @@ public:
     const TString& getTextureUniformName() { return textureUniformName; } 
     
 private:  
-    static const char* const kCSSMain;
+    static const char* const kCSSMainPrefix;
     static const char* const kFragColor;
     static const char* const kTextureUniformPrefix;
     static const char* const kBlendColor;
@@ -40,6 +41,7 @@ private:
     void insertBlendOp();
     
     TString textureUniformName;
+    TString cssMainFunctionName;
     bool useColorMatrix;
 };
 
