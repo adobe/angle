@@ -19,14 +19,10 @@ public:
     RewriteCSSShaderBase(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
         : root(treeRoot)
         , texCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix)
-        , sink(infoSink)
-        , numErrors(0) {}
+        , sink(infoSink) {}
     
     virtual void rewrite();
     TIntermNode* getNewTreeRoot() { return root; }
-    
-    // TODO: Remove.
-    int getNumErrors() { return numErrors; }
     
     virtual ~RewriteCSSShaderBase() {}
     
@@ -64,7 +60,6 @@ protected:
     TIntermNode* root;
     TString texCoordVaryingName;
     TInfoSinkBase& sink;
-    int numErrors;
     
 private:
     void createRootSequenceIfNeeded();

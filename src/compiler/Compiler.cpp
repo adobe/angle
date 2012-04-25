@@ -15,6 +15,11 @@
 #include "compiler/RewriteCSSVertexShader.h"
 #include "compiler/ValidateLimitations.h"
 
+bool isWebGLSpecSubset(ShShaderSpec spec)
+{
+    return spec == SH_WEBGL_SPEC || spec == SH_CSS_SHADERS_SPEC;
+}
+
 namespace {
 bool InitializeSymbolTable(
     const TBuiltInStrings& builtInStrings,
@@ -125,7 +130,7 @@ bool TCompiler::compile(const char* const shaderStrings[],
         return true;
 
     // If compiling for WebGL, validate loop and indexing as well.
-    if (shaderSpec == SH_WEBGL_SPEC)
+    if (isWebGLSpecSubset(shaderSpec))
         compileOptions |= SH_VALIDATE_LOOP_INDEXING;
 
     // First string is path of source file if flag is set. The actual source follows.
@@ -246,19 +251,11 @@ bool TCompiler::rewriteCSSShader()
     if (shaderType == SH_VERTEX_SHADER) {
         RewriteCSSVertexShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix, infoSink.info);
         rewriter.rewrite();
-        if (rewriter.getNumErrors() == 0) {
-            GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
-            return true;
-        }
-        return false;
+        GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
     } else {
         RewriteCSSFragmentShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix, infoSink.info);
         rewriter.rewrite();
-        if (rewriter.getNumErrors() == 0) {
-            GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
-            return true;
-        }
-        return false;
+        GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
     }
 }
 

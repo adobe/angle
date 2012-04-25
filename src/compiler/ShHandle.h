@@ -26,6 +26,12 @@ class LongNameMap;
 class TCompiler;
 
 //
+// Helper functions for relating enums.
+//
+
+bool isWebGLSpecSubset(ShShaderSpec spec);
+
+//
 // The base class used to back handles returned to the driver.
 //
 class TShHandleBase {
