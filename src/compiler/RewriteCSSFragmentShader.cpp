@@ -61,16 +61,3 @@ void RewriteCSSFragmentShader::insertBlendingOp()
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kFragColor), rhs);
     insertAtEndOfFunction(assign, findMainFunction());
 }
-
-//
-// RestrictFragColor implementation
-//
-
-void RewriteCSSFragmentShader::RestrictFragColor::visitSymbol(TIntermSymbol* node)
-{
-    if (node->getSymbol() == kFragColor) {
-        ++mRewriter->numErrors;
-        mRewriter->sink.prefix(EPrefixError);
-        mRewriter->sink << "'" << kFragColor << "' access is not permitted.\n";
-    }
-}
