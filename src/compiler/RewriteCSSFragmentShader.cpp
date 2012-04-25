@@ -8,34 +8,66 @@
 #include "ParseHelper.h"
 
 //
+// Generates errors for references to gl_FragColor.
+//
+class FindSymbolUsage : public TIntermTraverser
+{
+public:
+    FindSymbolUsage(const TString& symbol)
+        : TIntermTraverser(true, false, false)
+        , mSymbol(symbol)
+        , mSymbolUsageFound(false) {}
+
+    bool symbolUsageFound() { return mSymbolUsageFound; }
+    
+    virtual void visitSymbol(TIntermSymbol* node)
+    {
+        if (node->getSymbol() == mSymbol)
+            mSymbolUsageFound = true;
+    }
+    
+    virtual bool visitBinary(Visit visit, TIntermBinary*) {return shouldKeepLooking();}
+    virtual bool visitUnary(Visit visit, TIntermUnary*) {return shouldKeepLooking();}
+    virtual bool visitSelection(Visit visit, TIntermSelection*) {return shouldKeepLooking();}
+    virtual bool visitAggregate(Visit visit, TIntermAggregate*) {return shouldKeepLooking();}
+    virtual bool visitLoop(Visit visit, TIntermLoop*) {return shouldKeepLooking();}
+    virtual bool visitBranch(Visit visit, TIntermBranch*) {return shouldKeepLooking();}
+    
+private:
+    bool shouldKeepLooking() { return !mSymbolUsageFound; }
+    
+    const TString& mSymbol;
+    bool mSymbolUsageFound;
+};    
+
+
+//
 // RewriteCSSFragmentShader implementation
 //
 
 void RewriteCSSFragmentShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
+
+    FindSymbolUsage findColorMatrixUsage(kColorMatrix);
+    root->traverse(&findColorMatrixUsage);
+    useColorMatrix = findColorMatrixUsage.symbolUsageFound();
     
-    RestrictFragColor restrictGLFragColor(this);
-    root->traverse(&restrictGLFragColor);
-    if (numErrors > 0)
-        return;
-        
     insertTextureUniform();
     insertTexCoordVarying();
     insertBlendSymbolDeclaration();
-    insertBlendingOp();
+    insertBlendOp();
 }
 
 const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
 const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_TextureUniform";
-
 const char* const RewriteCSSFragmentShader::kBlendColor = "css_BlendColor";
 const char* const RewriteCSSFragmentShader::kColorMatrix = "css_ColorMatrix";
 
 // Inserts something like "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0)".
 void RewriteCSSFragmentShader::insertBlendSymbolDeclaration()
 {
-    if (blendSymbol == kColorMatrix)
+    if (useColorMatrix)
         insertAtTopOfShader(createDeclaration(createGlobalMat4Initialization(kColorMatrix, createMat4IdentityConstant())));
     else
         insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
@@ -48,15 +80,10 @@ void RewriteCSSFragmentShader::insertTextureUniform()
 }
 
 // Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
-void RewriteCSSFragmentShader::insertBlendingOp()
+void RewriteCSSFragmentShader::insertBlendOp()
 {
     // TODO(mvujovic): Maybe I should add types to the binary ops. They don't seem to be necessary, but maybe I'm missing something.
-    TIntermSymbol* multiplySymbol = NULL;
-    if (blendSymbol == kColorMatrix)
-        multiplySymbol = createGlobalMat4(kColorMatrix);
-    else
-        multiplySymbol = createGlobalVec4(kBlendColor);
-    
+    TIntermSymbol* multiplySymbol = useColorMatrix ? createGlobalMat4(kColorMatrix) : createGlobalVec4(kBlendColor);
     TIntermBinary* rhs = createBinary(EOpMul, multiplySymbol, createTexture2DCall(textureUniformName, texCoordVaryingName));
     TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kFragColor), rhs);
     insertAtEndOfFunction(assign, findMainFunction());
