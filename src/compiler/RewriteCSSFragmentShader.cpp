@@ -15,11 +15,13 @@ void RewriteCSSFragmentShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
 
-    useColorMatrix = isSymbolUsed(kColorMatrix);
+    usesColorMatrix = isSymbolUsed(kColorMatrix);
     
     insertTextureUniformDeclaration();
     insertTexCoordVaryingDeclaration();
-    insertBlendSymbolDeclaration();
+    insertBlendColorDeclaration();
+    if (usesColorMatrix)
+        insertColorMatrixDeclaration();
     renameFunction(kMain, cssMainFunctionName);
     insertNewMainFunction();
     insertCSSMainCall();
@@ -32,13 +34,16 @@ const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_Texture
 const char* const RewriteCSSFragmentShader::kBlendColor = "css_BlendColor";
 const char* const RewriteCSSFragmentShader::kColorMatrix = "css_ColorMatrix";
 
-// Inserts something like "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0)".
-void RewriteCSSFragmentShader::insertBlendSymbolDeclaration()
+// Inserts "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0)".
+void RewriteCSSFragmentShader::insertBlendColorDeclaration()
 {
-    if (useColorMatrix)
-        insertAtTopOfShader(createDeclaration(createGlobalMat4Initialization(kColorMatrix, createMat4IdentityConstant())));
-    else
-        insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+    insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+}
+
+// Inserts "mat4 css_ColorMatrix = mat4(1.0, 0.0, 0.0, 0.0 ...)".
+void RewriteCSSFragmentShader::insertColorMatrixDeclaration()
+{
+    insertAtTopOfShader(createDeclaration(createGlobalMat4Initialization(kColorMatrix, createMat4IdentityConstant())));
 }
 
 // Inserts "uniform sampler2D css_u_texture_XXX".
@@ -58,12 +63,23 @@ void RewriteCSSFragmentShader::insertCSSMainCall()
     insertAtTopOfFunction(createFunctionCall(cssMainFunctionName), findFunction(kMain));
 }
 
-// Inserts "gl_FragColor = css_FragColor * texture2D(s_texture, v_texCoord)"
+// TODO(mvujovic): Maybe I should add types to the binary ops. They don't seem to be necessary, but maybe I'm missing something.
+
+// If css_ColorMatrix is used, inserts "gl_FragColor = css_ColorMatrix * texture2D(s_texture, v_texCoord) <BLEND OP> css_FragColor"
+// Otherwise, inserts "gl_FragColor = texture2D(s_texture, v_texCoord) <BLEND OP> css_FragColor "
 void RewriteCSSFragmentShader::insertBlendOp()
 {
-    // TODO(mvujovic): Maybe I should add types to the binary ops. They don't seem to be necessary, but maybe I'm missing something.
-    TIntermSymbol* multiplySymbol = useColorMatrix ? createGlobalMat4(kColorMatrix) : createGlobalVec4(kBlendColor);
-    TIntermBinary* rhs = createBinary(EOpMul, multiplySymbol, createTexture2DCall(textureUniformName, texCoordVaryingName));
-    TIntermBinary* assign = createBinary(EOpAssign, createGlobalVec4(kFragColor), rhs);
-    insertAtEndOfFunction(assign, findFunction(kMain));
+    // FIXME(mvujovic): Eventually, we'd like to support other blend operations besides multiply.
+    TOperator blendOp = EOpMul;
+    
+    TIntermTyped* blendOpLhs = NULL;
+    TIntermAggregate* texture2DCall = createTexture2DCall(textureUniformName, texCoordVaryingName);
+    if (usesColorMatrix)
+        blendOpLhs = createBinary(EOpMul, createGlobalMat4(kColorMatrix), texture2DCall);
+    else
+        blendOpLhs = texture2DCall;
+    
+    TIntermBinary* assignmentRhs = createBinary(blendOp, blendOpLhs, createGlobalVec4(kBlendColor));
+    TIntermBinary* assignment = createBinary(EOpAssign, createGlobalVec4(kFragColor), assignmentRhs);
+    insertAtEndOfFunction(assignment, findFunction(kMain));
 }

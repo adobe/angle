@@ -23,6 +23,7 @@ public:
     void rewrite();
     
 private:
+    // TODO: This should be fixed to "a_texCoord", and defined if its not defined already.
     static const char* const kTexCoordAttributePrefix;
     
     void insertTexCoordAttribute();

@@ -21,7 +21,7 @@ public:
         : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink)
         , textureUniformName(kTextureUniformPrefix + hiddenSymbolSuffix)
         , cssMainFunctionName(kCSSMainPrefix + hiddenSymbolSuffix + "(")
-        , useColorMatrix(false) {}
+        , usesColorMatrix(false) {}
     
     virtual void rewrite();
     
@@ -33,8 +33,9 @@ private:
     static const char* const kTextureUniformPrefix;
     static const char* const kBlendColor;
     static const char* const kColorMatrix;
-        
-    void insertBlendSymbolDeclaration();
+    
+    void insertBlendColorDeclaration();
+    void insertColorMatrixDeclaration();
     void insertTextureUniformDeclaration();
     void insertNewMainFunction();
     void insertCSSMainCall();
@@ -42,7 +43,7 @@ private:
     
     TString textureUniformName;
     TString cssMainFunctionName;
-    bool useColorMatrix;
+    bool usesColorMatrix;
 };
 
 #endif  // COMPILER_REWRITE_CSS_FRAGMENT_SHADER
