@@ -15,6 +15,8 @@
 
 class TInfoSinkBase;
 
+// TODO(mvujovic): Give an example.
+
 class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSVertexShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
@@ -27,7 +29,7 @@ private:
     static const char* const kTexCoordAttributePrefix;
     
     void insertTexCoordAttribute();
-    void insertCSSTexCoordVaryingAssignment(TIntermAggregate* mainFunction);
+    void insertCSSTexCoordVaryingAssignment();
     
     TString texCoordAttributeName;
 };

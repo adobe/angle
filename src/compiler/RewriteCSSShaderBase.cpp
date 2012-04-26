@@ -114,7 +114,6 @@ TIntermConstantUnion* RewriteCSSShaderBase::createMat4IdentityConstant()
     return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4, true));    
 }
 
-// TODO(mvujovic): Is symbol id 0 ok? Or do we need to to insert these in the symbol table?
 TIntermSymbol* RewriteCSSShaderBase::createGlobalVec4(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
@@ -158,8 +157,8 @@ TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* le
 TIntermAggregate* RewriteCSSShaderBase::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
 {
     TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D); // TODO(mvujovic): Should I be pool allocating strings?
-    addArgument(createUniformSampler2D(textureUniformName), texture2DCall);
-    addArgument(createVaryingVec2(texCoordVaryingName), texture2DCall);
+    addArgument(texture2DCall, createUniformSampler2D(textureUniformName));
+    addArgument(texture2DCall, createVaryingVec2(texCoordVaryingName));
     return texture2DCall;
 }
 
@@ -173,7 +172,7 @@ TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
 TIntermBinary* RewriteCSSShaderBase::createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs)
 {
     TIntermBinary* initialization = createBinary(EOpInitialize, createGlobalVec4(symbolName), rhs);
-    initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4)); // TODO(mvujovic): What precision?
+    initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4));
     return initialization;
 }
 
@@ -201,21 +200,21 @@ TIntermAggregate* RewriteCSSShaderBase::createVoidFunction(const TString& name)
     return function;
 }
 
-void RewriteCSSShaderBase::addArgument(TIntermNode* argument, TIntermAggregate* functionCall)
+void RewriteCSSShaderBase::addArgument(TIntermAggregate* functionCall, TIntermNode* argument)
 {
     functionCall->getSequence().push_back(argument);
 }
 
-// Inserts "varying vec2 css_v_texCoord".
+// Inserts "varying vec2 css_TexCoordVarying".
 void RewriteCSSShaderBase::insertTexCoordVaryingDeclaration()
 {
-    insertAtTopOfShader(createDeclaration(createVaryingVec2(texCoordVaryingName)));
+    insertAtBeginningOfShader(createDeclaration(createVaryingVec2(texCoordVaryingName)));
 }
 
-void RewriteCSSShaderBase::insertAtTopOfShader(TIntermNode* node)
+void RewriteCSSShaderBase::insertAtBeginningOfShader(TIntermNode* node)
 {
-    TIntermSequence& globalSequence = root->getAsAggregate()->getSequence();
-    globalSequence.insert(globalSequence.begin(), node);
+    TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();
+    rootSequence.insert(rootSequence.begin(), node);
 }
 
 void RewriteCSSShaderBase::insertAtEndOfShader(TIntermNode* node)
@@ -223,25 +222,29 @@ void RewriteCSSShaderBase::insertAtEndOfShader(TIntermNode* node)
     root->getAsAggregate()->getSequence().push_back(node);
 }
 
-void RewriteCSSShaderBase::insertAtTopOfFunction(TIntermNode* node, TIntermAggregate* function)
+void RewriteCSSShaderBase::insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node)
 {
     TIntermSequence& bodySequence = getOrCreateFunctionBody(function)->getSequence();
     bodySequence.insert(bodySequence.begin(), node);
 }
 
-void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function)
+void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node)
 {
     getOrCreateFunctionBody(function)->getSequence().push_back(node);
 }
 
-// If there is only a main() function in the global scope, the main function will be the tree root.
-// However, we'd like to insert declarations above the main function, so we must wrap it in a sequence.
-// The new tree root must be that root sequence.
+// Call this at the beginning of rewriting to wrap the main function in a sequence, if it isn't already
+// wrapped in one.
+// All of the other methods in this class and any subclasses will assume that the root is a sequence.
+// Wrapping is required when the shader has only a main() function in the global scope, which makes the
+// main function the tree root.
+// In general, we want the main function wrapped in a sequence because we will need to insert declarations
+// in the global scope around it.
 void RewriteCSSShaderBase::createRootSequenceIfNeeded()
 {
     TIntermAggregate* rootAggregate = root->getAsAggregate();
  
-    // The root should be a sequence or a function declaration, both of which are aggregate nodes.
+    // The root should be a sequence or a function declaration, both of which should be aggregate nodes.
     ASSERT(rootAggregate);
     ASSERT(rootAggregate->getOp() == EOpSequence || rootAggregate->getOp() == EOpFunction);
     
@@ -278,7 +281,6 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
     return body;
 }
 
-// TODO: Maybe find the main function once and cache it.
 TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name)
 {
     TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();

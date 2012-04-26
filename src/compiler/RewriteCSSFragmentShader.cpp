@@ -22,34 +22,34 @@ void RewriteCSSFragmentShader::rewrite()
     insertBlendColorDeclaration();
     if (usesColorMatrix)
         insertColorMatrixDeclaration();
-    renameFunction(kMain, cssMainFunctionName);
+    renameFunction(kMain, userMainFunctionName);
     insertNewMainFunction();
     insertCSSMainCall();
     insertBlendOp();
 }
 
-const char* const RewriteCSSFragmentShader::kCSSMainPrefix = "css_Main";
-const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
-const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_TextureUniform";
 const char* const RewriteCSSFragmentShader::kBlendColor = "css_BlendColor";
 const char* const RewriteCSSFragmentShader::kColorMatrix = "css_ColorMatrix";
+const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_TextureUniform";
+const char* const RewriteCSSFragmentShader::kUserMainFunctionPrefix = "css_Main";
+const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
 
 // Inserts "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0)".
 void RewriteCSSFragmentShader::insertBlendColorDeclaration()
 {
-    insertAtTopOfShader(createDeclaration(createGlobalVec4Initialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+    insertAtBeginningOfShader(createDeclaration(createGlobalVec4Initialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
 // Inserts "mat4 css_ColorMatrix = mat4(1.0, 0.0, 0.0, 0.0 ...)".
 void RewriteCSSFragmentShader::insertColorMatrixDeclaration()
 {
-    insertAtTopOfShader(createDeclaration(createGlobalMat4Initialization(kColorMatrix, createMat4IdentityConstant())));
+    insertAtBeginningOfShader(createDeclaration(createGlobalMat4Initialization(kColorMatrix, createMat4IdentityConstant())));
 }
 
 // Inserts "uniform sampler2D css_u_texture_XXX".
 void RewriteCSSFragmentShader::insertTextureUniformDeclaration()
 {
-    insertAtTopOfShader(createDeclaration(createUniformSampler2D(textureUniformName)));
+    insertAtBeginningOfShader(createDeclaration(createUniformSampler2D(textureUniformName)));
 }
 
 // Inserts "void main() {}".
@@ -60,7 +60,7 @@ void RewriteCSSFragmentShader::insertNewMainFunction()
 
 void RewriteCSSFragmentShader::insertCSSMainCall()
 {
-    insertAtTopOfFunction(createFunctionCall(cssMainFunctionName), findFunction(kMain));
+    insertAtBeginningOfFunction(findFunction(kMain), createFunctionCall(userMainFunctionName));
 }
 
 // TODO(mvujovic): Maybe I should add types to the binary ops. They don't seem to be necessary, but maybe I'm missing something.
@@ -81,5 +81,5 @@ void RewriteCSSFragmentShader::insertBlendOp()
     
     TIntermBinary* assignmentRhs = createBinary(blendOp, blendOpLhs, createGlobalVec4(kBlendColor));
     TIntermBinary* assignment = createBinary(EOpAssign, createGlobalVec4(kFragColor), assignmentRhs);
-    insertAtEndOfFunction(assignment, findFunction(kMain));
+    insertAtEndOfFunction(findFunction(kMain), assignment);
 }

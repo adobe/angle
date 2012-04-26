@@ -39,7 +39,7 @@ protected:
     TIntermSymbol* createVaryingVec2(const TString& name);
     TIntermSymbol* createAttributeVec2(const TString& name);
     TIntermAggregate* createFunctionCall(const TString& name);
-    void addArgument(TIntermNode* argument, TIntermAggregate* functionCall);
+    void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
     TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermAggregate* createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName);
     TIntermAggregate* createDeclaration(TIntermNode* child);
@@ -47,10 +47,10 @@ protected:
     TIntermBinary* createGlobalMat4Initialization(const TString& symbolName, TIntermTyped* rhs);
     TIntermAggregate* createVoidFunction(const TString& name);
     
-    void insertAtTopOfShader(TIntermNode* node);
+    void insertAtBeginningOfShader(TIntermNode* node);
     void insertAtEndOfShader(TIntermNode* node);
-    void insertAtTopOfFunction(TIntermNode* node, TIntermAggregate* function);
-    void insertAtEndOfFunction(TIntermNode* node, TIntermAggregate* function);
+    void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node);
+    void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node);
     void insertTexCoordVaryingDeclaration();
     
     TIntermAggregate* findFunction(const TString& name);
