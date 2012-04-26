@@ -33,11 +33,11 @@ protected:
     
     TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
     TIntermConstantUnion* createMat4IdentityConstant();
-    TIntermSymbol* createGlobalVec4(const TString& name);
-    TIntermSymbol* createGlobalMat4(const TString& name);
-    TIntermSymbol* createUniformSampler2D(const TString& name);
-    TIntermSymbol* createVaryingVec2(const TString& name);
-    TIntermSymbol* createAttributeVec2(const TString& name);
+    TIntermSymbol* createVec4Global(const TString& name);
+    TIntermSymbol* createMat4Global(const TString& name);
+    TIntermSymbol* createSampler2DUniform(const TString& name);
+    TIntermSymbol* createVec2Varying(const TString& name);
+    TIntermSymbol* createVec2Attribute(const TString& name);
     TIntermAggregate* createFunctionCall(const TString& name);
     void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
     TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right);
@@ -46,8 +46,8 @@ protected:
     TIntermBinary* createBinaryWithMat4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermAggregate* createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName);
     TIntermAggregate* createDeclaration(TIntermNode* child);
-    TIntermBinary* createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs);
-    TIntermBinary* createGlobalMat4Initialization(const TString& symbolName, TIntermTyped* rhs);
+    TIntermBinary* createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
+    TIntermBinary* createMat4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
     TIntermAggregate* createVoidFunction(const TString& name);
     
     void insertAtBeginningOfShader(TIntermNode* node);

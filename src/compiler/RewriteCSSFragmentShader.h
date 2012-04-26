@@ -13,6 +13,8 @@
 #include "compiler/intermediate.h"
 #include "compiler/InfoSink.h"
 
+// TODO(mvujovic): Insert example.
+
 class TInfoSinkBase;
 
 class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
@@ -36,7 +38,7 @@ private:
     void insertColorMatrixDeclaration();
     void insertTextureUniformDeclaration();
     void insertNewMainFunction();
-    void insertCSSMainCall();
+    void insertUserMainFunctionCall();
     void insertBlendOp();
     
     TString textureUniformName;

@@ -30,7 +30,7 @@ private:
     static const char* const kTexCoordAttributePrefix;
     
     void insertTexCoordAttribute();
-    void insertCSSTexCoordVaryingAssignment();
+    void insertTexCoordVaryingAssignment();
     
     TString texCoordAttributeName;
 };

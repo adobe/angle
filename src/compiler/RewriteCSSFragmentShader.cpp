@@ -24,7 +24,7 @@ void RewriteCSSFragmentShader::rewrite()
         insertColorMatrixDeclaration();
     renameFunction(kMain, userMainFunctionName);
     insertNewMainFunction();
-    insertCSSMainCall();
+    insertUserMainFunctionCall();
     insertBlendOp();
 }
 
@@ -37,19 +37,19 @@ const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
 // Inserts "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0)".
 void RewriteCSSFragmentShader::insertBlendColorDeclaration()
 {
-    insertAtBeginningOfShader(createDeclaration(createGlobalVec4Initialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+    insertAtBeginningOfShader(createDeclaration(createVec4GlobalInitialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
 // Inserts "mat4 css_ColorMatrix = mat4(1.0, 0.0, 0.0, 0.0 ...)".
 void RewriteCSSFragmentShader::insertColorMatrixDeclaration()
 {
-    insertAtBeginningOfShader(createDeclaration(createGlobalMat4Initialization(kColorMatrix, createMat4IdentityConstant())));
+    insertAtBeginningOfShader(createDeclaration(createMat4GlobalInitialization(kColorMatrix, createMat4IdentityConstant())));
 }
 
 // Inserts "uniform sampler2D css_u_texture_XXX".
 void RewriteCSSFragmentShader::insertTextureUniformDeclaration()
 {
-    insertAtBeginningOfShader(createDeclaration(createUniformSampler2D(textureUniformName)));
+    insertAtBeginningOfShader(createDeclaration(createSampler2DUniform(textureUniformName)));
 }
 
 // Inserts "void main() {}".
@@ -58,12 +58,10 @@ void RewriteCSSFragmentShader::insertNewMainFunction()
     insertAtEndOfShader(createVoidFunction(kMain));
 }
 
-void RewriteCSSFragmentShader::insertCSSMainCall()
+void RewriteCSSFragmentShader::insertUserMainFunctionCall()
 {
     insertAtBeginningOfFunction(findFunction(kMain), createFunctionCall(userMainFunctionName));
 }
-
-// TODO(mvujovic): Maybe I should add types to the binary ops. They don't seem to be necessary, but maybe I'm missing something.
 
 // If css_ColorMatrix is used, inserts "gl_FragColor = css_ColorMatrix * texture2D(s_texture, v_texCoord) <BLEND OP> css_FragColor"
 // Otherwise, inserts "gl_FragColor = texture2D(s_texture, v_texCoord) <BLEND OP> css_FragColor "
@@ -75,11 +73,11 @@ void RewriteCSSFragmentShader::insertBlendOp()
     TIntermTyped* blendOpLhs = NULL;
     TIntermAggregate* texture2DCall = createTexture2DCall(textureUniformName, texCoordVaryingName);
     if (usesColorMatrix)
-        blendOpLhs = createBinaryWithVec4Result(EOpMatrixTimesVector, createGlobalMat4(kColorMatrix), texture2DCall);
+        blendOpLhs = createBinaryWithVec4Result(EOpMatrixTimesVector, createMat4Global(kColorMatrix), texture2DCall);
     else
         blendOpLhs = texture2DCall;
     
-    TIntermBinary* assignmentRhs = createBinaryWithVec4Result(blendOp, blendOpLhs, createGlobalVec4(kBlendColor));
-    TIntermBinary* assignment = createBinaryWithVec4Result(EOpAssign, createGlobalVec4(kFragColor), assignmentRhs);
+    TIntermBinary* assignmentRhs = createBinaryWithVec4Result(blendOp, blendOpLhs, createVec4Global(kBlendColor));
+    TIntermBinary* assignment = createBinaryWithVec4Result(EOpAssign, createVec4Global(kFragColor), assignmentRhs);
     insertAtEndOfFunction(findFunction(kMain), assignment);
 }

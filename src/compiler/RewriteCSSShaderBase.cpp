@@ -114,27 +114,27 @@ TIntermConstantUnion* RewriteCSSShaderBase::createMat4IdentityConstant()
     return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4, true));    
 }
 
-TIntermSymbol* RewriteCSSShaderBase::createGlobalVec4(const TString& name)
+TIntermSymbol* RewriteCSSShaderBase::createVec4Global(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
 }
 
-TIntermSymbol* RewriteCSSShaderBase::createGlobalMat4(const TString& name)
+TIntermSymbol* RewriteCSSShaderBase::createMat4Global(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4, true));
 }
 
-TIntermSymbol* RewriteCSSShaderBase::createUniformSampler2D(const TString& name)
+TIntermSymbol* RewriteCSSShaderBase::createSampler2DUniform(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtSampler2D, EbpUndefined, EvqUniform));
 }
 
-TIntermSymbol* RewriteCSSShaderBase::createVaryingVec2(const TString& name)
+TIntermSymbol* RewriteCSSShaderBase::createVec2Varying(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqVaryingIn, 2));
 }
 
-TIntermSymbol* RewriteCSSShaderBase::createAttributeVec2(const TString& name)
+TIntermSymbol* RewriteCSSShaderBase::createVec2Attribute(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqAttribute, 2));
 }
@@ -178,8 +178,8 @@ TIntermBinary* RewriteCSSShaderBase::createBinaryWithMat4Result(TOperator op, TI
 TIntermAggregate* RewriteCSSShaderBase::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
 {
     TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D); // TODO(mvujovic): Should I be pool allocating strings?
-    addArgument(texture2DCall, createUniformSampler2D(textureUniformName));
-    addArgument(texture2DCall, createVaryingVec2(texCoordVaryingName));
+    addArgument(texture2DCall, createSampler2DUniform(textureUniformName));
+    addArgument(texture2DCall, createVec2Varying(texCoordVaryingName));
     return texture2DCall;
 }
 
@@ -191,14 +191,14 @@ TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
     return declaration;    
 }
 
-TIntermBinary* RewriteCSSShaderBase::createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs)
+TIntermBinary* RewriteCSSShaderBase::createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs)
 {
-    return createBinaryWithVec4Result(EOpInitialize, createGlobalVec4(symbolName), rhs);
+    return createBinaryWithVec4Result(EOpInitialize, createVec4Global(symbolName), rhs);
 }
 
-TIntermBinary* RewriteCSSShaderBase::createGlobalMat4Initialization(const TString& symbolName, TIntermTyped* rhs)
+TIntermBinary* RewriteCSSShaderBase::createMat4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs)
 {
-    return createBinaryWithMat4Result(EOpInitialize, createGlobalMat4(symbolName), rhs);
+    return createBinaryWithMat4Result(EOpInitialize, createMat4Global(symbolName), rhs);
 }
 
 TIntermAggregate* RewriteCSSShaderBase::createVoidFunction(const TString& name)
@@ -226,7 +226,7 @@ void RewriteCSSShaderBase::addArgument(TIntermAggregate* functionCall, TIntermNo
 // Inserts "varying vec2 css_TexCoordVarying".
 void RewriteCSSShaderBase::insertTexCoordVaryingDeclaration()
 {
-    insertAtBeginningOfShader(createDeclaration(createVaryingVec2(texCoordVaryingName)));
+    insertAtBeginningOfShader(createDeclaration(createVec2Varying(texCoordVaryingName)));
 }
 
 void RewriteCSSShaderBase::insertAtBeginningOfShader(TIntermNode* node)

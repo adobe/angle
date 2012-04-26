@@ -15,15 +15,15 @@ void RewriteCSSVertexShader::rewrite()
     
     insertTexCoordVaryingDeclaration();
     insertTexCoordAttribute();
-    insertCSSTexCoordVaryingAssignment();
+    insertTexCoordVaryingAssignment();
 }
 
 void RewriteCSSVertexShader::insertTexCoordAttribute()
 {
-    insertAtBeginningOfShader(createDeclaration(createAttributeVec2(texCoordAttributeName)));
+    insertAtBeginningOfShader(createDeclaration(createVec2Attribute(texCoordAttributeName)));
 }
 
-void RewriteCSSVertexShader::insertCSSTexCoordVaryingAssignment()
+void RewriteCSSVertexShader::insertTexCoordVaryingAssignment()
 {
-    insertAtBeginningOfFunction(findFunction(kMain), createBinaryWithVec2Result(EOpAssign, createVaryingVec2(texCoordVaryingName), createAttributeVec2(texCoordAttributeName)));
+    insertAtBeginningOfFunction(findFunction(kMain), createBinaryWithVec2Result(EOpAssign, createVec2Varying(texCoordVaryingName), createVec2Attribute(texCoordAttributeName)));
 }
