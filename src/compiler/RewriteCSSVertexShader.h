@@ -22,10 +22,11 @@ public:
     RewriteCSSVertexShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
         : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink)
         , texCoordAttributeName(kTexCoordAttributePrefix + hiddenSymbolSuffix) {}    
+
     void rewrite();
     
 private:
-    // TODO: This should be fixed to "a_texCoord", and defined if its not defined already.
+    // TODO(mvujovic): This should be fixed to "a_texCoord", and defined if its not defined already.
     static const char* const kTexCoordAttributePrefix;
     
     void insertTexCoordAttribute();

@@ -57,6 +57,7 @@ public:
     virtual TCompiler* getAsCompiler() { return this; }
 
     bool Init(const ShBuiltInResources& resources);
+    void setHiddenSymbolSuffix(const char* const suffix) { hiddenSymbolSuffix = suffix; }
     bool compile(const char* const shaderStrings[],
                  const int numStrings,
                  int compileOptions);
@@ -67,11 +68,7 @@ public:
     const TVariableInfoList& getUniforms() const { return uniforms; }
     int getMappedNameMaxLength() const;
     
-    const TString getCSSShaderInfo(ShCSSShaderInfo info) const;
-
-    // TODO: Document.
-    void setHiddenSymbolSuffix(const char* const suffix) { hiddenSymbolSuffix = suffix; }
-    
+    const TString getCSSShaderInfo(ShCSSShaderInfo info) const;    
 protected:
     ShShaderType getShaderType() const { return shaderType; }
     ShShaderSpec getShaderSpec() const { return shaderSpec; }

@@ -26,7 +26,7 @@ public:
             mSymbolUsageFound = true;
     }
     
-    virtual bool visitBinary(Visit visit, TIntermBinary*) {return shouldKeepLooking();}
+    virtual bool visitBinary(Visit visit, TIntermBinary* node) {return shouldKeepLooking();} // TODO(mvujovic): Remove node.
     virtual bool visitUnary(Visit visit, TIntermUnary*) {return shouldKeepLooking();}
     virtual bool visitSelection(Visit visit, TIntermSelection*) {return shouldKeepLooking();}
     virtual bool visitAggregate(Visit visit, TIntermAggregate*) {return shouldKeepLooking();}
@@ -154,6 +154,27 @@ TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* le
     return binary; 
 }
 
+TIntermBinary* RewriteCSSShaderBase::createBinaryWithVec2Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
+{
+    TIntermBinary* binary = createBinary(op, left, right);
+    binary->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 2));
+    return binary;
+}
+
+TIntermBinary* RewriteCSSShaderBase::createBinaryWithVec4Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
+{
+    TIntermBinary* binary = createBinary(op, left, right);
+    binary->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4));
+    return binary;
+}
+
+TIntermBinary* RewriteCSSShaderBase::createBinaryWithMat4Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
+{
+    TIntermBinary* binary = createBinary(op, left, right);
+    binary->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4, true));
+    return binary;
+}
+
 TIntermAggregate* RewriteCSSShaderBase::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
 {
     TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D); // TODO(mvujovic): Should I be pool allocating strings?
@@ -162,6 +183,7 @@ TIntermAggregate* RewriteCSSShaderBase::createTexture2DCall(const TString& textu
     return texture2DCall;
 }
 
+// The child can either be a symbol node or an initialization node. 
 TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
 {
     TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
@@ -171,16 +193,12 @@ TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
 
 TIntermBinary* RewriteCSSShaderBase::createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs)
 {
-    TIntermBinary* initialization = createBinary(EOpInitialize, createGlobalVec4(symbolName), rhs);
-    initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4));
-    return initialization;
+    return createBinaryWithVec4Result(EOpInitialize, createGlobalVec4(symbolName), rhs);
 }
 
 TIntermBinary* RewriteCSSShaderBase::createGlobalMat4Initialization(const TString& symbolName, TIntermTyped* rhs)
 {
-    TIntermBinary* initialization = createBinary(EOpInitialize, createGlobalMat4(symbolName), rhs);
-    initialization->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4, true));
-    return initialization;
+    return createBinaryWithMat4Result(EOpInitialize, createGlobalMat4(symbolName), rhs);
 }
 
 TIntermAggregate* RewriteCSSShaderBase::createVoidFunction(const TString& name)

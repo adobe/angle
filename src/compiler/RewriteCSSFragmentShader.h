@@ -25,8 +25,6 @@ public:
     
     virtual void rewrite();
     
-    const TString& getTextureUniformName() { return textureUniformName; } 
-    
 private:  
     static const char* const kBlendColor;
     static const char* const kColorMatrix;

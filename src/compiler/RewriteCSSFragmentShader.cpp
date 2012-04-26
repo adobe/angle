@@ -75,11 +75,11 @@ void RewriteCSSFragmentShader::insertBlendOp()
     TIntermTyped* blendOpLhs = NULL;
     TIntermAggregate* texture2DCall = createTexture2DCall(textureUniformName, texCoordVaryingName);
     if (usesColorMatrix)
-        blendOpLhs = createBinary(EOpMul, createGlobalMat4(kColorMatrix), texture2DCall);
+        blendOpLhs = createBinaryWithVec4Result(EOpMatrixTimesVector, createGlobalMat4(kColorMatrix), texture2DCall);
     else
         blendOpLhs = texture2DCall;
     
-    TIntermBinary* assignmentRhs = createBinary(blendOp, blendOpLhs, createGlobalVec4(kBlendColor));
-    TIntermBinary* assignment = createBinary(EOpAssign, createGlobalVec4(kFragColor), assignmentRhs);
+    TIntermBinary* assignmentRhs = createBinaryWithVec4Result(blendOp, blendOpLhs, createGlobalVec4(kBlendColor));
+    TIntermBinary* assignment = createBinaryWithVec4Result(EOpAssign, createGlobalVec4(kFragColor), assignmentRhs);
     insertAtEndOfFunction(findFunction(kMain), assignment);
 }

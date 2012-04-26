@@ -163,7 +163,8 @@ void ShDestruct(ShHandle handle)
 }
 
 //
-// TODO: Document.
+// Set the suffix that the compiler will append to hidden symbols as a
+// backup security measure.
 //
 COMPILER_EXPORT void ShSetHiddenSymbolSuffix(const ShHandle handle, const char* const suffix)
 {

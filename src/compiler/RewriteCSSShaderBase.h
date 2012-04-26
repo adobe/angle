@@ -41,6 +41,9 @@ protected:
     TIntermAggregate* createFunctionCall(const TString& name);
     void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
     TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right);
+    TIntermBinary* createBinaryWithVec2Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
+    TIntermBinary* createBinaryWithVec4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
+    TIntermBinary* createBinaryWithMat4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermAggregate* createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName);
     TIntermAggregate* createDeclaration(TIntermNode* child);
     TIntermBinary* createGlobalVec4Initialization(const TString& symbolName, TIntermTyped* rhs);
