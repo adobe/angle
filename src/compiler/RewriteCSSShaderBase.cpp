@@ -17,28 +17,28 @@ public:
     : TIntermTraverser(true, false, false)
     , mSymbolName(symbolName)
     , mSymbolUsageFound(false) {}
-    
+
     bool symbolUsageFound() { return mSymbolUsageFound; }
-    
+
     virtual void visitSymbol(TIntermSymbol* node)
     {
         if (node->getSymbol() == mSymbolName)
             mSymbolUsageFound = true;
     }
-    
+
     virtual bool visitBinary(Visit visit, TIntermBinary*) {return shouldKeepLooking();}
     virtual bool visitUnary(Visit visit, TIntermUnary*) {return shouldKeepLooking();}
     virtual bool visitSelection(Visit visit, TIntermSelection*) {return shouldKeepLooking();}
     virtual bool visitAggregate(Visit visit, TIntermAggregate*) {return shouldKeepLooking();}
     virtual bool visitLoop(Visit visit, TIntermLoop*) {return shouldKeepLooking();}
     virtual bool visitBranch(Visit visit, TIntermBranch*) {return shouldKeepLooking();}
-    
+
 private:
     bool shouldKeepLooking() { return !mSymbolUsageFound; }
-    
+
     const TString& mSymbolName;
     bool mSymbolUsageFound;
-};    
+};
 
 bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
 {
@@ -48,7 +48,7 @@ bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
 }
 
 //
-// Renames a function, including its declaration and any calls to it. 
+// Renames a function, including its declaration and any calls to it.
 //
 class RenameFunction : public TIntermTraverser
 {
@@ -57,7 +57,7 @@ public:
     : TIntermTraverser(true, false, false)
     , mOldFunctionName(oldFunctionName)
     , mNewFunctionName(newFunctionName) {}
-    
+
     virtual bool visitAggregate(Visit visit, TIntermAggregate* node)
     {
         TOperator op = node->getOp();
@@ -65,7 +65,7 @@ public:
             node->setName(mNewFunctionName);
         return true;
     }
-    
+
 private:
     const TString& mOldFunctionName;
     const TString& mNewFunctionName;
@@ -97,7 +97,7 @@ TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y,
     constantArray[1].setFConst(y);
     constantArray[2].setFConst(z);
     constantArray[3].setFConst(w);
-    return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4));    
+    return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4));
 }
 
 TIntermConstantUnion* RewriteCSSShaderBase::createMat4IdentityConstant()
@@ -105,13 +105,13 @@ TIntermConstantUnion* RewriteCSSShaderBase::createMat4IdentityConstant()
     ConstantUnion* constantArray = new ConstantUnion[4 * 4];
     for (int i = 0; i < 4 * 4; i++)
         constantArray[i].setFConst(0.0);
-    
+
     constantArray[0].setFConst(1.0);
     constantArray[5].setFConst(1.0);
     constantArray[10].setFConst(1.0);
     constantArray[15].setFConst(1.0);
-    
-    return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4, true));    
+
+    return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4, true));
 }
 
 TIntermSymbol* RewriteCSSShaderBase::createVec4Global(const TString& name)
@@ -151,7 +151,7 @@ TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* le
     TIntermBinary* binary = new TIntermBinary(op);
     binary->setLeft(left);
     binary->setRight(right);
-    return binary; 
+    return binary;
 }
 
 TIntermBinary* RewriteCSSShaderBase::createBinaryWithVec2Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
@@ -177,18 +177,18 @@ TIntermBinary* RewriteCSSShaderBase::createBinaryWithMat4Result(TOperator op, TI
 
 TIntermAggregate* RewriteCSSShaderBase::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
 {
-    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D); // TODO(mvujovic): Should I be pool allocating strings?
+    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D);
     addArgument(texture2DCall, createSampler2DUniform(textureUniformName));
     addArgument(texture2DCall, createVec2Varying(texCoordVaryingName));
     return texture2DCall;
 }
 
-// The child can either be a symbol node or an initialization node. 
+// The child can either be a symbol node or an initialization node.
 TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
 {
     TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
     declaration->getSequence().push_back(child);
-    return declaration;    
+    return declaration;
 }
 
 TIntermBinary* RewriteCSSShaderBase::createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs)
@@ -206,15 +206,15 @@ TIntermAggregate* RewriteCSSShaderBase::createVoidFunction(const TString& name)
     TIntermAggregate* function = new TIntermAggregate(EOpFunction);
     function->setName(name);
     function->setType(TType(EbtVoid, EbpUndefined, EvqGlobal));
-    
+
     TIntermSequence& paramsAndBody = function->getSequence();
-    
+
     TIntermAggregate* parameters = new TIntermAggregate(EOpParameters);
     paramsAndBody.push_back(parameters);
-    
+
     TIntermAggregate* body = new TIntermAggregate(EOpSequence);
     paramsAndBody.push_back(body);
-    
+
     return function;
 }
 
@@ -261,15 +261,15 @@ void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermAggregate* function, TIn
 void RewriteCSSShaderBase::createRootSequenceIfNeeded()
 {
     TIntermAggregate* rootAggregate = root->getAsAggregate();
- 
+
     // The root should be a sequence or a function declaration, both of which should be aggregate nodes.
     ASSERT(rootAggregate);
     ASSERT(rootAggregate->getOp() == EOpSequence || rootAggregate->getOp() == EOpFunction);
-    
+
     if (rootAggregate->getOp() == EOpFunction) {
         // If the tree root is a function declaration, it should be the main function.
         ASSERT(rootAggregate->getName() == kMain);
-        
+
         TIntermAggregate* newRoot = new TIntermAggregate(EOpSequence);
         TIntermSequence& sequence = newRoot->getSequence();
         sequence.push_back(root);
@@ -281,10 +281,10 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
 {
     TIntermAggregate* body = NULL;
     TIntermSequence& paramsAndBody = function->getSequence();
-    
+
     // The function should have parameters and may have a body.
     ASSERT(paramsAndBody.size() == 1 || paramsAndBody.size() == 2);
-    
+
     if (paramsAndBody.size() == 2) {
         body = paramsAndBody[1]->getAsAggregate();
     } else {
@@ -292,7 +292,7 @@ TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate
         body = new TIntermAggregate(EOpSequence);
         paramsAndBody.push_back(body);
     }
-    
+
     // The function body should be an aggregate node.
     ASSERT(body);
 

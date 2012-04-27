@@ -20,17 +20,17 @@ public:
         : root(treeRoot)
         , texCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix)
         , sink(infoSink) {}
-    
+
     virtual void rewrite();
     TIntermNode* getNewTreeRoot() { return root; }
-    
+
     virtual ~RewriteCSSShaderBase() {}
-    
+
 protected:
     static const char* const kTexCoordVaryingPrefix;
     static const char* const kTexture2D;
     static const char* const kMain;
-    
+
     TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
     TIntermConstantUnion* createMat4IdentityConstant();
     TIntermSymbol* createVec4Global(const TString& name);
@@ -49,21 +49,21 @@ protected:
     TIntermBinary* createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
     TIntermBinary* createMat4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
     TIntermAggregate* createVoidFunction(const TString& name);
-    
+
     void insertAtBeginningOfShader(TIntermNode* node);
     void insertAtEndOfShader(TIntermNode* node);
     void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node);
     void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node);
     void insertTexCoordVaryingDeclaration();
-    
+
     TIntermAggregate* findFunction(const TString& name);
     void renameFunction(const TString& oldFunctionName, const TString& newFunctionName);
     bool isSymbolUsed(const TString& symbolName);
-    
+
     TIntermNode* root;
     TString texCoordVaryingName;
     TInfoSinkBase& sink;
-    
+
 private:
     void createRootSequenceIfNeeded();
     TIntermAggregate* getOrCreateFunctionBody(TIntermAggregate* function);

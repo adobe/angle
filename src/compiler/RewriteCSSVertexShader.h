@@ -15,7 +15,30 @@
 
 class TInfoSinkBase;
 
-// TODO(mvujovic): Give an example.
+//
+// Rewrites a CSS vertex shader into a valid GLSL shader via the intermediate tree.
+//
+
+// Example original vertex shader:
+/*
+
+ attribute vec2 a_texCoord;
+ void main() {
+ }
+
+ */
+
+// Example rewritten vertex shader:
+// "XXX" represents the hidden symbol suffix.
+/*
+
+ varying vec2 css_v_texCoordXXX;
+ attribute vec2 a_texCoord;
+ void main(){
+ (css_v_texCoordXXX = a_texCoord);
+ }
+
+ */
 
 class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
@@ -23,10 +46,10 @@ public:
         : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink) {}
 
     void rewrite();
-    
+
 private:
     static const char* const kTexCoordAttributeName;
-    
+
     void insertTexCoordVaryingAssignment();
 };
 

@@ -15,11 +15,13 @@ void RewriteCSSFragmentShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
 
+    usesBlendColor = isSymbolUsed(kBlendColor);
     usesColorMatrix = isSymbolUsed(kColorMatrix);
-    
+
     insertTextureUniformDeclaration();
     insertTexCoordVaryingDeclaration();
-    insertBlendColorDeclaration();
+    if (usesBlendColor)
+        insertBlendColorDeclaration();
     if (usesColorMatrix)
         insertColorMatrixDeclaration();
     renameFunction(kMain, userMainFunctionName);
@@ -63,21 +65,26 @@ void RewriteCSSFragmentShader::insertUserMainFunctionCall()
     insertAtBeginningOfFunction(findFunction(kMain), createFunctionCall(userMainFunctionName));
 }
 
-// If css_ColorMatrix is used, inserts "gl_FragColor = css_ColorMatrix * texture2D(s_texture, v_texCoord) <BLEND OP> css_FragColor"
-// Otherwise, inserts "gl_FragColor = texture2D(s_texture, v_texCoord) <BLEND OP> css_FragColor "
+// If both css_BlendColor and css_ColorMatrix are used,
+// inserts "gl_FragColor = (css_ColorMatrix * texture2D(css_u_textureXXX, css_v_texCoordXXX)) <BLEND OP> css_FragColor"
 void RewriteCSSFragmentShader::insertBlendOp()
 {
     // FIXME(mvujovic): Eventually, we'd like to support other blend operations besides multiply.
     TOperator blendOp = EOpMul;
-    
+
     TIntermTyped* blendOpLhs = NULL;
     TIntermAggregate* texture2DCall = createTexture2DCall(textureUniformName, texCoordVaryingName);
     if (usesColorMatrix)
         blendOpLhs = createBinaryWithVec4Result(EOpMatrixTimesVector, createMat4Global(kColorMatrix), texture2DCall);
     else
         blendOpLhs = texture2DCall;
-    
-    TIntermBinary* assignmentRhs = createBinaryWithVec4Result(blendOp, blendOpLhs, createVec4Global(kBlendColor));
+
+    TIntermTyped* assignmentRhs = NULL;
+    if (usesBlendColor)
+        assignmentRhs = createBinaryWithVec4Result(blendOp, blendOpLhs, createVec4Global(kBlendColor));
+    else
+        assignmentRhs = blendOpLhs;
+
     TIntermBinary* assignment = createBinaryWithVec4Result(EOpAssign, createVec4Global(kFragColor), assignmentRhs);
     insertAtEndOfFunction(findFunction(kMain), assignment);
 }

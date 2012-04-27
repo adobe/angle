@@ -13,7 +13,7 @@ void RewriteCSSVertexShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
 
-    // FIXME(mvujovic): We rely on the shader defining a_texCoord. 
+    // FIXME(mvujovic): We rely on the shader defining a_texCoord.
     // In the future, all of the attributes and uniforms from the CSS Shaders spec will be built-ins,
     // and we will insert declarations for them here.
     insertTexCoordVaryingDeclaration();
