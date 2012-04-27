@@ -157,22 +157,25 @@ bool TCompiler::compile(const char* const shaderStrings[],
     // Parse shader.
     bool success =
         (PaParseStrings(numStrings - firstSource, &shaderStrings[firstSource], NULL, &parseContext) == 0) &&
-        (parseContext.treeRoot != NULL) &&
-        intermediate.postProcess(parseContext.treeRoot);
+        (parseContext.treeRoot != NULL);
     if (success) {
-        // The CSS Shaders spec requires rewriting parts of shaders.
-        // Note that the tree root may change as a side effect.
-        if (shaderSpec == SH_CSS_SHADERS_SPEC)
-            rewriteCSSShader();
-
+        intermediate.postProcess(parseContext.treeRoot);
+        
         TIntermNode* root = parseContext.treeRoot;
-
+        
         if (success)
             success = detectRecursion(root);
 
         if (success && (compileOptions & SH_VALIDATE_LOOP_INDEXING))
             success = validateLimitations(root);
 
+        if (success && shaderSpec == SH_CSS_SHADERS_SPEC) {
+            // The tree root (GlobalParseContext->treeRoot) may change as a side effect
+            // of rewriting the shader according the CSS Shaders spec.
+            root = rewriteCSSShader(root);
+            parseContext.treeRoot = root;
+        }
+        
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
             ForLoopUnroll::MarkForLoopsWithIntegerIndicesForUnrolling(root);
@@ -247,16 +250,16 @@ bool TCompiler::detectRecursion(TIntermNode* root)
     }
 }
 
-void TCompiler::rewriteCSSShader()
+TIntermNode* TCompiler::rewriteCSSShader(TIntermNode* root)
 {
     if (shaderType == SH_VERTEX_SHADER) {
-        RewriteCSSVertexShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix);
+        RewriteCSSVertexShader rewriter(root, hiddenSymbolSuffix);
         rewriter.rewrite();
-        GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
+        return rewriter.getNewTreeRoot();
     } else {
-        RewriteCSSFragmentShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix);
+        RewriteCSSFragmentShader rewriter(root, hiddenSymbolSuffix);
         rewriter.rewrite();
-        GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
+        return rewriter.getNewTreeRoot();
     }
 }
 

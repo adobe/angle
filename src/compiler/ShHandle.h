@@ -76,8 +76,9 @@ protected:
     void clearResults();
     // Return true if function recursion is detected.
     bool detectRecursion(TIntermNode* root);
-    // Rewrites a CSS shader's intermediate tree into a valid GLSL shader.
-    void rewriteCSSShader();
+    // Rewrites a CSS shader's intermediate tree into a valid GLSL shader,
+    // and returns the potentially new intermediate tree root.
+    TIntermNode* rewriteCSSShader(TIntermNode* root);
     // Returns true if the given shader does not exceed the minimum
     // functionality mandated in GLSL 1.0 spec Appendix A.
     bool validateLimitations(TIntermNode* root);

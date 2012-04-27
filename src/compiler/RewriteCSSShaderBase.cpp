@@ -94,6 +94,11 @@ TIntermAggregate* RewriteCSSShaderBase::createFunctionCall(const TString& name, 
     return functionCall;
 }
 
+void RewriteCSSShaderBase::addArgument(TIntermAggregate* functionCall, TIntermNode* argument)
+{
+    functionCall->getSequence().push_back(argument);
+}
+
 TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type)
 {
     TIntermBinary* binary = new TIntermBinary(op);
@@ -153,11 +158,6 @@ TIntermAggregate* RewriteCSSShaderBase::createVoidFunction(const TString& name)
     return function;
 }
 
-void RewriteCSSShaderBase::addArgument(TIntermAggregate* functionCall, TIntermNode* argument)
-{
-    functionCall->getSequence().push_back(argument);
-}
-
 // Inserts "varying vec2 css_v_texCoord;".
 void RewriteCSSShaderBase::insertTexCoordVaryingDeclaration()
 {
@@ -166,13 +166,25 @@ void RewriteCSSShaderBase::insertTexCoordVaryingDeclaration()
 
 void RewriteCSSShaderBase::insertAtBeginningOfShader(TIntermNode* node)
 {
-    TIntermSequence& rootSequence = root->getAsAggregate()->getSequence();
+    TIntermAggregate* rootAggregate = root->getAsAggregate();
+    
+    // Assert that the tree root is a sequence (i.e. createRootSequenceIfNeeded was called).
+    ASSERT(rootAggregate);
+    ASSERT(rootAggregate->getOp() == EOpSequence);
+    
+    TIntermSequence& rootSequence = rootAggregate->getSequence();
     rootSequence.insert(rootSequence.begin(), node);
 }
 
 void RewriteCSSShaderBase::insertAtEndOfShader(TIntermNode* node)
 {
-    root->getAsAggregate()->getSequence().push_back(node);
+    TIntermAggregate* rootAggregate = root->getAsAggregate();
+    
+    // Assert that the tree root is a sequence (i.e. createRootSequenceIfNeeded was called).
+    ASSERT(rootAggregate);
+    ASSERT(rootAggregate->getOp() == EOpSequence);
+    
+    rootAggregate->getSequence().push_back(node);
 }
 
 void RewriteCSSShaderBase::insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node)
@@ -186,23 +198,22 @@ void RewriteCSSShaderBase::insertAtEndOfFunction(TIntermAggregate* function, TIn
     getOrCreateFunctionBody(function)->getSequence().push_back(node);
 }
 
-// Call this at the beginning of rewriting to wrap the main function in a sequence, if it isn't already
-// wrapped in one.
-// All of the other methods in this class and any subclasses will assume that the root is a sequence.
-// Wrapping is required when the shader has only a main() function in the global scope, which makes the
-// main function the tree root.
-// In general, we want the main function wrapped in a sequence because we will need to insert declarations
-// in the global scope around it.
+// The tree root comes in as either a sequence or a main function declaration.
+// If the tree root is a main function declaration, this method creates a new sequence,
+// puts the main function declaration inside it, and changes the tree root to point to
+// the new sequence.
+// Thus, after this function is called, the tree root can only be a sequence.
 void RewriteCSSShaderBase::createRootSequenceIfNeeded()
 {
     TIntermAggregate* rootAggregate = root->getAsAggregate();
 
-    // The root should be a sequence or a function declaration, both of which should be aggregate nodes.
+    // The root should come in as either a sequence or a function declaration, both of which are aggregate nodes.
     ASSERT(rootAggregate);
     ASSERT(rootAggregate->getOp() == EOpSequence || rootAggregate->getOp() == EOpFunction);
 
     if (rootAggregate->getOp() == EOpFunction) {
         // If the tree root is a function declaration, it should be the main function.
+        // Previous compiler steps should have already thrown an error if there is no main function.
         ASSERT(rootAggregate->getName() == kMain);
 
         TIntermAggregate* newRoot = new TIntermAggregate(EOpSequence);
@@ -212,25 +223,31 @@ void RewriteCSSShaderBase::createRootSequenceIfNeeded()
     }
 }
 
+// A function in the shader is an aggregate node that can contain two children in its sequence,
+// including a parameter list node and function body node.
+// A function with an empty body will not have a body node (e.g. "void main() {}").
+// If the function does not have a body node, this method will create one for it.
+// If the function does have a body node, this method will just return it.
 TIntermAggregate* RewriteCSSShaderBase::getOrCreateFunctionBody(TIntermAggregate* function)
 {
     TIntermAggregate* body = NULL;
     TIntermSequence& paramsAndBody = function->getSequence();
 
-    // The function should have parameters and may have a body.
-    ASSERT(paramsAndBody.size() == 1 || paramsAndBody.size() == 2);
+    // Functions always have parameters nodes. They might also have a body node.
+    ASSERT(paramsAndBody.size() >= 1 || paramsAndBody.size() <= 2);
 
     if (paramsAndBody.size() == 2) {
         body = paramsAndBody[1]->getAsAggregate();
+        
+        // If a body node exists, it should be an aggregate sequence node.
+        ASSERT(body);
+        ASSERT(body->getOp() == EOpSequence);
     } else {
-        // Make a function body if necessary.
+        // If a body node doesn't exist, make one.
         body = new TIntermAggregate(EOpSequence);
         paramsAndBody.push_back(body);
     }
-
-    // The function body should be an aggregate node.
-    ASSERT(body);
-
+    
     return body;
 }
 
