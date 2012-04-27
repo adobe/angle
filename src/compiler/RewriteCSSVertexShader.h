@@ -20,19 +20,14 @@ class TInfoSinkBase;
 class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSVertexShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
-        : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink)
-        , texCoordAttributeName(kTexCoordAttributePrefix + hiddenSymbolSuffix) {}    
+        : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink) {}
 
     void rewrite();
     
 private:
-    // TODO(mvujovic): This should be fixed to "a_texCoord", and defined if its not defined already.
-    static const char* const kTexCoordAttributePrefix;
+    static const char* const kTexCoordAttributeName;
     
-    void insertTexCoordAttribute();
     void insertTexCoordVaryingAssignment();
-    
-    TString texCoordAttributeName;
 };
 
 #endif  // COMPILER_REWRITE_CSS_VERTEX_SHADER

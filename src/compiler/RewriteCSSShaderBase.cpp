@@ -26,7 +26,7 @@ public:
             mSymbolUsageFound = true;
     }
     
-    virtual bool visitBinary(Visit visit, TIntermBinary* node) {return shouldKeepLooking();} // TODO(mvujovic): Remove node.
+    virtual bool visitBinary(Visit visit, TIntermBinary*) {return shouldKeepLooking();}
     virtual bool visitUnary(Visit visit, TIntermUnary*) {return shouldKeepLooking();}
     virtual bool visitSelection(Visit visit, TIntermSelection*) {return shouldKeepLooking();}
     virtual bool visitAggregate(Visit visit, TIntermAggregate*) {return shouldKeepLooking();}
@@ -86,7 +86,7 @@ void RewriteCSSShaderBase::rewrite()
     createRootSequenceIfNeeded();
 }
 
-const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_TexCoordVarying";
+const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_v_texCoord";
 const char* const RewriteCSSShaderBase::kTexture2D = "texture2D(s21;vf2;";
 const char* const RewriteCSSShaderBase::kMain = "main(";
 
@@ -223,7 +223,7 @@ void RewriteCSSShaderBase::addArgument(TIntermAggregate* functionCall, TIntermNo
     functionCall->getSequence().push_back(argument);
 }
 
-// Inserts "varying vec2 css_TexCoordVarying".
+// Inserts "varying vec2 css_v_texCoord".
 void RewriteCSSShaderBase::insertTexCoordVaryingDeclaration()
 {
     insertAtBeginningOfShader(createDeclaration(createVec2Varying(texCoordVaryingName)));

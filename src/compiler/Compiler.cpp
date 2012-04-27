@@ -160,7 +160,8 @@ bool TCompiler::compile(const char* const shaderStrings[],
         (parseContext.treeRoot != NULL) &&
         intermediate.postProcess(parseContext.treeRoot);
     if (success) {
-        // The CSS Shaders spec requires rewriting shaders. Note that the tree root may change as a side effect.
+        // The CSS Shaders spec requires rewriting parts of shaders. 
+        // Note that the tree root may change as a side effect.
         if (shaderSpec == SH_CSS_SHADERS_SPEC)
             success = rewriteCSSShader();
 

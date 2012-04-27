@@ -7,23 +7,21 @@
 #include "compiler/RewriteCSSVertexShader.h"
 #include "ParseHelper.h"
 
-const char* const RewriteCSSVertexShader::kTexCoordAttributePrefix = "css_TexCoordAttribute";
+const char* const RewriteCSSVertexShader::kTexCoordAttributeName = "a_texCoord";
 
 void RewriteCSSVertexShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
-    
+
+    // FIXME(mvujovic): We rely on the shader defining a_texCoord. 
+    // In the future, all of the attributes and uniforms from the CSS Shaders spec will be built-ins,
+    // and we will insert declarations for them here.
     insertTexCoordVaryingDeclaration();
-    insertTexCoordAttribute();
     insertTexCoordVaryingAssignment();
 }
 
-void RewriteCSSVertexShader::insertTexCoordAttribute()
-{
-    insertAtBeginningOfShader(createDeclaration(createVec2Attribute(texCoordAttributeName)));
-}
-
+// Inserts "css_v_texCoordXXX = a_texCoord;" as the first line of the main function.
 void RewriteCSSVertexShader::insertTexCoordVaryingAssignment()
 {
-    insertAtBeginningOfFunction(findFunction(kMain), createBinaryWithVec2Result(EOpAssign, createVec2Varying(texCoordVaryingName), createVec2Attribute(texCoordAttributeName)));
+    insertAtBeginningOfFunction(findFunction(kMain), createBinaryWithVec2Result(EOpAssign, createVec2Varying(texCoordVaryingName), createVec2Attribute(kTexCoordAttributeName)));
 }
