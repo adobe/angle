@@ -4,40 +4,13 @@
 // found in the LICENSE file.
 //
 
+#include "compiler/FindSymbolUsage.h"
+#include "compiler/RenameFunction.h"
 #include "compiler/RewriteCSSShaderBase.h"
 
-//
-// Determines if a symbol is used.
-//
-class FindSymbolUsage : public TIntermTraverser
-{
-public:
-    FindSymbolUsage(const TString& symbolName)
-    : TIntermTraverser(true, false, false)
-    , mSymbolName(symbolName)
-    , mSymbolUsageFound(false) {}
+// TODO: Update gyp.
 
-    bool symbolUsageFound() { return mSymbolUsageFound; }
-
-    virtual void visitSymbol(TIntermSymbol* node)
-    {
-        if (node->getSymbol() == mSymbolName)
-            mSymbolUsageFound = true;
-    }
-
-    virtual bool visitBinary(Visit visit, TIntermBinary*) {return shouldKeepLooking();}
-    virtual bool visitUnary(Visit visit, TIntermUnary*) {return shouldKeepLooking();}
-    virtual bool visitSelection(Visit visit, TIntermSelection*) {return shouldKeepLooking();}
-    virtual bool visitAggregate(Visit visit, TIntermAggregate*) {return shouldKeepLooking();}
-    virtual bool visitLoop(Visit visit, TIntermLoop*) {return shouldKeepLooking();}
-    virtual bool visitBranch(Visit visit, TIntermBranch*) {return shouldKeepLooking();}
-
-private:
-    bool shouldKeepLooking() { return !mSymbolUsageFound; }
-
-    const TString& mSymbolName;
-    bool mSymbolUsageFound;
-};
+// TODO: Move these.
 
 bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
 {
@@ -45,30 +18,6 @@ bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
     root->traverse(&findSymbolUsage);
     return findSymbolUsage.symbolUsageFound();
 }
-
-//
-// Renames a function, including its declaration and any calls to it.
-//
-class RenameFunction : public TIntermTraverser
-{
-public:
-    RenameFunction(const TString& oldFunctionName, const TString& newFunctionName)
-    : TIntermTraverser(true, false, false)
-    , mOldFunctionName(oldFunctionName)
-    , mNewFunctionName(newFunctionName) {}
-
-    virtual bool visitAggregate(Visit visit, TIntermAggregate* node)
-    {
-        TOperator op = node->getOp();
-        if ((op == EOpFunction || op == EOpFunctionCall) && node->getName() == mOldFunctionName)
-            node->setName(mNewFunctionName);
-        return true;
-    }
-
-private:
-    const TString& mOldFunctionName;
-    const TString& mNewFunctionName;
-};
 
 void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const TString& newFunctionName)
 {
@@ -86,7 +35,6 @@ void RewriteCSSShaderBase::rewrite()
 }
 
 const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_v_texCoord";
-const char* const RewriteCSSShaderBase::kTexture2D = "texture2D(s21;vf2;";
 const char* const RewriteCSSShaderBase::kMain = "main(";
 
 TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y, float z, float w)
@@ -138,16 +86,18 @@ TIntermSymbol* RewriteCSSShaderBase::createVec2Attribute(const TString& name)
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqAttribute, 2));
 }
 
-TIntermAggregate* RewriteCSSShaderBase::createFunctionCall(const TString& name)
+TIntermAggregate* RewriteCSSShaderBase::createFunctionCall(const TString& name, const TType& resultType)
 {
     TIntermAggregate* functionCall = new TIntermAggregate(EOpFunctionCall);
     functionCall->setName(name);
+    functionCall->setType(resultType);
     return functionCall;
 }
 
-TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right)
+TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type)
 {
     TIntermBinary* binary = new TIntermBinary(op);
+    binary->setType(type);
     binary->setLeft(left);
     binary->setRight(right);
     return binary;
@@ -155,31 +105,17 @@ TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* le
 
 TIntermBinary* RewriteCSSShaderBase::createBinaryWithVec2Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
 {
-    TIntermBinary* binary = createBinary(op, left, right);
-    binary->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 2));
-    return binary;
+    return createBinary(op, left, right, TType(EbtFloat, EbpHigh, EvqTemporary, 2));
 }
 
 TIntermBinary* RewriteCSSShaderBase::createBinaryWithVec4Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
 {
-    TIntermBinary* binary = createBinary(op, left, right);
-    binary->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4));
-    return binary;
+    return createBinary(op, left, right, TType(EbtFloat, EbpHigh, EvqTemporary, 4));
 }
 
 TIntermBinary* RewriteCSSShaderBase::createBinaryWithMat4Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
 {
-    TIntermBinary* binary = createBinary(op, left, right);
-    binary->setType(TType(EbtFloat, EbpHigh, EvqTemporary, 4, true));
-    return binary;
-}
-
-TIntermAggregate* RewriteCSSShaderBase::createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName)
-{
-    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D);
-    addArgument(texture2DCall, createSampler2DUniform(textureUniformName));
-    addArgument(texture2DCall, createVec2Varying(texCoordVaryingName));
-    return texture2DCall;
+    return createBinary(op, left, right, TType(EbtFloat, EbpHigh, EvqTemporary, 4, true));
 }
 
 // The child can either be a symbol node or an initialization node.

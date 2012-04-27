@@ -47,10 +47,8 @@ class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSFragmentShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix)
         : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix)
-        , textureUniformName(kTextureUniformPrefix + hiddenSymbolSuffix)
-        , userMainFunctionName(kUserMainFunctionPrefix + hiddenSymbolSuffix + "(")
-        , usesBlendColor(false)
-        , usesColorMatrix(false) {}
+        , mTextureUniformName(kTextureUniformPrefix + hiddenSymbolSuffix)
+        , mUserMainFunctionName(kUserMainFunctionPrefix + hiddenSymbolSuffix + "(") {}
 
     virtual void rewrite();
 
@@ -60,18 +58,19 @@ private:
     static const char* const kTextureUniformPrefix;
     static const char* const kUserMainFunctionPrefix;
     static const char* const kFragColor;
+    static const char* const kTexture2D;
 
+    TIntermAggregate* createTexture2DCall(const TString& mTextureUniformName, const TString& texCoordVaryingName);
+    
     void insertBlendColorDeclaration();
     void insertColorMatrixDeclaration();
     void insertTextureUniformDeclaration();
-    void insertNewMainFunction();
-    void insertUserMainFunctionCall();
-    void insertBlendOp();
+    TIntermAggregate* insertNewMainFunction();
+    void insertUserMainFunctionCall(TIntermAggregate* function);
+    void insertBlendOp(TIntermAggregate* function, bool usesBlendColor, bool usesColorMatrix);
 
-    TString textureUniformName;
-    TString userMainFunctionName;
-    bool usesBlendColor;
-    bool usesColorMatrix;
+    TString mTextureUniformName;
+    TString mUserMainFunctionName;
 };
 
 #endif  // COMPILER_REWRITE_CSS_FRAGMENT_SHADER

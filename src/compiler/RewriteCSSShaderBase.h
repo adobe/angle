@@ -26,7 +26,6 @@ public:
 
 protected:
     static const char* const kTexCoordVaryingPrefix;
-    static const char* const kTexture2D;
     static const char* const kMain;
 
     TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
@@ -36,13 +35,12 @@ protected:
     TIntermSymbol* createSampler2DUniform(const TString& name);
     TIntermSymbol* createVec2Varying(const TString& name);
     TIntermSymbol* createVec2Attribute(const TString& name);
-    TIntermAggregate* createFunctionCall(const TString& name);
+    TIntermAggregate* createFunctionCall(const TString& name, const TType& resultType);
     void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
-    TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right);
+    TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type);
     TIntermBinary* createBinaryWithVec2Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermBinary* createBinaryWithVec4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermBinary* createBinaryWithMat4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
-    TIntermAggregate* createTexture2DCall(const TString& textureUniformName, const TString& texCoordVaryingName);
     TIntermAggregate* createDeclaration(TIntermNode* child);
     TIntermBinary* createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
     TIntermBinary* createMat4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);

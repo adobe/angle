@@ -14,8 +14,8 @@ void RewriteCSSFragmentShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
 
-    usesBlendColor = isSymbolUsed(kBlendColor);
-    usesColorMatrix = isSymbolUsed(kColorMatrix);
+    bool usesBlendColor = isSymbolUsed(kBlendColor);
+    bool usesColorMatrix = isSymbolUsed(kColorMatrix);
 
     insertTextureUniformDeclaration();
     insertTexCoordVaryingDeclaration();
@@ -23,10 +23,12 @@ void RewriteCSSFragmentShader::rewrite()
         insertBlendColorDeclaration();
     if (usesColorMatrix)
         insertColorMatrixDeclaration();
-    renameFunction(kMain, userMainFunctionName);
-    insertNewMainFunction();
-    insertUserMainFunctionCall();
-    insertBlendOp();
+    
+    renameFunction(kMain, mUserMainFunctionName);
+    
+    TIntermAggregate* newMainFunction = insertNewMainFunction();
+    insertUserMainFunctionCall(newMainFunction);
+    insertBlendOp(newMainFunction, usesBlendColor, usesColorMatrix);
 }
 
 const char* const RewriteCSSFragmentShader::kBlendColor = "css_BlendColor";
@@ -34,6 +36,15 @@ const char* const RewriteCSSFragmentShader::kColorMatrix = "css_ColorMatrix";
 const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_u_texture";
 const char* const RewriteCSSFragmentShader::kUserMainFunctionPrefix = "css_main";
 const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
+const char* const RewriteCSSFragmentShader::kTexture2D = "texture2D(s21;vf2;";
+
+TIntermAggregate* RewriteCSSFragmentShader::createTexture2DCall(const TString& mTextureUniformName, const TString& texCoordVaryingName)
+{
+    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D, TType(EbtFloat, EbpUndefined, EvqTemporary, 4));   // TODO: Double check precision.
+    addArgument(texture2DCall, createSampler2DUniform(mTextureUniformName));
+    addArgument(texture2DCall, createVec2Varying(texCoordVaryingName));
+    return texture2DCall;
+}
 
 // Inserts "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0);".
 void RewriteCSSFragmentShader::insertBlendColorDeclaration()
@@ -50,29 +61,32 @@ void RewriteCSSFragmentShader::insertColorMatrixDeclaration()
 // Inserts "uniform sampler2D css_u_texture_XXX;".
 void RewriteCSSFragmentShader::insertTextureUniformDeclaration()
 {
-    insertAtBeginningOfShader(createDeclaration(createSampler2DUniform(textureUniformName)));
+    insertAtBeginningOfShader(createDeclaration(createSampler2DUniform(mTextureUniformName)));
 }
 
-// Inserts "void main() {}".
-void RewriteCSSFragmentShader::insertNewMainFunction()
+// Inserts "void main() {}" and returns the new main function.
+TIntermAggregate* RewriteCSSFragmentShader::insertNewMainFunction()
 {
-    insertAtEndOfShader(createVoidFunction(kMain));
+    TIntermAggregate* newMainFunction = createVoidFunction(kMain);
+    insertAtEndOfShader(newMainFunction);
+    return newMainFunction;
 }
 
-void RewriteCSSFragmentShader::insertUserMainFunctionCall()
+// Inserts "css_mainXXX();" at the beginning of the passed-in function.
+void RewriteCSSFragmentShader::insertUserMainFunctionCall(TIntermAggregate* function)
 {
-    insertAtBeginningOfFunction(findFunction(kMain), createFunctionCall(userMainFunctionName));
+    insertAtBeginningOfFunction(function, createFunctionCall(mUserMainFunctionName, TType(EbtVoid, EbpUndefined, EvqTemporary)));
 }
 
-// If both css_BlendColor and css_ColorMatrix are used,
 // Inserts "gl_FragColor = (css_ColorMatrix * texture2D(css_u_textureXXX, css_v_texCoordXXX)) <BLEND OP> css_FragColor;"
-void RewriteCSSFragmentShader::insertBlendOp()
+// at the beginning of the passed-in function if both css_BlendColor and css_ColorMatrix are used.
+void RewriteCSSFragmentShader::insertBlendOp(TIntermAggregate* function, bool usesBlendColor, bool usesColorMatrix)
 {
     // TODO(mvujovic): In the future, we'll support other blend operations besides multiply.
     TOperator blendOp = EOpMul;
 
     TIntermTyped* blendOpLhs = NULL;
-    TIntermAggregate* texture2DCall = createTexture2DCall(textureUniformName, texCoordVaryingName);
+    TIntermAggregate* texture2DCall = createTexture2DCall(mTextureUniformName, texCoordVaryingName);
     if (usesColorMatrix)
         blendOpLhs = createBinaryWithVec4Result(EOpMatrixTimesVector, createMat4Global(kColorMatrix), texture2DCall);
     else
@@ -85,5 +99,5 @@ void RewriteCSSFragmentShader::insertBlendOp()
         assignmentRhs = blendOpLhs;
 
     TIntermBinary* assignment = createBinaryWithVec4Result(EOpAssign, createVec4Global(kFragColor), assignmentRhs);
-    insertAtEndOfFunction(findFunction(kMain), assignment);
+    insertAtEndOfFunction(function, assignment);
 }

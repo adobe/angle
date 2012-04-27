@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     GenerateResources(&resources);
 
     ShShaderSpec spec = SH_GLES2_SPEC;
-    const char* hiddenSymbolSuffix = "";
+    const char* hiddenSymbolSuffix = NULL;
 
     argc--;
     argv++;
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
             default: break;
             }
             if (compiler) {
-              if (strlen(hiddenSymbolSuffix) > 0)
+              if (hiddenSymbolSuffix)
                   ShSetHiddenSymbolSuffix(compiler, hiddenSymbolSuffix);
 
               bool compiled = CompileFile(argv[0], compiler, compileOptions);
