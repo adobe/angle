@@ -61,6 +61,11 @@ TIntermConstantUnion* RewriteCSSShaderBase::createMat4IdentityConstant()
     return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4, true));
 }
 
+TIntermSymbol* RewriteCSSShaderBase::createSymbol(const TString& name, const TType& type)
+{
+    return new TIntermSymbol(0, name, type);
+}
+
 TIntermSymbol* RewriteCSSShaderBase::createVec4Global(const TString& name)
 {
     return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
@@ -129,6 +134,11 @@ TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
     TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
     declaration->getSequence().push_back(child);
     return declaration;
+}
+
+TIntermBinary* RewriteCSSShaderBase::createInitialization(TIntermSymbol* symbol, TIntermTyped* rhs)
+{
+    return createBinaryWithVec4Result(EOpInitialize, symbol, rhs);
 }
 
 TIntermBinary* RewriteCSSShaderBase::createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs)

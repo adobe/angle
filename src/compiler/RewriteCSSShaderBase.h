@@ -30,6 +30,7 @@ protected:
 
     TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
     TIntermConstantUnion* createMat4IdentityConstant();
+    TIntermSymbol* createSymbol(const TString& name, const TType& type);
     TIntermSymbol* createVec4Global(const TString& name);
     TIntermSymbol* createMat4Global(const TString& name);
     TIntermSymbol* createSampler2DUniform(const TString& name);
@@ -42,6 +43,7 @@ protected:
     TIntermBinary* createBinaryWithVec4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermBinary* createBinaryWithMat4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermAggregate* createDeclaration(TIntermNode* child);
+    TIntermBinary* createInitialization(TIntermSymbol* symbol, TIntermTyped* rhs);
     TIntermBinary* createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
     TIntermBinary* createMat4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
     TIntermAggregate* createVoidFunction(const TString& name);
