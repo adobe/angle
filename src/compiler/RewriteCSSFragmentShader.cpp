@@ -35,19 +35,19 @@ const char* const RewriteCSSFragmentShader::kTextureUniformPrefix = "css_u_textu
 const char* const RewriteCSSFragmentShader::kUserMainFunctionPrefix = "css_main";
 const char* const RewriteCSSFragmentShader::kFragColor = "gl_FragColor";
 
-// Inserts "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0)".
+// Inserts "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0);".
 void RewriteCSSFragmentShader::insertBlendColorDeclaration()
 {
     insertAtBeginningOfShader(createDeclaration(createVec4GlobalInitialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
 }
 
-// Inserts "mat4 css_ColorMatrix = mat4(1.0, 0.0, 0.0, 0.0 ...)".
+// Inserts "mat4 css_ColorMatrix = mat4(1.0, 0.0, 0.0, 0.0 ...);".
 void RewriteCSSFragmentShader::insertColorMatrixDeclaration()
 {
     insertAtBeginningOfShader(createDeclaration(createMat4GlobalInitialization(kColorMatrix, createMat4IdentityConstant())));
 }
 
-// Inserts "uniform sampler2D css_u_texture_XXX".
+// Inserts "uniform sampler2D css_u_texture_XXX;".
 void RewriteCSSFragmentShader::insertTextureUniformDeclaration()
 {
     insertAtBeginningOfShader(createDeclaration(createSampler2DUniform(textureUniformName)));
@@ -65,10 +65,10 @@ void RewriteCSSFragmentShader::insertUserMainFunctionCall()
 }
 
 // If both css_BlendColor and css_ColorMatrix are used,
-// inserts "gl_FragColor = (css_ColorMatrix * texture2D(css_u_textureXXX, css_v_texCoordXXX)) <BLEND OP> css_FragColor"
+// Inserts "gl_FragColor = (css_ColorMatrix * texture2D(css_u_textureXXX, css_v_texCoordXXX)) <BLEND OP> css_FragColor;"
 void RewriteCSSFragmentShader::insertBlendOp()
 {
-    // FIXME(mvujovic): Eventually, we'd like to support other blend operations besides multiply.
+    // TODO(mvujovic): In the future, we'll support other blend operations besides multiply.
     TOperator blendOp = EOpMul;
 
     TIntermTyped* blendOpLhs = NULL;

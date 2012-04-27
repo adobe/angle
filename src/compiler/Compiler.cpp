@@ -172,7 +172,7 @@ bool TCompiler::compile(const char* const shaderStrings[],
 
         if (success && (compileOptions & SH_VALIDATE_LOOP_INDEXING))
             success = validateLimitations(root);
-        
+
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
             ForLoopUnroll::MarkForLoopsWithIntegerIndicesForUnrolling(root);

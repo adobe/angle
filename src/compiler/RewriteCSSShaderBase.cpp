@@ -222,7 +222,7 @@ void RewriteCSSShaderBase::addArgument(TIntermAggregate* functionCall, TIntermNo
     functionCall->getSequence().push_back(argument);
 }
 
-// Inserts "varying vec2 css_v_texCoord".
+// Inserts "varying vec2 css_v_texCoord;".
 void RewriteCSSShaderBase::insertTexCoordVaryingDeclaration()
 {
     insertAtBeginningOfShader(createDeclaration(createVec2Varying(texCoordVaryingName)));
