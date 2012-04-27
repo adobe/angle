@@ -14,7 +14,7 @@
 #include "compiler/InfoSink.h"
 
 //
-// Rewrites a CSS fragment shader into a valid GLSL shader via the intermediate tree.
+// Rewrites a CSS fragment shader's intermediate tree into a valid GLSL shader.
 //
 
 // Example original fragment shader:

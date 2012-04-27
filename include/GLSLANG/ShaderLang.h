@@ -105,7 +105,7 @@ typedef enum {
   SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX = 0x0080,
 
   // This is needed only as a workaround for certain OpenGL driver bugs.
-  SH_EMULATE_BUILT_IN_FUNCTIONS = 0x0100,
+  SH_EMULATE_BUILT_IN_FUNCTIONS = 0x0100
 } ShCompileOptions;
 
 typedef enum {
@@ -155,7 +155,7 @@ COMPILER_EXPORT void ShInitBuiltInResources(ShBuiltInResources* resources);
 
 //
 // ShHandle held by but opaque to the driver.  It is allocated,
-// managed, and de-allocated by the compiler. It's contents
+// managed, and de-allocated by the compiler. It's contents 
 // are defined by and used by the compiler.
 //
 // If handle creation fails, 0 will be returned.
@@ -270,7 +270,7 @@ COMPILER_EXPORT int ShCompile(
 //                               termination character.
 // SH_MAPPED_NAME_MAX_LENGTH: the length of the mapped variable name including
 //                            the null termination character.
-//
+// 
 // params: Requested parameter
 COMPILER_EXPORT void ShGetInfo(const ShHandle handle,
                                ShShaderInfo pname,

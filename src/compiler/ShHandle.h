@@ -67,8 +67,7 @@ public:
     const TVariableInfoList& getAttribs() const { return attribs; }
     const TVariableInfoList& getUniforms() const { return uniforms; }
     int getMappedNameMaxLength() const;
-    
-    const TString getCSSShaderInfo(ShCSSShaderInfo info) const;    
+
 protected:
     ShShaderType getShaderType() const { return shaderType; }
     ShShaderSpec getShaderSpec() const { return shaderSpec; }
@@ -78,9 +77,8 @@ protected:
     void clearResults();
     // Return true if function recursion is detected.
     bool detectRecursion(TIntermNode* root);
-    // Return true if the CSS shader's intermediate tree 
-    // could be rewritten into a valid GLSL shader.
-    bool rewriteCSSShader();
+    // Rewrites a CSS shader's intermediate tree into a valid GLSL shader.
+    void rewriteCSSShader();
     // Returns true if the given shader does not exceed the minimum
     // functionality mandated in GLSL 1.0 spec Appendix A.
     bool validateLimitations(TIntermNode* root);

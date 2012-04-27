@@ -160,13 +160,13 @@ bool TCompiler::compile(const char* const shaderStrings[],
         (parseContext.treeRoot != NULL) &&
         intermediate.postProcess(parseContext.treeRoot);
     if (success) {
-        // The CSS Shaders spec requires rewriting parts of shaders. 
+        // The CSS Shaders spec requires rewriting parts of shaders.
         // Note that the tree root may change as a side effect.
         if (shaderSpec == SH_CSS_SHADERS_SPEC)
-            success = rewriteCSSShader();
+            rewriteCSSShader();
 
         TIntermNode* root = parseContext.treeRoot;
-        
+
         if (success)
             success = detectRecursion(root);
 
@@ -247,7 +247,7 @@ bool TCompiler::detectRecursion(TIntermNode* root)
     }
 }
 
-bool TCompiler::rewriteCSSShader()
+void TCompiler::rewriteCSSShader()
 {
     if (shaderType == SH_VERTEX_SHADER) {
         RewriteCSSVertexShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix, infoSink.info);
@@ -292,13 +292,4 @@ const TExtensionBehavior& TCompiler::getExtensionBehavior() const
 const BuiltInFunctionEmulator& TCompiler::getBuiltInFunctionEmulator() const
 {
     return builtInFunctionEmulator;
-}
-
-const TString TCompiler::getCSSShaderInfo(ShCSSShaderInfo info) const
-{
-    switch (info) {
-        case SH_TEXCOORD_ATTRIBUTE_NAME: return ""; break;
-        case SH_TEXTURE_UNIFORM_NAME: return ""; break;
-        default: return "";
-    }
 }

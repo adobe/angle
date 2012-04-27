@@ -16,7 +16,7 @@
 class TInfoSinkBase;
 
 //
-// Rewrites a CSS vertex shader into a valid GLSL shader via the intermediate tree.
+// Rewrites a CSS vertex shader's intermediate tree into a valid GLSL shader.
 //
 
 // Example original vertex shader:
