@@ -530,7 +530,7 @@ void IdentifyBuiltIns(ShShaderType type, ShShaderSpec spec,
         symbolTable.insert(*new TVariable(NewPoolTString("gl_FrontFacing"),                 TType(EbtBool,  EbpUndefined, EvqFrontFacing, 1)));
         symbolTable.insert(*new TVariable(NewPoolTString("gl_FragData[gl_MaxDrawBuffers]"), TType(EbtFloat, EbpMedium, EvqFragData,    4)));
         symbolTable.insert(*new TVariable(NewPoolTString("gl_PointCoord"),                  TType(EbtFloat, EbpMedium, EvqPointCoord,  2)));
-        
+
         // In CSS Shaders, gl_FragColor is not available. Instead, css_BlendColor and css_ColorMatrix are available.
         if (spec == SH_CSS_SHADERS_SPEC) {
             symbolTable.insert(*new TVariable(NewPoolTString("css_BlendColor"),             TType(EbtFloat, EbpHigh, EvqGlobal,      4)));
@@ -538,7 +538,7 @@ void IdentifyBuiltIns(ShShaderType type, ShShaderSpec spec,
         } else {
             symbolTable.insert(*new TVariable(NewPoolTString("gl_FragColor"),               TType(EbtFloat, EbpMedium, EvqFragColor,   4)));
         }
-            
+
         break;
 
     case SH_VERTEX_SHADER:

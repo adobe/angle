@@ -5,7 +5,6 @@
 //
 
 #include "compiler/RewriteCSSFragmentShader.h"
-#include "ParseHelper.h"
 
 //
 // RewriteCSSFragmentShader implementation

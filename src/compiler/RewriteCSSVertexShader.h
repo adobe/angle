@@ -10,10 +10,6 @@
 #include "GLSLANG/ShaderLang.h"
 
 #include "compiler/RewriteCSSShaderBase.h"
-#include "compiler/intermediate.h"
-#include "compiler/InfoSink.h"
-
-class TInfoSinkBase;
 
 //
 // Rewrites a CSS vertex shader's intermediate tree into a valid GLSL shader.
@@ -42,8 +38,8 @@ class TInfoSinkBase;
 
 class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
-    RewriteCSSVertexShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
-        : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix, infoSink) {}
+    RewriteCSSVertexShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix)
+        : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix) {}
 
     void rewrite();
 

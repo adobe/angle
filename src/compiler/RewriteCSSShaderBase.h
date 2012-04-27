@@ -10,16 +10,14 @@
 #include "GLSLANG/ShaderLang.h"
 
 #include "compiler/intermediate.h"
-#include "compiler/InfoSink.h"
 
 class TInfoSinkBase;
 
 class RewriteCSSShaderBase {
 public:
-    RewriteCSSShaderBase(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix, TInfoSinkBase& infoSink)
+    RewriteCSSShaderBase(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix)
         : root(treeRoot)
-        , texCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix)
-        , sink(infoSink) {}
+        , texCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix) {}
 
     virtual void rewrite();
     TIntermNode* getNewTreeRoot() { return root; }
@@ -62,7 +60,6 @@ protected:
 
     TIntermNode* root;
     TString texCoordVaryingName;
-    TInfoSinkBase& sink;
 
 private:
     void createRootSequenceIfNeeded();

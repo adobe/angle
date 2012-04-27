@@ -5,7 +5,6 @@
 //
 
 #include "compiler/RewriteCSSVertexShader.h"
-#include "ParseHelper.h"
 
 const char* const RewriteCSSVertexShader::kTexCoordAttributeName = "a_texCoord";
 

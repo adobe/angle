@@ -11,8 +11,8 @@
 #include "compiler/MapLongVariableNames.h"
 #include "compiler/ParseHelper.h"
 #include "compiler/RewriteCSSFragmentShader.h"
-#include "compiler/ShHandle.h"
 #include "compiler/RewriteCSSVertexShader.h"
+#include "compiler/ShHandle.h"
 #include "compiler/ValidateLimitations.h"
 
 bool isWebGLSpecSubset(ShShaderSpec spec)
@@ -250,11 +250,11 @@ bool TCompiler::detectRecursion(TIntermNode* root)
 void TCompiler::rewriteCSSShader()
 {
     if (shaderType == SH_VERTEX_SHADER) {
-        RewriteCSSVertexShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix, infoSink.info);
+        RewriteCSSVertexShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix);
         rewriter.rewrite();
         GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
     } else {
-        RewriteCSSFragmentShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix, infoSink.info);
+        RewriteCSSFragmentShader rewriter(GlobalParseContext->treeRoot, hiddenSymbolSuffix);
         rewriter.rewrite();
         GlobalParseContext->treeRoot = rewriter.getNewTreeRoot();
     }

@@ -5,7 +5,6 @@
 //
 
 #include "compiler/RewriteCSSShaderBase.h"
-#include "ParseHelper.h"
 
 //
 // Determines if a symbol is used.
