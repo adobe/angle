@@ -92,10 +92,12 @@ protected:
     const TExtensionBehavior& getExtensionBehavior() const;
 
     const BuiltInFunctionEmulator& getBuiltInFunctionEmulator() const;
-    
+
 private:
     ShShaderType shaderType;
     ShShaderSpec shaderSpec;
+
+    TString hiddenSymbolSuffix;    
 
     // Built-in symbol table for the given language, spec, and resources.
     // It is preserved from compile-to-compile.
@@ -112,8 +114,6 @@ private:
 
     // Cached copy of the ref-counted singleton.
     LongNameMap* longNameMap;
-    
-    TString hiddenSymbolSuffix;
 };
 
 //
