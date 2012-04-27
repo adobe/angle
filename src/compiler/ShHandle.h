@@ -26,9 +26,8 @@ class LongNameMap;
 class TCompiler;
 
 //
-// Helper functions for relating enums.
+// Helper function to identify specs based on the WebGL spec.
 //
-
 bool isWebGLSpecSubset(ShShaderSpec spec);
 
 //
