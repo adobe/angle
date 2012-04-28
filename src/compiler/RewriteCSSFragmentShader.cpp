@@ -66,7 +66,7 @@ void RewriteCSSFragmentShader::insertTextureUniformDeclaration()
 // Inserts "varying vec2 css_v_texCoord;".
 void RewriteCSSFragmentShader::insertTexCoordVaryingDeclaration()
 {
-    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, vec2Type(EvqVaryingIn));
+    TIntermSymbol* texCoordVarying = createSymbol(getTexCoordVaryingName(), vec2Type(EvqVaryingIn));
     TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
     insertAtBeginningOfShader(declaration);
 }
@@ -88,13 +88,14 @@ void RewriteCSSFragmentShader::insertUserMainFunctionCall(TIntermAggregate* func
 
 // Inserts "gl_FragColor = (css_ColorMatrix * texture2D(css_u_textureXXX, css_v_texCoordXXX)) <BLEND OP> css_FragColor;"
 // at the beginning of the passed-in function if both css_BlendColor and css_ColorMatrix are used.
+// If they are not used in the shader, they are used in the blend op expression.
 void RewriteCSSFragmentShader::insertBlendOp(TIntermAggregate* function, bool usesBlendColor, bool usesColorMatrix)
 {
-    // TODO(mvujovic): In the future, we'll support other blend operations besides multiply.
+    // TODO(mvujovic): In the future, we'll support more blend operations than just multiply.
     const TOperator blendOp = EOpMul;
 
     TIntermSymbol* textureUniform = createSymbol(mTextureUniformName, sampler2DType());
-    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, vec2Type(EvqVaryingIn));
+    TIntermSymbol* texCoordVarying = createSymbol(getTexCoordVaryingName(), vec2Type(EvqVaryingIn));
     TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D, textureUniform, texCoordVarying, vec4Type(EvqTemporary));
     
     TIntermTyped* blendOpLhs = texture2DCall;

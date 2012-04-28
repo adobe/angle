@@ -25,7 +25,7 @@ void RewriteCSSVertexShader::rewrite()
 // Inserts "varying vec2 css_v_texCoord;".
 void RewriteCSSVertexShader::insertTexCoordVaryingDeclaration()
 {
-    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, vec2Type(EvqVaryingIn));
+    TIntermSymbol* texCoordVarying = createSymbol(getTexCoordVaryingName(), vec2Type(EvqVaryingIn));
     TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
     insertAtBeginningOfShader(declaration);
 }
@@ -33,7 +33,7 @@ void RewriteCSSVertexShader::insertTexCoordVaryingDeclaration()
 // Inserts "css_v_texCoordXXX = a_texCoord;" as the first line of the main function.
 void RewriteCSSVertexShader::insertTexCoordVaryingAssignment()
 {
-    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, vec2Type(EvqVaryingIn));
+    TIntermSymbol* texCoordVarying = createSymbol(getTexCoordVaryingName(), vec2Type(EvqVaryingIn));
     TIntermSymbol* texCoordAttribute = createSymbol(kTexCoordAttributeName, vec2Type(EvqAttribute));
     TIntermBinary* assignment = createBinary(EOpAssign, texCoordVarying, texCoordAttribute, vec2Type(EvqTemporary));
     insertAtBeginningOfFunction(findFunction(kMain), assignment);
