@@ -11,7 +11,17 @@
 
 using namespace RewriteCSSShaderHelper;
 
-// TODO: Update gyp.
+RewriteCSSShaderBase::RewriteCSSShaderBase(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix)
+    : mRoot(root->getAsAggregate())
+    , mSymbolTable(symbolTable)
+    , mTexCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix) 
+{
+    // The intermediate tree root should come in as an aggregate node.
+    // It should be either a sequence or the main function declaration.
+    // Previous compiler steps should have already thrown an error and exited if there is no main function.
+    ASSERT(mRoot);
+    ASSERT(mRoot->getOp() == EOpSequence || (mRoot->getOp() == EOpFunction && mRoot->getName() == kMain));
+}
 
 void RewriteCSSShaderBase::rewrite()
 {
@@ -23,30 +33,18 @@ const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_v_texCoord
 
 void RewriteCSSShaderBase::insertAtBeginningOfShader(TIntermNode* node)
 {
-    TIntermAggregate* rootAggregate = mRoot->getAsAggregate();
-    
-    // Assert that the tree mRoot is a sequence (i.e. createRootSequenceIfNeeded was called).
-    ASSERT(rootAggregate);
-    ASSERT(rootAggregate->getOp() == EOpSequence);
-    
-    TIntermSequence& rootSequence = rootAggregate->getSequence();
+    TIntermSequence& rootSequence = getRoot()->getSequence();
     rootSequence.insert(rootSequence.begin(), node);
 }
 
 void RewriteCSSShaderBase::insertAtEndOfShader(TIntermNode* node)
 {
-    TIntermAggregate* rootAggregate = mRoot->getAsAggregate();
-    
-    // Assert that the tree mRoot is a sequence (i.e. createRootSequenceIfNeeded was called).
-    ASSERT(rootAggregate);
-    ASSERT(rootAggregate->getOp() == EOpSequence);
-    
-    rootAggregate->getSequence().push_back(node);
+    getRoot()->getSequence().push_back(node);
 }
 
 TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name) const
 {
-    TIntermSequence& rootSequence = mRoot->getAsAggregate()->getSequence();
+    TIntermSequence& rootSequence = getRoot()->getSequence();
     for (TIntermSequence::const_iterator iter = rootSequence.begin(); iter != rootSequence.end(); ++iter) {
         TIntermNode* node = *iter;
         TIntermAggregate* aggregate = node->getAsAggregate();
@@ -59,14 +57,14 @@ TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name) const
 void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const TString& newFunctionName)
 {
     RenameFunction renameFunction(oldFunctionName, newFunctionName);
-    mRoot->traverse(&renameFunction);
+    getRoot()->traverse(&renameFunction);
 }
 
 
 bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
 {
     FindSymbolUsage findSymbolUsage(symbolName);
-    mRoot->traverse(&findSymbolUsage);
+    getRoot()->traverse(&findSymbolUsage);
     return findSymbolUsage.symbolUsageFound();
 }
 
@@ -78,24 +76,22 @@ const TType& RewriteCSSShaderBase::getBuiltinType(const TString& builtinName) co
     return builtinVariable->getType();
 }
 
-// The tree mRoot comes in as either a sequence or a main function declaration.
-// If the tree mRoot is a main function declaration, this method creates a new sequence,
-// puts the main function declaration inside it, and changes the tree mRoot to point to
-// the new sequence.
-// Thus, after this function is called, the tree mRoot can only be a sequence.
-void RewriteCSSShaderBase::createRootSequenceIfNeeded()
+TIntermAggregate* RewriteCSSShaderBase::getRoot() const
 {
-    TIntermAggregate* rootAggregate = mRoot->getAsAggregate();
-    
-    // The mRoot should come in as either a sequence or a function declaration, both of which are aggregate nodes.
-    ASSERT(rootAggregate);
-    ASSERT(rootAggregate->getOp() == EOpSequence || rootAggregate->getOp() == EOpFunction);
-    
-    if (rootAggregate->getOp() == EOpFunction) {
-        // If the tree mRoot is a function declaration, it should be the main function.
-        // Previous compiler steps should have already thrown an error if there is no main function.
-        ASSERT(rootAggregate->getName() == kMain);
-        
+    // createRootSequenceIfNeeded should have been called at the beginning of the rewrite,
+    // so the tree should be a sequence.
+    ASSERT(mRoot->getOp() == EOpSequence);
+    return mRoot;
+}
+
+// The tree root comes in as either a sequence or a main function declaration.
+// If the tree root is a main function declaration, this method creates a new sequence,
+// puts the main function declaration inside it, and changes the tree root to point to
+// the new sequence.
+// Thus, after this function is called, the tree root can only be a sequence.
+void RewriteCSSShaderBase::createRootSequenceIfNeeded()
+{    
+    if (mRoot->getOp() == EOpFunction) {
         TIntermAggregate* newRoot = new TIntermAggregate(EOpSequence);
         TIntermSequence& sequence = newRoot->getSequence();
         sequence.push_back(mRoot);
