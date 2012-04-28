@@ -82,13 +82,6 @@ int main(int argc, char* argv[])
     for (; (argc >= 1) && (failCode == ESuccess); argc--, argv++) {
         if (argv[0][0] == '-') {
             switch (argv[0][1]) {
-            case 'c': spec = SH_CSS_SHADERS_SPEC; break;
-            case 's':
-                if (argv[0][2] == '=')
-                    hiddenSymbolSuffix = &argv[0][3];
-                else
-                    failCode = EFailUsage;
-                break;
             case 'i': compileOptions |= SH_INTERMEDIATE_TREE; break;
             case 'm': compileOptions |= SH_MAP_LONG_VARIABLE_NAMES; break;
             case 'o': compileOptions |= SH_OBJECT_CODE; break;
@@ -117,6 +110,13 @@ int main(int argc, char* argv[])
                 } else {
                     failCode = EFailUsage;
                 }
+                break;
+            case 'c': spec = SH_CSS_SHADERS_SPEC; break;
+            case 's':
+                if (argv[0][2] == '=')
+                    hiddenSymbolSuffix = &argv[0][3];
+                else
+                    failCode = EFailUsage;
                 break;
             default: failCode = EFailUsage;
             }
@@ -213,7 +213,9 @@ void usage()
         "       -b=g     : output GLSL code\n"
         "       -b=h     : output HLSL code\n"
         "       -x=i     : enable GL_OES_EGL_image_external\n"
-        "       -x=d     : enable GL_OES_EGL_standard_derivatives\n");
+        "       -x=d     : enable GL_OES_EGL_standard_derivatives\n"
+        "       -c       : rewrite a CSS shader into a valid GLSL shader\n"
+        "       -s=<str> : append a suffix <str> to the hidden symbols generated in CSS shader rewriting\n");
 }
 
 //
