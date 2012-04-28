@@ -88,7 +88,6 @@ TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* le
     return binary;
 }
 
-// The child can either be a symbol node or an initialization node.
 TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
 {
     TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
@@ -96,13 +95,17 @@ TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
     return declaration;
 }
 
-TIntermBinary* RewriteCSSShaderBase::createInitialization(TIntermSymbol* symbol, TIntermTyped* rhs)
+TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs)
 {
-    // The initialization is the same type as the symbol, except with an undefined precision.
+    // The initialization node has the same type as the symbol, except with undefined precision.
     TType type(symbol->getType());
     type.setPrecision(EbpUndefined);
     
-    return createBinary(EOpInitialize, symbol, rhs, type);
+    // The initialization node sets the symbol equal to the right hand side.
+    TIntermBinary* initialization = createBinary(EOpInitialize, symbol, rhs, type);
+    
+    // The declaration node contains the initialization node.
+    return createDeclaration(initialization);
 }
 
 TIntermAggregate* RewriteCSSShaderBase::createFunction(const TString& name, const TType& returnType)

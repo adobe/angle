@@ -35,7 +35,7 @@ protected:
     void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
     TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type);
     TIntermAggregate* createDeclaration(TIntermNode* child);
-    TIntermBinary* createSymbolInitialization(TIntermSymbol* symbol, TIntermTyped* rhs);
+    TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs);
     TIntermAggregate* createFunction(const TString& name, const TType& returnType);
 
     void insertAtBeginningOfShader(TIntermNode* node);

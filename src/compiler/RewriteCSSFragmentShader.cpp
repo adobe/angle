@@ -56,8 +56,7 @@ void RewriteCSSFragmentShader::insertBlendColorDeclaration()
 {
     TIntermSymbol* blendColor = createSymbol(kBlendColor, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
     TIntermConstantUnion* constant = createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f);
-    TIntermBinary* initialization = createInitialization(blendColor, constant);
-    TIntermAggregate* declaration = createDeclaration(initialization);
+    TIntermAggregate* declaration = createDeclaration(blendColor, constant);
     insertAtBeginningOfShader(declaration);
 }
 
@@ -66,8 +65,7 @@ void RewriteCSSFragmentShader::insertColorMatrixDeclaration()
 {
     TIntermSymbol* colorMatrix = createSymbol(kColorMatrix, TType(EbtFloat, EbpHigh, EvqGlobal, 4, true));
     TIntermConstantUnion* identityMatrix = createMat4IdentityConstant();
-    TIntermBinary* initialization = createInitialization(colorMatrix, identityMatrix);
-    TIntermAggregate* declaration = createDeclaration(initialization);
+    TIntermAggregate* declaration = createDeclaration(colorMatrix, identityMatrix);
     insertAtBeginningOfShader(declaration);
 }
 
