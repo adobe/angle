@@ -160,7 +160,7 @@ bool TCompiler::compile(const char* const shaderStrings[],
         (parseContext.treeRoot != NULL);
     if (success) {
         TIntermNode* root = parseContext.treeRoot;
-        success = intermediate.postProcess(parseContext.treeRoot);
+        success = intermediate.postProcess(root);
 
         if (success)
             success = detectRecursion(root);
