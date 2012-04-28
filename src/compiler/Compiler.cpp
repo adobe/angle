@@ -174,7 +174,7 @@ bool TCompiler::compile(const char* const shaderStrings[],
             root = rewriteCSSShader(root);
             parseContext.treeRoot = root;
         }
-        
+
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
             ForLoopUnroll::MarkForLoopsWithIntegerIndicesForUnrolling(root);
