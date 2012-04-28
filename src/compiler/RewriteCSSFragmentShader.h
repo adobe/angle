@@ -45,8 +45,8 @@ class TInfoSinkBase;
 
 class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
 public:
-    RewriteCSSFragmentShader(TIntermNode* treeRoot, const TSymbolTable& table, const TString& hiddenSymbolSuffix)
-        : RewriteCSSShaderBase(treeRoot, table, hiddenSymbolSuffix)
+    RewriteCSSFragmentShader(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix)
+        : RewriteCSSShaderBase(root, symbolTable, hiddenSymbolSuffix)
         , mTextureUniformName(kTextureUniformPrefix + hiddenSymbolSuffix)
         , mUserMainFunctionName(kUserMainFunctionPrefix + hiddenSymbolSuffix + "(") {}
 

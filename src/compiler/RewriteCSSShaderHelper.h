@@ -27,6 +27,9 @@ namespace RewriteCSSShaderHelper {
     TIntermAggregate* createDeclaration(TIntermNode* child);
     TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs);
     TIntermAggregate* createFunction(const TString& name, const TType& returnType);
+    
+    void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node);
+    void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node);
 }
 
 #endif

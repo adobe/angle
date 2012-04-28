@@ -8,6 +8,38 @@
 
 namespace RewriteCSSShaderHelper {
 
+namespace {
+
+    // A function node is an aggregate node that can contain two children in its sequence,
+    // including (1) a parameter list node and (2) a function body node.
+    // A function with an empty body will not have a body node (e.g. "void main() {}").
+    // If the function does not have a body node, this method will create one for it.
+    // If the function does have a body node, this method will just return it.
+    TIntermAggregate* getOrCreateFunctionBody(TIntermAggregate* function)
+    {
+        TIntermAggregate* body = NULL;
+        TIntermSequence& paramsAndBody = function->getSequence();
+        
+        // Functions always have parameters nodes. They might also have a body node.
+        ASSERT(paramsAndBody.size() >= 1 || paramsAndBody.size() <= 2);
+        
+        if (paramsAndBody.size() == 2) {
+            body = paramsAndBody[1]->getAsAggregate();
+            
+            // If a body node exists, it should be an aggregate sequence node.
+            ASSERT(body);
+            ASSERT(body->getOp() == EOpSequence);
+        } else {
+            // If a body node doesn't exist, make one.
+            body = new TIntermAggregate(EOpSequence);
+            paramsAndBody.push_back(body);
+        }
+        
+        return body;
+    }
+
+}  // anonymous namespace
+
 const TType voidType(TQualifier qualifier)
 {
     return TType(EbtVoid, EbpUndefined, qualifier);
@@ -132,6 +164,17 @@ TIntermAggregate* createFunction(const TString& name, const TType& returnType)
     paramsAndBody.push_back(body);
     
     return function;
+}
+    
+void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node)
+{
+    TIntermSequence& bodySequence = getOrCreateFunctionBody(function)->getSequence();
+    bodySequence.insert(bodySequence.begin(), node);
+}
+
+void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node)
+{
+    getOrCreateFunctionBody(function)->getSequence().push_back(node);
 }
 
 }  // namespace

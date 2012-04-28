@@ -16,13 +16,13 @@ class TInfoSinkBase;
 
 class RewriteCSSShaderBase {
 public:
-    RewriteCSSShaderBase(TIntermNode* treeRoot, const TSymbolTable& table, const TString& hiddenSymbolSuffix)
-        : root(treeRoot)
-        , symbolTable(table)
+    RewriteCSSShaderBase(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix)
+        : mRoot(root)
+        , mSymbolTable(symbolTable)
         , texCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix) {}
 
     virtual void rewrite();
-    TIntermNode* getNewTreeRoot() { return root; }
+    TIntermNode* getNewTreeRoot() { return mRoot; }
 
     virtual ~RewriteCSSShaderBase() {}
 
@@ -32,22 +32,22 @@ protected:
     
     void insertAtBeginningOfShader(TIntermNode* node);
     void insertAtEndOfShader(TIntermNode* node);
-    void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node);
-    void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node);
 
-    TIntermAggregate* findFunction(const TString& name);
+    TIntermAggregate* findFunction(const TString& name) const;
+    
     void renameFunction(const TString& oldFunctionName, const TString& newFunctionName);
     bool isSymbolUsed(const TString& symbolName);
     
-    const TType& getBuiltinType(const TString& builtinName);
+    const TType& getBuiltinType(const TString& builtinName) const;
+    
 
-    TIntermNode* root;
-    const TSymbolTable& symbolTable;
     TString texCoordVaryingName;
 
 private:
+    TIntermNode* mRoot;
+    const TSymbolTable& mSymbolTable;
+    
     void createRootSequenceIfNeeded();
-    TIntermAggregate* getOrCreateFunctionBody(TIntermAggregate* function);
 };
 
 #endif  // COMPILER_REWRITE_CSS_SHADER_BASE
