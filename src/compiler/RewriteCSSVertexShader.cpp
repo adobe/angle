@@ -19,8 +19,19 @@ void RewriteCSSVertexShader::rewrite()
     insertTexCoordVaryingAssignment();
 }
 
+// Inserts "varying vec2 css_v_texCoord;".
+void RewriteCSSVertexShader::insertTexCoordVaryingDeclaration()
+{
+    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingOut, 4));
+    TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
+    insertAtBeginningOfShader(createDeclaration(declaration));
+}
+
 // Inserts "css_v_texCoordXXX = a_texCoord;" as the first line of the main function.
 void RewriteCSSVertexShader::insertTexCoordVaryingAssignment()
 {
-    insertAtBeginningOfFunction(findFunction(kMain), createBinaryWithVec2Result(EOpAssign, createVec2Varying(texCoordVaryingName), createVec2Attribute(kTexCoordAttributeName)));
+    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingIn, 2));
+    TIntermSymbol* texCoordAttribute = createSymbol(kTexCoordAttributeName, TType(EbtFloat, EbpHigh, EvqAttribute, 2));
+    TIntermBinary* assignment = createBinary(EOpAssign, texCoordVarying, texCoordAttribute, TType(EbtFloat, EbpHigh, EvqTemporary, 2));
+    insertAtBeginningOfFunction(findFunction(kMain), assignment);
 }

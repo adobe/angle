@@ -65,6 +65,7 @@ private:
     void insertBlendColorDeclaration();
     void insertColorMatrixDeclaration();
     void insertTextureUniformDeclaration();
+    void insertTexCoordVaryingDeclaration();
     TIntermAggregate* insertNewMainFunction();
     void insertUserMainFunctionCall(TIntermAggregate* function);
     void insertBlendOp(TIntermAggregate* function, bool usesBlendColor, bool usesColorMatrix);

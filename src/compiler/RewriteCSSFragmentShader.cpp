@@ -40,34 +40,57 @@ const char* const RewriteCSSFragmentShader::kTexture2D = "texture2D(s21;vf2;";
 
 TIntermAggregate* RewriteCSSFragmentShader::createTexture2DCall(const TString& mTextureUniformName, const TString& texCoordVaryingName)
 {
-    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D, TType(EbtFloat, EbpUndefined, EvqTemporary, 4));   // TODO: Double check precision.
-    addArgument(texture2DCall, createSampler2DUniform(mTextureUniformName));
-    addArgument(texture2DCall, createVec2Varying(texCoordVaryingName));
+    TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D, TType(EbtFloat, EbpUndefined, EvqTemporary, 4));
+    
+    TIntermSymbol* textureUniform = createSymbol(mTextureUniformName, TType(EbtSampler2D, EbpUndefined, EvqUniform));
+    addArgument(texture2DCall, textureUniform);
+    
+    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqAttribute, 2));
+    addArgument(texture2DCall, texCoordVarying);
+    
     return texture2DCall;
 }
 
 // Inserts "vec4 css_BlendColor = vec4(1.0, 1.0, 1.0, 1.0);".
 void RewriteCSSFragmentShader::insertBlendColorDeclaration()
 {
-    insertAtBeginningOfShader(createDeclaration(createVec4GlobalInitialization(kBlendColor, createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f))));
+    TIntermSymbol* blendColor = createSymbol(kBlendColor, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
+    TIntermConstantUnion* constant = createVec4Constant(1.0f, 1.0f, 1.0f, 1.0f);
+    TIntermBinary* initialization = createInitialization(blendColor, constant);
+    TIntermAggregate* declaration = createDeclaration(initialization);
+    insertAtBeginningOfShader(declaration);
 }
 
 // Inserts "mat4 css_ColorMatrix = mat4(1.0, 0.0, 0.0, 0.0 ...);".
 void RewriteCSSFragmentShader::insertColorMatrixDeclaration()
 {
-    insertAtBeginningOfShader(createDeclaration(createMat4GlobalInitialization(kColorMatrix, createMat4IdentityConstant())));
+    TIntermSymbol* colorMatrix = createSymbol(kColorMatrix, TType(EbtFloat, EbpHigh, EvqGlobal, 4, true));
+    TIntermConstantUnion* identityMatrix = createMat4IdentityConstant();
+    TIntermBinary* initialization = createInitialization(colorMatrix, identityMatrix);
+    TIntermAggregate* declaration = createDeclaration(initialization);
+    insertAtBeginningOfShader(declaration);
 }
 
 // Inserts "uniform sampler2D css_u_texture_XXX;".
 void RewriteCSSFragmentShader::insertTextureUniformDeclaration()
 {
-    insertAtBeginningOfShader(createDeclaration(createSampler2DUniform(mTextureUniformName)));
+    TIntermSymbol* textureUniform = createSymbol(mTextureUniformName, TType(EbtSampler2D, EbpUndefined, EvqUniform));
+    TIntermAggregate* declaration = createDeclaration(textureUniform);
+    insertAtBeginningOfShader(declaration);
+}
+
+// Inserts "varying vec2 css_v_texCoord;".
+void RewriteCSSFragmentShader::insertTexCoordVaryingDeclaration()
+{
+    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingIn, 4));
+    TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
+    insertAtBeginningOfShader(createDeclaration(declaration));
 }
 
 // Inserts "void main() {}" and returns the new main function.
 TIntermAggregate* RewriteCSSFragmentShader::insertNewMainFunction()
 {
-    TIntermAggregate* newMainFunction = createVoidFunction(kMain);
+    TIntermAggregate* newMainFunction = createFunction(kMain, TType(EbtVoid, EbpUndefined, EvqGlobal));
     insertAtEndOfShader(newMainFunction);
     return newMainFunction;
 }
@@ -83,21 +106,29 @@ void RewriteCSSFragmentShader::insertUserMainFunctionCall(TIntermAggregate* func
 void RewriteCSSFragmentShader::insertBlendOp(TIntermAggregate* function, bool usesBlendColor, bool usesColorMatrix)
 {
     // TODO(mvujovic): In the future, we'll support other blend operations besides multiply.
-    TOperator blendOp = EOpMul;
+    const TOperator blendOp = EOpMul;
 
-    TIntermTyped* blendOpLhs = NULL;
     TIntermAggregate* texture2DCall = createTexture2DCall(mTextureUniformName, texCoordVaryingName);
-    if (usesColorMatrix)
-        blendOpLhs = createBinaryWithVec4Result(EOpMatrixTimesVector, createMat4Global(kColorMatrix), texture2DCall);
-    else
+    
+    TIntermTyped* blendOpLhs = NULL;
+    if (usesColorMatrix) {
+        TIntermSymbol* colorMatrix = createSymbol(kColorMatrix, TType(EbtFloat, EbpHigh, EvqGlobal, 4, true));
+        blendOpLhs = createBinary(EOpMatrixTimesVector, colorMatrix, texture2DCall, TType(EbtFloat, EbpUndefined, EvqTemporary, 4));
+    }
+    else {
         blendOpLhs = texture2DCall;
+    }
 
     TIntermTyped* assignmentRhs = NULL;
-    if (usesBlendColor)
-        assignmentRhs = createBinaryWithVec4Result(blendOp, blendOpLhs, createVec4Global(kBlendColor));
-    else
+    if (usesBlendColor) {
+        TIntermSymbol* blendColor = createSymbol(kColorMatrix, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
+        assignmentRhs = createBinary(blendOp, blendOpLhs, blendColor, TType(EbtFloat, EbpUndefined, EvqTemporary, 4));
+    }
+    else {
         assignmentRhs = blendOpLhs;
+    }
 
-    TIntermBinary* assignment = createBinaryWithVec4Result(EOpAssign, createVec4Global(kFragColor), assignmentRhs);
+    TIntermSymbol* fragColorBuiltin = createSymbol(kFragColor, TType(EbtFloat, EbpMedium, EvqFragColor, 4)); // TODO: Reference the symbol table for the type.
+    TIntermBinary* assignment = createBinary(EOpAssign, fragColorBuiltin, assignmentRhs, TType(EbtFloat, EbpUndefined, EvqTemporary, 4));
     insertAtEndOfFunction(function, assignment);
 }

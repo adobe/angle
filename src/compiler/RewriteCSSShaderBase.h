@@ -31,28 +31,17 @@ protected:
     TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
     TIntermConstantUnion* createMat4IdentityConstant();
     TIntermSymbol* createSymbol(const TString& name, const TType& type);
-    TIntermSymbol* createVec4Global(const TString& name);
-    TIntermSymbol* createMat4Global(const TString& name);
-    TIntermSymbol* createSampler2DUniform(const TString& name);
-    TIntermSymbol* createVec2Varying(const TString& name);
-    TIntermSymbol* createVec2Attribute(const TString& name);
     TIntermAggregate* createFunctionCall(const TString& name, const TType& resultType);
     void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
     TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type);
-    TIntermBinary* createBinaryWithVec2Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
-    TIntermBinary* createBinaryWithVec4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
-    TIntermBinary* createBinaryWithMat4Result(TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermAggregate* createDeclaration(TIntermNode* child);
-    TIntermBinary* createInitialization(TIntermSymbol* symbol, TIntermTyped* rhs);
-    TIntermBinary* createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
-    TIntermBinary* createMat4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs);
-    TIntermAggregate* createVoidFunction(const TString& name);
+    TIntermBinary* createSymbolInitialization(TIntermSymbol* symbol, TIntermTyped* rhs);
+    TIntermAggregate* createFunction(const TString& name, const TType& returnType);
 
     void insertAtBeginningOfShader(TIntermNode* node);
     void insertAtEndOfShader(TIntermNode* node);
     void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node);
     void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node);
-    void insertTexCoordVaryingDeclaration();
 
     TIntermAggregate* findFunction(const TString& name);
     void renameFunction(const TString& oldFunctionName, const TString& newFunctionName);

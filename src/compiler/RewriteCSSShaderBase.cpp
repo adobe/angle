@@ -66,31 +66,6 @@ TIntermSymbol* RewriteCSSShaderBase::createSymbol(const TString& name, const TTy
     return new TIntermSymbol(0, name, type);
 }
 
-TIntermSymbol* RewriteCSSShaderBase::createVec4Global(const TString& name)
-{
-    return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4));
-}
-
-TIntermSymbol* RewriteCSSShaderBase::createMat4Global(const TString& name)
-{
-    return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqGlobal, 4, true));
-}
-
-TIntermSymbol* RewriteCSSShaderBase::createSampler2DUniform(const TString& name)
-{
-    return new TIntermSymbol(0, name, TType(EbtSampler2D, EbpUndefined, EvqUniform));
-}
-
-TIntermSymbol* RewriteCSSShaderBase::createVec2Varying(const TString& name)
-{
-    return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqVaryingIn, 2));
-}
-
-TIntermSymbol* RewriteCSSShaderBase::createVec2Attribute(const TString& name)
-{
-    return new TIntermSymbol(0, name, TType(EbtFloat, EbpHigh, EvqAttribute, 2));
-}
-
 TIntermAggregate* RewriteCSSShaderBase::createFunctionCall(const TString& name, const TType& resultType)
 {
     TIntermAggregate* functionCall = new TIntermAggregate(EOpFunctionCall);
@@ -104,28 +79,13 @@ void RewriteCSSShaderBase::addArgument(TIntermAggregate* functionCall, TIntermNo
     functionCall->getSequence().push_back(argument);
 }
 
-TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type)
+TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& resultType)
 {
     TIntermBinary* binary = new TIntermBinary(op);
-    binary->setType(type);
+    binary->setType(resultType);
     binary->setLeft(left);
     binary->setRight(right);
     return binary;
-}
-
-TIntermBinary* RewriteCSSShaderBase::createBinaryWithVec2Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
-{
-    return createBinary(op, left, right, TType(EbtFloat, EbpHigh, EvqTemporary, 2));
-}
-
-TIntermBinary* RewriteCSSShaderBase::createBinaryWithVec4Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
-{
-    return createBinary(op, left, right, TType(EbtFloat, EbpHigh, EvqTemporary, 4));
-}
-
-TIntermBinary* RewriteCSSShaderBase::createBinaryWithMat4Result(TOperator op, TIntermTyped* left, TIntermTyped* right)
-{
-    return createBinary(op, left, right, TType(EbtFloat, EbpHigh, EvqTemporary, 4, true));
 }
 
 // The child can either be a symbol node or an initialization node.
@@ -138,24 +98,18 @@ TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
 
 TIntermBinary* RewriteCSSShaderBase::createInitialization(TIntermSymbol* symbol, TIntermTyped* rhs)
 {
-    return createBinaryWithVec4Result(EOpInitialize, symbol, rhs);
+    // The initialization is the same type as the symbol, except with an undefined precision.
+    TType type(symbol->getType());
+    type.setPrecision(EbpUndefined);
+    
+    return createBinary(EOpInitialize, symbol, rhs, type);
 }
 
-TIntermBinary* RewriteCSSShaderBase::createVec4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs)
-{
-    return createBinaryWithVec4Result(EOpInitialize, createVec4Global(symbolName), rhs);
-}
-
-TIntermBinary* RewriteCSSShaderBase::createMat4GlobalInitialization(const TString& symbolName, TIntermTyped* rhs)
-{
-    return createBinaryWithMat4Result(EOpInitialize, createMat4Global(symbolName), rhs);
-}
-
-TIntermAggregate* RewriteCSSShaderBase::createVoidFunction(const TString& name)
+TIntermAggregate* RewriteCSSShaderBase::createFunction(const TString& name, const TType& returnType)
 {
     TIntermAggregate* function = new TIntermAggregate(EOpFunction);
     function->setName(name);
-    function->setType(TType(EbtVoid, EbpUndefined, EvqGlobal));
+    function->setType(returnType);
 
     TIntermSequence& paramsAndBody = function->getSequence();
 
@@ -166,12 +120,6 @@ TIntermAggregate* RewriteCSSShaderBase::createVoidFunction(const TString& name)
     paramsAndBody.push_back(body);
 
     return function;
-}
-
-// Inserts "varying vec2 css_v_texCoord;".
-void RewriteCSSShaderBase::insertTexCoordVaryingDeclaration()
-{
-    insertAtBeginningOfShader(createDeclaration(createVec2Varying(texCoordVaryingName)));
 }
 
 void RewriteCSSShaderBase::insertAtBeginningOfShader(TIntermNode* node)
