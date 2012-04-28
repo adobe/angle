@@ -202,12 +202,11 @@ COMPILER_EXPORT void ShDestruct(ShHandle handle);
 // where "XXX" represents the hidden symbol suffix you provide via this function.
 //
 // Vertex Shader Hidden Symbols:
-//     attribute vec2 css_TexCoordAttributeXXX
-//     varying vec2 css_TexCoordVaryingXXX
+//     varying vec2 css_v_texCoordXXX
 //
 // Fragment Shader Hidden Symbols:
-//     varying vec2 css_TexCoordVaryingXXX
-//     uniform sampler2D css_TextureUniformXXX
+//     varying vec2 css_v_texCoordXXX
+//     uniform sampler2D css_u_textureXXX
 //
 // Parameters:
 // handle: Specifies the handle of compiler to be used.
