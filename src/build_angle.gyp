@@ -51,7 +51,7 @@
         'compiler/DetectRecursion.h',
         'compiler/FindSymbolUsage.h',
         'compiler/ForLoopUnroll.cpp',
-        'compiler/ForLoopUnroll.h','
+        'compiler/ForLoopUnroll.h',
         'compiler/glslang.h',
         'compiler/glslang_lex.cpp',
         'compiler/glslang_tab.cpp',
