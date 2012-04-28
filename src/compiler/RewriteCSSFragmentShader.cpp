@@ -22,9 +22,9 @@ void RewriteCSSFragmentShader::rewrite()
         insertBlendColorDeclaration();
     if (usesColorMatrix)
         insertColorMatrixDeclaration();
-    
+
     renameFunction(kMain, mUserMainFunctionName);
-    
+
     TIntermAggregate* newMainFunction = insertNewMainFunction();
     insertUserMainFunctionCall(newMainFunction);
     insertBlendOp(newMainFunction, usesBlendColor, usesColorMatrix);
@@ -67,7 +67,7 @@ void RewriteCSSFragmentShader::insertTextureUniformDeclaration()
 void RewriteCSSFragmentShader::insertTexCoordVaryingDeclaration()
 {
     TIntermSymbol* texCoordVarying = createSymbol(getTexCoordVaryingName(), vec2Type(EvqVaryingIn));
-    TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
+    TIntermAggregate* declaration = createDeclaration(texCoordVarying);
     insertAtBeginningOfShader(declaration);
 }
 
@@ -97,7 +97,7 @@ void RewriteCSSFragmentShader::insertBlendOp(TIntermAggregate* function, bool us
     TIntermSymbol* textureUniform = createSymbol(mTextureUniformName, sampler2DType());
     TIntermSymbol* texCoordVarying = createSymbol(getTexCoordVaryingName(), vec2Type(EvqVaryingIn));
     TIntermAggregate* texture2DCall = createFunctionCall(kTexture2D, textureUniform, texCoordVarying, vec4Type(EvqTemporary));
-    
+
     TIntermTyped* blendOpLhs = texture2DCall;
     if (usesColorMatrix) {
         TIntermSymbol* colorMatrix = createSymbol(kColorMatrix, mat4Type(EvqGlobal));

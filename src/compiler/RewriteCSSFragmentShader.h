@@ -59,7 +59,7 @@ private:
     static const char* const kUserMainFunctionPrefix;
     static const char* const kFragColor;
     static const char* const kTexture2D;
-    
+
     void insertBlendColorDeclaration();
     void insertColorMatrixDeclaration();
     void insertTextureUniformDeclaration();

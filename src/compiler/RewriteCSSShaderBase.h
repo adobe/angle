@@ -17,7 +17,7 @@ class TInfoSinkBase;
 class RewriteCSSShaderBase {
 public:
     RewriteCSSShaderBase(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix);
-    
+
     virtual void rewrite();
     TIntermNode* getNewTreeRoot() { return mRoot; }
 
@@ -25,26 +25,26 @@ public:
 
 protected:
     static const char* const kMain;
-    
+
     void insertAtBeginningOfShader(TIntermNode* node);
     void insertAtEndOfShader(TIntermNode* node);
 
     TIntermAggregate* findFunction(const TString& name) const;
     void renameFunction(const TString& oldFunctionName, const TString& newFunctionName);
     bool isSymbolUsed(const TString& symbolName);
-    
+
     const TType& getBuiltinType(const TString& builtinName) const;
     const TString& getTexCoordVaryingName() const { return mTexCoordVaryingName; }
 
 private:
     static const char* const kTexCoordVaryingPrefix;
-    
+
     TIntermAggregate* mRoot;
     const TSymbolTable& mSymbolTable;
     TString mTexCoordVaryingName;
-    
+
     TIntermAggregate* getRoot() const;
-    
+
     void createRootSequenceIfNeeded();
 };
 

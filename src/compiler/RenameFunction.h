@@ -19,7 +19,7 @@ public:
     : TIntermTraverser(true, false, false)
     , mOldFunctionName(oldFunctionName)
     , mNewFunctionName(newFunctionName) {}
-    
+
     virtual bool visitAggregate(Visit visit, TIntermAggregate* node)
     {
         TOperator op = node->getOp();
@@ -27,7 +27,7 @@ public:
             node->setName(mNewFunctionName);
         return true;
     }
-    
+
 private:
     const TString& mOldFunctionName;
     const TString& mNewFunctionName;

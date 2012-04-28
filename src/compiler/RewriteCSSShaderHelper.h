@@ -16,18 +16,18 @@ namespace RewriteCSSShaderHelper {
     const TType mat4Type(TQualifier qualifier);
     const TType sampler2DType();
     const TPrecision getDefaultPrecision(TQualifier qualifier);
-    
-    TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w); // TODO: Add consts
+
+    TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
     TIntermConstantUnion* createMat4IdentityConstant();
     TIntermSymbol* createSymbol(const TString& name, const TType& type);
+    TIntermAggregate* createDeclaration(TIntermNode* child);
+    TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs);
+    TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type);
+    TIntermAggregate* createFunction(const TString& name, const TType& returnType);
     TIntermAggregate* createFunctionCall(const TString& name, const TType& returnType);
     TIntermAggregate* createFunctionCall(const TString& name, TIntermNode* argument1, TIntermNode* argument2, const TType& returnType);
     void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
-    TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type);
-    TIntermAggregate* createDeclaration(TIntermNode* child);
-    TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs);
-    TIntermAggregate* createFunction(const TString& name, const TType& returnType);
-    
+
     void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node);
     void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node);
 }

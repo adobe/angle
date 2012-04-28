@@ -19,13 +19,13 @@ namespace {
     {
         TIntermAggregate* body = NULL;
         TIntermSequence& paramsAndBody = function->getSequence();
-        
+
         // Functions always have parameters nodes. They might also have a body node.
         ASSERT(paramsAndBody.size() >= 1 || paramsAndBody.size() <= 2);
-        
+
         if (paramsAndBody.size() == 2) {
             body = paramsAndBody[1]->getAsAggregate();
-            
+
             // If a body node exists, it should be an aggregate sequence node.
             ASSERT(body);
             ASSERT(body->getOp() == EOpSequence);
@@ -34,7 +34,7 @@ namespace {
             body = new TIntermAggregate(EOpSequence);
             paramsAndBody.push_back(body);
         }
-        
+
         return body;
     }
 
@@ -85,18 +85,64 @@ TIntermConstantUnion* createMat4IdentityConstant()
     ConstantUnion* constantArray = new ConstantUnion[4 * 4];
     for (int i = 0; i < 4 * 4; i++)
         constantArray[i].setFConst(0.0);
-    
+
     constantArray[0].setFConst(1.0);
     constantArray[5].setFConst(1.0);
     constantArray[10].setFConst(1.0);
     constantArray[15].setFConst(1.0);
-    
+
     return new TIntermConstantUnion(constantArray, mat4Type(EvqConst));
 }
 
 TIntermSymbol* createSymbol(const TString& name, const TType& type)
 {
     return new TIntermSymbol(0, name, type);
+}
+
+TIntermAggregate* createDeclaration(TIntermNode* child)
+{
+    TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
+    declaration->getSequence().push_back(child);
+    return declaration;
+}
+
+TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs)
+{
+    // The initialization node has the same type as the symbol, except with undefined precision.
+    TType type(symbol->getType());
+    type.setPrecision(EbpUndefined);
+
+    // The initialization node sets the symbol equal to the right hand side.
+    TIntermBinary* initialization = createBinary(EOpInitialize, symbol, rhs, type);
+
+    // The declaration node contains the initialization node.
+    return createDeclaration(initialization);
+}
+
+TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& returnType)
+{
+    TIntermBinary* binary = new TIntermBinary(op);
+    binary->setType(returnType);
+    binary->setLeft(left);
+    binary->setRight(right);
+    return binary;
+}
+
+TIntermAggregate* createFunction(const TString& name, const TType& returnType)
+{
+    TIntermAggregate* function = new TIntermAggregate(EOpFunction);
+    function->setName(name);
+    function->setType(returnType);
+
+    TIntermSequence& paramsAndBody = function->getSequence();
+
+    TIntermAggregate* parameters = new TIntermAggregate(EOpParameters);
+    paramsAndBody.push_back(parameters);
+
+    TIntermAggregate* body = new TIntermAggregate(EOpSequence);
+    paramsAndBody.push_back(body);
+
+    return function;
 }
 
 TIntermAggregate* createFunctionCall(const TString& name, const TType& returnType)
@@ -120,52 +166,6 @@ void addArgument(TIntermAggregate* functionCall, TIntermNode* argument)
     functionCall->getSequence().push_back(argument);
 }
 
-TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& returnType)
-{
-    TIntermBinary* binary = new TIntermBinary(op);
-    binary->setType(returnType);
-    binary->setLeft(left);
-    binary->setRight(right);
-    return binary;
-}
-
-TIntermAggregate* createDeclaration(TIntermNode* child)
-{
-    TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
-    declaration->getSequence().push_back(child);
-    return declaration;
-}
-
-TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs)
-{
-    // The initialization node has the same type as the symbol, except with undefined precision.
-    TType type(symbol->getType());
-    type.setPrecision(EbpUndefined);
-    
-    // The initialization node sets the symbol equal to the right hand side.
-    TIntermBinary* initialization = createBinary(EOpInitialize, symbol, rhs, type);
-    
-    // The declaration node contains the initialization node.
-    return createDeclaration(initialization);
-}
-
-TIntermAggregate* createFunction(const TString& name, const TType& returnType)
-{
-    TIntermAggregate* function = new TIntermAggregate(EOpFunction);
-    function->setName(name);
-    function->setType(returnType);
-    
-    TIntermSequence& paramsAndBody = function->getSequence();
-    
-    TIntermAggregate* parameters = new TIntermAggregate(EOpParameters);
-    paramsAndBody.push_back(parameters);
-    
-    TIntermAggregate* body = new TIntermAggregate(EOpSequence);
-    paramsAndBody.push_back(body);
-    
-    return function;
-}
-    
 void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node)
 {
     TIntermSequence& bodySequence = getOrCreateFunctionBody(function)->getSequence();

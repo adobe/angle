@@ -19,25 +19,25 @@ public:
     : TIntermTraverser(true, false, false)
     , mSymbolName(symbolName)
     , mSymbolUsageFound(false) {}
-    
+
     bool symbolUsageFound() { return mSymbolUsageFound; }
-    
+
     virtual void visitSymbol(TIntermSymbol* node)
     {
         if (node->getSymbol() == mSymbolName)
             mSymbolUsageFound = true;
     }
-    
+
     virtual bool visitBinary(Visit visit, TIntermBinary*) { return shouldKeepLooking(); }
     virtual bool visitUnary(Visit visit, TIntermUnary*) { return shouldKeepLooking(); }
     virtual bool visitSelection(Visit visit, TIntermSelection*) { return shouldKeepLooking(); }
     virtual bool visitAggregate(Visit visit, TIntermAggregate*) { return shouldKeepLooking(); }
     virtual bool visitLoop(Visit visit, TIntermLoop*) { return shouldKeepLooking(); }
     virtual bool visitBranch(Visit visit, TIntermBranch*) { return shouldKeepLooking(); }
-    
+
 private:
     bool shouldKeepLooking() { return !mSymbolUsageFound; }
-    
+
     const TString& mSymbolName;
     bool mSymbolUsageFound;
 };

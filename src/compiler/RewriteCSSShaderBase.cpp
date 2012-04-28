@@ -14,7 +14,7 @@ using namespace RewriteCSSShaderHelper;
 RewriteCSSShaderBase::RewriteCSSShaderBase(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix)
     : mRoot(root->getAsAggregate())
     , mSymbolTable(symbolTable)
-    , mTexCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix) 
+    , mTexCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix)
 {
     // The intermediate tree root should come in as an aggregate node.
     // It should be either a sequence or the main function declaration.
@@ -90,7 +90,7 @@ TIntermAggregate* RewriteCSSShaderBase::getRoot() const
 // the new sequence.
 // Thus, after this function is called, the tree root can only be a sequence.
 void RewriteCSSShaderBase::createRootSequenceIfNeeded()
-{    
+{
     if (mRoot->getOp() == EOpFunction) {
         TIntermAggregate* newRoot = new TIntermAggregate(EOpSequence);
         TIntermSequence& sequence = newRoot->getSequence();

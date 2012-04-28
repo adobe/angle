@@ -26,7 +26,7 @@ void RewriteCSSVertexShader::rewrite()
 void RewriteCSSVertexShader::insertTexCoordVaryingDeclaration()
 {
     TIntermSymbol* texCoordVarying = createSymbol(getTexCoordVaryingName(), vec2Type(EvqVaryingIn));
-    TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
+    TIntermAggregate* declaration = createDeclaration(texCoordVarying);
     insertAtBeginningOfShader(declaration);
 }
 
