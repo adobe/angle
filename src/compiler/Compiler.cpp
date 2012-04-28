@@ -253,11 +253,11 @@ bool TCompiler::detectRecursion(TIntermNode* root)
 TIntermNode* TCompiler::rewriteCSSShader(TIntermNode* root)
 {
     if (shaderType == SH_VERTEX_SHADER) {
-        RewriteCSSVertexShader rewriter(root, hiddenSymbolSuffix);
+        RewriteCSSVertexShader rewriter(root, symbolTable, hiddenSymbolSuffix);
         rewriter.rewrite();
         return rewriter.getNewTreeRoot();
     } else {
-        RewriteCSSFragmentShader rewriter(root, hiddenSymbolSuffix);
+        RewriteCSSFragmentShader rewriter(root, symbolTable, hiddenSymbolSuffix);
         rewriter.rewrite();
         return rewriter.getNewTreeRoot();
     }

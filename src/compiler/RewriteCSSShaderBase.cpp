@@ -223,3 +223,11 @@ TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name)
     }
     return NULL;
 }
+
+const TType& RewriteCSSShaderBase::getBuiltinType(const TString& builtinName)
+{
+    TSymbol* builtinSymbol = symbolTable.find(builtinName);
+    ASSERT(builtinSymbol->isVariable());
+    TVariable* builtinVariable = static_cast<TVariable*>(builtinSymbol);
+    return builtinVariable->getType();
+}

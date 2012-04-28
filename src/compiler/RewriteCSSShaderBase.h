@@ -10,13 +10,15 @@
 #include "GLSLANG/ShaderLang.h"
 
 #include "compiler/intermediate.h"
+#include "compiler/SymbolTable.h"
 
 class TInfoSinkBase;
 
 class RewriteCSSShaderBase {
 public:
-    RewriteCSSShaderBase(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix)
+    RewriteCSSShaderBase(TIntermNode* treeRoot, const TSymbolTable& table, const TString& hiddenSymbolSuffix)
         : root(treeRoot)
+        , symbolTable(table)
         , texCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix) {}
 
     virtual void rewrite();
@@ -46,8 +48,11 @@ protected:
     TIntermAggregate* findFunction(const TString& name);
     void renameFunction(const TString& oldFunctionName, const TString& newFunctionName);
     bool isSymbolUsed(const TString& symbolName);
+    
+    const TType& getBuiltinType(const TString& builtinName);
 
     TIntermNode* root;
+    const TSymbolTable& symbolTable;
     TString texCoordVaryingName;
 
 private:

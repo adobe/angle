@@ -38,8 +38,8 @@
 
 class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
-    RewriteCSSVertexShader(TIntermNode* treeRoot, const TString& hiddenSymbolSuffix)
-        : RewriteCSSShaderBase(treeRoot, hiddenSymbolSuffix) {}
+    RewriteCSSVertexShader(TIntermNode* treeRoot, const TSymbolTable& table, const TString& hiddenSymbolSuffix)
+        : RewriteCSSShaderBase(treeRoot, table, hiddenSymbolSuffix) {}
 
     void rewrite();
 

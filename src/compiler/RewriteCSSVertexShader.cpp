@@ -22,9 +22,9 @@ void RewriteCSSVertexShader::rewrite()
 // Inserts "varying vec2 css_v_texCoord;".
 void RewriteCSSVertexShader::insertTexCoordVaryingDeclaration()
 {
-    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingOut, 4));
+    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingOut, 2));
     TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
-    insertAtBeginningOfShader(createDeclaration(declaration));
+    insertAtBeginningOfShader(declaration);
 }
 
 // Inserts "css_v_texCoordXXX = a_texCoord;" as the first line of the main function.

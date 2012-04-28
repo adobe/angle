@@ -80,9 +80,9 @@ void RewriteCSSFragmentShader::insertTextureUniformDeclaration()
 // Inserts "varying vec2 css_v_texCoord;".
 void RewriteCSSFragmentShader::insertTexCoordVaryingDeclaration()
 {
-    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingIn, 4));
+    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingIn, 2));
     TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
-    insertAtBeginningOfShader(createDeclaration(declaration));
+    insertAtBeginningOfShader(declaration);
 }
 
 // Inserts "void main() {}" and returns the new main function.
