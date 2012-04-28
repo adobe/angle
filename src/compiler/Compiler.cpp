@@ -159,10 +159,9 @@ bool TCompiler::compile(const char* const shaderStrings[],
         (PaParseStrings(numStrings - firstSource, &shaderStrings[firstSource], NULL, &parseContext) == 0) &&
         (parseContext.treeRoot != NULL);
     if (success) {
-        intermediate.postProcess(parseContext.treeRoot);
-        
         TIntermNode* root = parseContext.treeRoot;
-        
+        success = intermediate.postProcess(parseContext.treeRoot);
+
         if (success)
             success = detectRecursion(root);
 
