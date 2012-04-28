@@ -4,7 +4,10 @@
 // found in the LICENSE file.
 //
 
+#include "compiler/RewriteCSSShaderHelper.h"
 #include "compiler/RewriteCSSVertexShader.h"
+
+using namespace RewriteCSSShaderHelper;
 
 const char* const RewriteCSSVertexShader::kTexCoordAttributeName = "a_texCoord";
 
@@ -22,7 +25,7 @@ void RewriteCSSVertexShader::rewrite()
 // Inserts "varying vec2 css_v_texCoord;".
 void RewriteCSSVertexShader::insertTexCoordVaryingDeclaration()
 {
-    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingOut, 2));
+    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, vec2Type(EvqVaryingIn));
     TIntermAggregate* declaration = createDeclaration(texCoordVarying);    
     insertAtBeginningOfShader(declaration);
 }
@@ -30,8 +33,8 @@ void RewriteCSSVertexShader::insertTexCoordVaryingDeclaration()
 // Inserts "css_v_texCoordXXX = a_texCoord;" as the first line of the main function.
 void RewriteCSSVertexShader::insertTexCoordVaryingAssignment()
 {
-    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, TType(EbtFloat, EbpHigh, EvqVaryingIn, 2));
-    TIntermSymbol* texCoordAttribute = createSymbol(kTexCoordAttributeName, TType(EbtFloat, EbpHigh, EvqAttribute, 2));
-    TIntermBinary* assignment = createBinary(EOpAssign, texCoordVarying, texCoordAttribute, TType(EbtFloat, EbpHigh, EvqTemporary, 2));
+    TIntermSymbol* texCoordVarying = createSymbol(texCoordVaryingName, vec2Type(EvqVaryingIn));
+    TIntermSymbol* texCoordAttribute = createSymbol(kTexCoordAttributeName, vec2Type(EvqAttribute));
+    TIntermBinary* assignment = createBinary(EOpAssign, texCoordVarying, texCoordAttribute, vec2Type(EvqTemporary));
     insertAtBeginningOfFunction(findFunction(kMain), assignment);
 }

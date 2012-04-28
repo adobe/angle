@@ -59,8 +59,6 @@ private:
     static const char* const kUserMainFunctionPrefix;
     static const char* const kFragColor;
     static const char* const kTexture2D;
-
-    TIntermAggregate* createTexture2DCall(const TString& mTextureUniformName, const TString& texCoordVaryingName);
     
     void insertBlendColorDeclaration();
     void insertColorMatrixDeclaration();

@@ -45,7 +45,7 @@ public:
 
 private:
     static const char* const kTexCoordAttributeName;
-
+    
     void insertTexCoordVaryingDeclaration();
     void insertTexCoordVaryingAssignment();
 };

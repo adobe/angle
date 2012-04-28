@@ -29,17 +29,7 @@ public:
 protected:
     static const char* const kTexCoordVaryingPrefix;
     static const char* const kMain;
-
-    TIntermConstantUnion* createVec4Constant(float x, float y, float z, float w);
-    TIntermConstantUnion* createMat4IdentityConstant();
-    TIntermSymbol* createSymbol(const TString& name, const TType& type);
-    TIntermAggregate* createFunctionCall(const TString& name, const TType& resultType);
-    void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
-    TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type);
-    TIntermAggregate* createDeclaration(TIntermNode* child);
-    TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs);
-    TIntermAggregate* createFunction(const TString& name, const TType& returnType);
-
+    
     void insertAtBeginningOfShader(TIntermNode* node);
     void insertAtEndOfShader(TIntermNode* node);
     void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node);

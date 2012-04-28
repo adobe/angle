@@ -12,19 +12,6 @@
 
 // TODO: Move these.
 
-bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
-{
-    FindSymbolUsage findSymbolUsage(symbolName);
-    root->traverse(&findSymbolUsage);
-    return findSymbolUsage.symbolUsageFound();
-}
-
-void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const TString& newFunctionName)
-{
-    RenameFunction renameFunction(oldFunctionName, newFunctionName);
-    root->traverse(&renameFunction);
-}
-
 //
 // RewriteCSSShaderBase implementation
 //
@@ -36,94 +23,6 @@ void RewriteCSSShaderBase::rewrite()
 
 const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_v_texCoord";
 const char* const RewriteCSSShaderBase::kMain = "main(";
-
-TIntermConstantUnion* RewriteCSSShaderBase::createVec4Constant(float x, float y, float z, float w)
-{
-    ConstantUnion* constantArray = new ConstantUnion[4];
-    constantArray[0].setFConst(x);
-    constantArray[1].setFConst(y);
-    constantArray[2].setFConst(z);
-    constantArray[3].setFConst(w);
-    return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4));
-}
-
-TIntermConstantUnion* RewriteCSSShaderBase::createMat4IdentityConstant()
-{
-    ConstantUnion* constantArray = new ConstantUnion[4 * 4];
-    for (int i = 0; i < 4 * 4; i++)
-        constantArray[i].setFConst(0.0);
-
-    constantArray[0].setFConst(1.0);
-    constantArray[5].setFConst(1.0);
-    constantArray[10].setFConst(1.0);
-    constantArray[15].setFConst(1.0);
-
-    return new TIntermConstantUnion(constantArray, TType(EbtFloat, EbpUndefined, EvqConst, 4, true));
-}
-
-TIntermSymbol* RewriteCSSShaderBase::createSymbol(const TString& name, const TType& type)
-{
-    return new TIntermSymbol(0, name, type);
-}
-
-TIntermAggregate* RewriteCSSShaderBase::createFunctionCall(const TString& name, const TType& resultType)
-{
-    TIntermAggregate* functionCall = new TIntermAggregate(EOpFunctionCall);
-    functionCall->setName(name);
-    functionCall->setType(resultType);
-    return functionCall;
-}
-
-void RewriteCSSShaderBase::addArgument(TIntermAggregate* functionCall, TIntermNode* argument)
-{
-    functionCall->getSequence().push_back(argument);
-}
-
-TIntermBinary* RewriteCSSShaderBase::createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& resultType)
-{
-    TIntermBinary* binary = new TIntermBinary(op);
-    binary->setType(resultType);
-    binary->setLeft(left);
-    binary->setRight(right);
-    return binary;
-}
-
-TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermNode* child)
-{
-    TIntermAggregate* declaration = new TIntermAggregate(EOpDeclaration);
-    declaration->getSequence().push_back(child);
-    return declaration;
-}
-
-TIntermAggregate* RewriteCSSShaderBase::createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs)
-{
-    // The initialization node has the same type as the symbol, except with undefined precision.
-    TType type(symbol->getType());
-    type.setPrecision(EbpUndefined);
-    
-    // The initialization node sets the symbol equal to the right hand side.
-    TIntermBinary* initialization = createBinary(EOpInitialize, symbol, rhs, type);
-    
-    // The declaration node contains the initialization node.
-    return createDeclaration(initialization);
-}
-
-TIntermAggregate* RewriteCSSShaderBase::createFunction(const TString& name, const TType& returnType)
-{
-    TIntermAggregate* function = new TIntermAggregate(EOpFunction);
-    function->setName(name);
-    function->setType(returnType);
-
-    TIntermSequence& paramsAndBody = function->getSequence();
-
-    TIntermAggregate* parameters = new TIntermAggregate(EOpParameters);
-    paramsAndBody.push_back(parameters);
-
-    TIntermAggregate* body = new TIntermAggregate(EOpSequence);
-    paramsAndBody.push_back(body);
-
-    return function;
-}
 
 void RewriteCSSShaderBase::insertAtBeginningOfShader(TIntermNode* node)
 {
@@ -222,6 +121,19 @@ TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name)
             return aggregate;
     }
     return NULL;
+}
+
+bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
+{
+    FindSymbolUsage findSymbolUsage(symbolName);
+    root->traverse(&findSymbolUsage);
+    return findSymbolUsage.symbolUsageFound();
+}
+
+void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const TString& newFunctionName)
+{
+    RenameFunction renameFunction(oldFunctionName, newFunctionName);
+    root->traverse(&renameFunction);
 }
 
 const TType& RewriteCSSShaderBase::getBuiltinType(const TString& builtinName)
