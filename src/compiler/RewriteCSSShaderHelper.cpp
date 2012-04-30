@@ -108,12 +108,8 @@ TIntermAggregate* createDeclaration(TIntermNode* child)
 
 TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs)
 {
-    // The initialization node has the same type as the symbol, except with undefined precision.
-    TType type(symbol->getType());
-    type.setPrecision(EbpUndefined);
-
-    // The initialization node sets the symbol equal to the right hand side.
-    TIntermBinary* initialization = createBinary(EOpInitialize, symbol, rhs, type);
+    // The initialization node has the same type as the symbol.
+    TIntermBinary* initialization = createBinary(EOpInitialize, symbol, rhs, symbol->getType());
 
     // The declaration node contains the initialization node.
     return createDeclaration(initialization);
