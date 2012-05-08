@@ -5,17 +5,17 @@
 //
 
 #include "compiler/BuiltInFunctionEmulator.h"
-#include "compiler/websafe/DependencyGraph.h"
-#include "compiler/websafe/DependencyGraphOutput.h"
 #include "compiler/DetectRecursion.h"
-#include "compiler/websafe/ValidateWebSafeVertexShader.h"
 #include "compiler/ForLoopUnroll.h"
 #include "compiler/Initialize.h"
 #include "compiler/MapLongVariableNames.h"
 #include "compiler/ParseHelper.h"
 #include "compiler/ShHandle.h"
 #include "compiler/ValidateLimitations.h"
+#include "compiler/websafe/DependencyGraph.h"
+#include "compiler/websafe/DependencyGraphOutput.h"
 #include "compiler/websafe/ValidateWebSafeFragmentShader.h"
+#include "compiler/websafe/ValidateWebSafeVertexShader.h"
 
 namespace {
 bool InitializeSymbolTable(

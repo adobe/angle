@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/websafe/DependencyGraphOutput.h"
 #include "compiler/InfoSink.h"
 #include "compiler/ParseHelper.h"
+#include "compiler/websafe/DependencyGraphOutput.h"
 #include "compiler/websafe/ValidateWebSafeFragmentShader.h"
 
 // FIXME(mvujovic): We do not know if the execution time of built-in operations like sin, pow, etc.
