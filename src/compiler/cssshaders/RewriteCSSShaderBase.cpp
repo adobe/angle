@@ -63,11 +63,7 @@ void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const 
 
 bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
 {
-// TODO(mvujovic): Use this.
-//    SearchSymbol search(symbolName);
-//    getRoot()->traverse(&search);
-//    return search.foundMatch();
-    
+    // TODO(mvujovic): Replace.
     FindSymbolUsage findSymbolUsage(symbolName);
     getRoot()->traverse(&findSymbolUsage);
     return findSymbolUsage.symbolUsageFound();

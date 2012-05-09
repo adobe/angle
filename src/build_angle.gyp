@@ -82,8 +82,6 @@
         'compiler/RemoveTree.cpp',
         'compiler/RemoveTree.h',
         'compiler/RenameFunction.h',
-        'compiler/SearchSymbol.cpp',
-        'compiler/SearchSymbol.h',
         'compiler/ShHandle.h',
         'compiler/SymbolTable.cpp',
         'compiler/SymbolTable.h',
@@ -177,6 +175,8 @@
             'COMPILER_IMPLEMENTATION',
           ],
           'sources': [
+            'compiler/SearchSymbol.cpp',
+            'compiler/SearchSymbol.h',
             'compiler/ShaderLang.cpp',
             'compiler/CodeGenHLSL.cpp',
             'compiler/OutputHLSL.cpp',
