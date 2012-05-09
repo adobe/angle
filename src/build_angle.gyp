@@ -81,7 +81,6 @@
         'compiler/QualifierAlive.h',
         'compiler/RemoveTree.cpp',
         'compiler/RemoveTree.h',
-        'compiler/RenameFunction.h',
         'compiler/ShHandle.h',
         'compiler/SymbolTable.cpp',
         'compiler/SymbolTable.h',
@@ -93,6 +92,8 @@
         'compiler/VariableInfo.cpp',
         'compiler/VariableInfo.h',
         # CSS Shaders
+        'compiler/cssshaders/RenameFunction.h',
+        'compiler/cssshaders/RemoveUnusedSymbols.h',
         'compiler/cssshaders/RewriteCSSFragmentShader.cpp',
         'compiler/cssshaders/RewriteCSSFragmentShader.h',
         'compiler/cssshaders/RewriteCSSShaderBase.cpp',
