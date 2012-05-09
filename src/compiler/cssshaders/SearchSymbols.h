@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_REMOVE_UNUSED_SYMBOLS
-#define COMPILER_REMOVE_UNUSED_SYMBOLS
+#ifndef COMPILER_SEARCH_SYMBOLS
+#define COMPILER_SEARCH_SYMBOLS
 
 #include <set>
 
@@ -45,4 +45,4 @@ private:
     SymbolNames mFoundSymbolNames;
 };
 
-#endif COMPILER_REMOVE_UNUSED_SYMBOLS
+#endif COMPILER_SEARCH_SYMBOLS

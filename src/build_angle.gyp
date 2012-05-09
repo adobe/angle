@@ -146,7 +146,7 @@
       'sources': [
         'compiler/CodeGenGLSL.cpp',
         'compiler/OutputESSL.cpp',
-        'compiler/OutputESSL.h',
+        'compiler/OutputESSL.h',        
         'compiler/OutputGLSLBase.cpp',
         'compiler/OutputGLSLBase.h',
         'compiler/OutputGLSL.cpp',
@@ -176,8 +176,6 @@
             'COMPILER_IMPLEMENTATION',
           ],
           'sources': [
-            'compiler/SearchSymbol.cpp',
-            'compiler/SearchSymbol.h',
             'compiler/ShaderLang.cpp',
             'compiler/CodeGenHLSL.cpp',
             'compiler/OutputHLSL.cpp',
@@ -186,6 +184,8 @@
             'compiler/TranslatorHLSL.h',
             'compiler/UnfoldShortCircuit.cpp',
             'compiler/UnfoldShortCircuit.h',
+            'compiler/SearchSymbol.cpp',
+            'compiler/SearchSymbol.h',
           ],
         },
         {
