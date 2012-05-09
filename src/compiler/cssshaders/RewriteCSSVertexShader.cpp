@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/RewriteCSSShaderHelper.h"
-#include "compiler/RewriteCSSVertexShader.h"
+#include "compiler/cssshaders/RewriteCSSShaderHelper.h"
+#include "compiler/cssshaders/RewriteCSSVertexShader.h"
 
 using namespace RewriteCSSShaderHelper;
 

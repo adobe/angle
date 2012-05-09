@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/RewriteCSSFragmentShader.h"
-#include "compiler/RewriteCSSShaderHelper.h"
+#include "compiler/cssshaders/RewriteCSSFragmentShader.h"
+#include "compiler/cssshaders/RewriteCSSShaderHelper.h"
 
 using namespace RewriteCSSShaderHelper;
 

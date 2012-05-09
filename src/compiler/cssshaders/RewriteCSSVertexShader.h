@@ -9,7 +9,7 @@
 
 #include "GLSLANG/ShaderLang.h"
 
-#include "compiler/RewriteCSSShaderBase.h"
+#include "compiler/cssshaders/RewriteCSSShaderBase.h"
 
 //
 // Rewrites a CSS vertex shader's intermediate tree into a valid GLSL shader.

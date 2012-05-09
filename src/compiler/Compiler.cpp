@@ -10,10 +10,10 @@
 #include "compiler/Initialize.h"
 #include "compiler/MapLongVariableNames.h"
 #include "compiler/ParseHelper.h"
-#include "compiler/RewriteCSSFragmentShader.h"
-#include "compiler/RewriteCSSVertexShader.h"
 #include "compiler/ShHandle.h"
 #include "compiler/ValidateLimitations.h"
+#include "compiler/cssshaders/RewriteCSSFragmentShader.h"
+#include "compiler/cssshaders/RewriteCSSVertexShader.h"
 
 bool isWebGLSpecSubset(ShShaderSpec spec)
 {

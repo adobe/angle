@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/RewriteCSSShaderHelper.h"
+#include "compiler/cssshaders/RewriteCSSShaderHelper.h"
 
 namespace RewriteCSSShaderHelper {
 
