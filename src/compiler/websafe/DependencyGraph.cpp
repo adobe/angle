@@ -32,7 +32,8 @@ TGraphSymbol* TDependencyGraph::getGlobalSymbolByName(const TString& name) const
     return symbol;
 }
 
-TGraphArgument* TDependencyGraph::createArgument(TIntermAggregate* intermFunctionCall, int argumentNumber)
+TGraphArgument* TDependencyGraph::createArgument(TIntermAggregate* intermFunctionCall,
+                                                 int argumentNumber)
 {
     TGraphArgument* argument = new TGraphArgument(intermFunctionCall, argumentNumber);
     mAllNodes.push_back(argument);
@@ -65,7 +66,8 @@ TGraphSymbol* TDependencyGraph::getOrCreateSymbol(TIntermSymbol* intermSymbol, b
         mSymbolIdMap.insert(pair);
 
         if (isGlobalSymbol) {
-            // We map all symbols in the global scope by name, so traversers of the graph can quickly start searches at global symbols with specific names.
+            // We map all symbols in the global scope by name, so traversers of the graph can
+            // quickly start searches at global symbols with specific names.
             TSymbolNamePair pair(intermSymbol->getSymbol(), symbol);
             mGlobalSymbolMap.insert(pair);
         }

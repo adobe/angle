@@ -6,8 +6,11 @@
 
 #include "compiler/websafe/DependencyGraphBuilder.h"
 
-TDependencyGraphBuilder::TLeftmostSymbolMaintainer::TSubtreePlaceholder TDependencyGraphBuilder::TLeftmostSymbolMaintainer::kLeftSubtree;
-TDependencyGraphBuilder::TLeftmostSymbolMaintainer::TSubtreePlaceholder TDependencyGraphBuilder::TLeftmostSymbolMaintainer::kRightSubtree;
+TDependencyGraphBuilder::TLeftmostSymbolMaintainer::TSubtreePlaceholder
+    TDependencyGraphBuilder::TLeftmostSymbolMaintainer::kLeftSubtree;
+
+TDependencyGraphBuilder::TLeftmostSymbolMaintainer::TSubtreePlaceholder
+    TDependencyGraphBuilder::TLeftmostSymbolMaintainer::kRightSubtree;
 
 void TDependencyGraphBuilder::build(TIntermNode* node, TDependencyGraph* graph)
 {
@@ -42,7 +45,8 @@ void TDependencyGraphBuilder::visitFunctionDefinition(TIntermAggregate* intermAg
     mIsGlobalScope = true;
 }
 
-// Takes an expression like "f(x)" and creates a dependency graph like "x -> argument 0 -> function call".
+// Takes an expression like "f(x)" and creates a dependency graph like
+// "x -> argument 0 -> function call".
 void TDependencyGraphBuilder::visitFunctionCall(TIntermAggregate* intermFunctionCall)
 {
     TGraphFunctionCall* functionCall = mGraph->createFunctionCall(intermFunctionCall);
@@ -50,7 +54,9 @@ void TDependencyGraphBuilder::visitFunctionCall(TIntermAggregate* intermFunction
     // Run through the function call arguments.
     int argumentNumber = 0;
     TIntermSequence& intermArguments = intermFunctionCall->getSequence();
-    for(TIntermSequence::const_iterator iter = intermArguments.begin(); iter != intermArguments.end(); ++iter, ++argumentNumber)
+    for (TIntermSequence::const_iterator iter = intermArguments.begin();
+         iter != intermArguments.end();
+         ++iter, ++argumentNumber)
     {
         TNodeSetMaintainer nodeSetMaintainer(this);
 
@@ -64,9 +70,12 @@ void TDependencyGraphBuilder::visitFunctionCall(TIntermAggregate* intermFunction
         }
     }
 
-    // Push the leftmost symbol of this function call into the current set of dependent symbols to represent the result of this function call.
-    // An expression like "y = f(x)" will yield a dependency graph like "x -> argument 0 -> function call -> y".
-    // This line essentially passes the function call node back up to an earlier visitAssignment call, which will create the connection "function call -> y".
+    // Push the leftmost symbol of this function call into the current set of dependent symbols to
+    // represent the result of this function call.
+    // Thus, an expression like "y = f(x)" will yield a dependency graph like
+    // "x -> argument 0 -> function call -> y".
+    // This line essentially passes the function call node back up to an earlier visitAssignment
+    // call, which will create the connection "function call -> y".
     mNodeSets.insertIntoTopSet(functionCall);
 }
 
@@ -82,12 +91,15 @@ void TDependencyGraphBuilder::visitAggregateChildren(TIntermAggregate* intermAgg
 
 void TDependencyGraphBuilder::visitSymbol(TIntermSymbol* intermSymbol)
 {
-    // Push this symbol into the set of dependent symbols for the current assignment or condition that we are traversing.
+    // Push this symbol into the set of dependent symbols for the current assignment or condition
+    // that we are traversing.
     TGraphSymbol* symbol = mGraph->getOrCreateSymbol(intermSymbol, mIsGlobalScope);
     mNodeSets.insertIntoTopSet(symbol);
 
-    // If this symbol is the leftmost symbol under an assignment, replace the current leftmost symbol with this symbol.
-    if (!mLeftmostSymbols.empty() && mLeftmostSymbols.top() != &TLeftmostSymbolMaintainer::kRightSubtree) {
+    // If this symbol is the current leftmost symbol under an assignment, replace the previous
+    // leftmost symbol with this symbol.
+    if (!mLeftmostSymbols.empty() && mLeftmostSymbols.top() !=
+        &TLeftmostSymbolMaintainer::kRightSubtree) {
         mLeftmostSymbols.pop();
         mLeftmostSymbols.push(symbol);
     }
@@ -122,7 +134,8 @@ void TDependencyGraphBuilder::visitAssignment(TIntermBinary* intermAssignment)
             intermLeft->traverse(this);
             leftmostSymbol = mLeftmostSymbols.top();
 
-            // After traversing the left subtree of this assignment, the leftmost symbol should be real symbol, not a placeholder.
+            // After traversing the left subtree of this assignment, we should have found a real
+            // leftmost symbol, and the leftmost symbol should not be a placeholder.
             ASSERT(leftmostSymbol != &TLeftmostSymbolMaintainer::kLeftSubtree);
             ASSERT(leftmostSymbol != &TLeftmostSymbolMaintainer::kRightSubtree);
         }
@@ -136,10 +149,12 @@ void TDependencyGraphBuilder::visitAssignment(TIntermBinary* intermAssignment)
             connectMultipleNodesToSingleNode(assignmentNodes, leftmostSymbol);
     }
 
-    // Push the leftmost symbol of this assignment into the current set of dependent symbols to represent the result of this assignment.
+    // Push the leftmost symbol of this assignment into the current set of dependent symbols to
+    // represent the result of this assignment.
     // An expression like "a = (b = c)" will yield a dependency graph like "c -> b -> a".
-    // This line essentially passes the leftmost symbol of the nested assignment ("b" in this example) back up to an earlier visitAssignment call
-    // for the outer assignment, which will create the connection "b -> a".
+    // This line essentially passes the leftmost symbol of the nested assignment ("b" in this
+    // example) back up to the earlier visitAssignment call for the outer assignment, which will
+    // create the connection "b -> a".
     mNodeSets.insertIntoTopSet(leftmostSymbol);
 }
 
@@ -215,7 +230,8 @@ bool TDependencyGraphBuilder::visitLoop(Visit visit, TIntermLoop* intermLoop)
 }
 
 
-void TDependencyGraphBuilder::connectMultipleNodesToSingleNode(TParentNodeSet* nodes, TGraphNode* node) const
+void TDependencyGraphBuilder::connectMultipleNodesToSingleNode(TParentNodeSet* nodes,
+                                                               TGraphNode* node) const
 {
     for (TParentNodeSet::const_iterator iter = nodes->begin(); iter != nodes->end(); ++iter)
     {

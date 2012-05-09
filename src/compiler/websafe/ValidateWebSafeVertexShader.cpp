@@ -14,14 +14,15 @@ void ValidateWebSafeVertexShader::visitSymbol(TIntermSymbol* node)
         mFoundRestrictedSymbol = true;
         mSink.prefix(EPrefixError);
         mSink.location(node->getLine());
-        mSink << "Definition of a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted in vertex shaders.\n";
+        mSink << "Definition of a uniform sampler2D by the name '" << mRestrictedSymbol
+              << "' is not permitted in vertex shaders.\n";
     }
 }
 
 bool ValidateWebSafeVertexShader::visitAggregate(Visit visit, TIntermAggregate* node)
 {
-    // Don't keep exploring if we've found the restricted symbol,
-    // and don't explore anything besides the global scope (i.e. don't explore function definitions).
+    // Don't keep exploring if we've found the restricted symbol, and don't explore anything besides
+    // the global scope (i.e. don't explore function definitions).
     if (mFoundRestrictedSymbol || node->getOp() == EOpFunction)
         return false;
 

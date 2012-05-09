@@ -20,7 +20,9 @@ void TGraphParentNode::traverse(TDependencyGraphTraverser* graphTraverser)
     graphTraverser->incrementDepth();
 
     // Visit the parent node's children.
-    for (TGraphNodeSet::const_iterator iter = mDependentNodes.begin(); iter != mDependentNodes.end(); ++iter)
+    for (TGraphNodeSet::const_iterator iter = mDependentNodes.begin();
+         iter != mDependentNodes.end();
+         ++iter)
     {
         TGraphNode* node = *iter;
         if (!graphTraverser->isVisited(node))

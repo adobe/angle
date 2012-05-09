@@ -4,13 +4,14 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_DEPENDENCY_GRAPH_FACTORY_H
-#define COMPILER_DEPENDENCY_GRAPH_FACTORY_H
+#ifndef COMPILER_DEPENDENCY_GRAPH_BUILDER_H
+#define COMPILER_DEPENDENCY_GRAPH_BUILDER_H
 
 #include "compiler/websafe/DependencyGraph.h"
 
 //
-// Creates a dependency graph of symbols, function calls, conditions etc. by traversing a intermediate tree.
+// Creates a dependency graph of symbols, function calls, conditions etc. by traversing a
+// intermediate tree.
 //
 class TDependencyGraphBuilder : public TIntermTraverser {
 public:
@@ -101,7 +102,8 @@ private:
     //
     class TNodeSetMaintainer {
     public:
-        TNodeSetMaintainer(TDependencyGraphBuilder* factory) : sets(factory->mNodeSets) { sets.pushSet(); }
+        TNodeSetMaintainer(TDependencyGraphBuilder* factory)
+            : sets(factory->mNodeSets) { sets.pushSet(); }
         ~TNodeSetMaintainer() { sets.popSet(); }
     protected:
         TNodeSetStack& sets;
@@ -109,23 +111,27 @@ private:
 
     //
     // An instance of this class pushes a new node set when instantiated.
-    // When the instance goes out of scope, it and pops the top node set and adds its contents to the new top node set.
+    // When the instance goes out of scope, it and pops the top node set and adds its contents to
+    // the new top node set.
     //
     class TNodeSetPropagatingMaintainer {
     public:
-        TNodeSetPropagatingMaintainer(TDependencyGraphBuilder* factory) : sets(factory->mNodeSets) { sets.pushSet(); }
+        TNodeSetPropagatingMaintainer(TDependencyGraphBuilder* factory)
+            : sets(factory->mNodeSets) { sets.pushSet(); }
         ~TNodeSetPropagatingMaintainer() { sets.popSetIntoNext(); }
     protected:
         TNodeSetStack& sets;
     };
 
     //
-    // An instance of this class keeps track of the leftmost symbol while we're exploring an assignment.
+    // An instance of this class keeps track of the leftmost symbol while we're exploring an
+    // assignment.
     // It will push the placeholder symbol kLeftSubtree when instantiated under a left subtree,
     // and kRightSubtree under a right subtree.
     // When it goes out of scope, it will pop the leftmost symbol at the top of the scope.
     // During traversal, the TDependencyGraphBuilder will replace kLeftSubtree with a real symbol.
-    // kRightSubtree will never be replaced by a real symbol because we are tracking the leftmost symbol.
+    // kRightSubtree will never be replaced by a real symbol because we are tracking the leftmost
+    // symbol.
     //
     class TLeftmostSymbolMaintainer {
     public:
@@ -156,7 +162,10 @@ private:
         bool needsPlaceholderSymbol;
     };
 
-    TDependencyGraphBuilder(TDependencyGraph* graph) : TIntermTraverser(true, false, false), mGraph(graph), mIsGlobalScope(true) {}
+    TDependencyGraphBuilder(TDependencyGraph* graph)
+        : TIntermTraverser(true, false, false)
+        , mGraph(graph)
+        , mIsGlobalScope(true) {}
     void build(TIntermNode* intermNode) { intermNode->traverse(this); }
 
     void connectMultipleNodesToSingleNode(TParentNodeSet* nodes, TGraphNode* node) const;
@@ -174,4 +183,4 @@ private:
     bool mIsGlobalScope;
 };
 
-#endif  // COMPILER_DEPENDENCY_GRAPH_FACTORY_H
+#endif  // COMPILER_DEPENDENCY_GRAPH_BUILDER_H

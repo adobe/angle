@@ -15,10 +15,12 @@ void ValidateWebSafeFragmentShader::validate(const TDependencyGraph& graph)
 {
     mNumErrors = 0;
 
-    // FIXME(mvujovic): The dependency graph does not support user defined function calls right now, so we generate errors for them.
+    // FIXME(mvujovic): The dependency graph does not support user defined function calls right now,
+    // so we generate errors for them.
     validateUserDefinedFunctionCallUsage(graph);
 
-    // Traverse the dependency graph starting at s_texture and generate an error each time we hit a condition nodes.
+    // Traverse the dependency graph starting at s_texture and generate an error each time we hit a
+    // condition node.
     TGraphSymbol* uTextureGraphSymbol = graph.getGlobalSymbolByName(mRestrictedSymbol);
     if (uTextureGraphSymbol &&
         uTextureGraphSymbol->getIntermSymbol()->getQualifier() == EvqUniform &&
@@ -28,7 +30,9 @@ void ValidateWebSafeFragmentShader::validate(const TDependencyGraph& graph)
 
 void ValidateWebSafeFragmentShader::validateUserDefinedFunctionCallUsage(const TDependencyGraph& graph)
 {
-    for (TFunctionCallVector::const_iterator iter = graph.beginUserDefinedFunctionCalls(); iter != graph.endUserDefinedFunctionCalls(); ++iter)
+    for (TFunctionCallVector::const_iterator iter = graph.beginUserDefinedFunctionCalls();
+         iter != graph.endUserDefinedFunctionCalls();
+         ++iter)
     {
         TGraphFunctionCall* functionCall = *iter;
         beginError(functionCall->getIntermFunctionCall());
@@ -45,28 +49,33 @@ void ValidateWebSafeFragmentShader::beginError(const TIntermNode* node)
 
 void ValidateWebSafeFragmentShader::visitArgument(TGraphArgument* parameter)
 {
-    if (parameter->getIntermFunctionCall()->getName() != "texture2D(s21;vf2;" || parameter->getArgumentNumber() != 1)
+    if (parameter->getIntermFunctionCall()->getName() != "texture2D(s21;vf2;" ||
+        parameter->getArgumentNumber() != 1)
         return;
 
     beginError(parameter->getIntermFunctionCall());
-    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted to be the second argument of a texture2D call.\n";
+    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol
+          << "' is not permitted to be the second argument of a texture2D call.\n";
 }
 
 void ValidateWebSafeFragmentShader::visitSelection(TGraphSelection* selection)
 {
     beginError(selection->getIntermSelection());
-    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted in a conditional statement.\n";
+    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol
+          << "' is not permitted in a conditional statement.\n";
 }
 
 void ValidateWebSafeFragmentShader::visitLoop(TGraphLoop* loop)
 {
     beginError(loop->getIntermLoop());
-    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted in a loop condition.\n";
+    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol
+          << "' is not permitted in a loop condition.\n";
 }
 
 void ValidateWebSafeFragmentShader::visitLogicalOp(TGraphLogicalOp* logicalOp)
 {
     beginError(logicalOp->getIntermLogicalOp());
-    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol << "' is not permitted on the left hand side of a logical "
-          << logicalOp->getOpString() << " operator.\n";
+    mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol
+          << "' is not permitted on the left hand side of a logical " << logicalOp->getOpString()
+          << " operator.\n";
 }

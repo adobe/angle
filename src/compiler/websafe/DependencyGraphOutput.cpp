@@ -15,7 +15,8 @@ void TDependencyGraphOutput::outputIndentation()
 void TDependencyGraphOutput::visitArgument(TGraphArgument* parameter)
 {
     outputIndentation();
-    mSink << "argument " << parameter->getArgumentNumber() << " of call to " << parameter->getIntermFunctionCall()->getName() << "\n";
+    mSink << "argument " << parameter->getArgumentNumber() << " of call to "
+          << parameter->getIntermFunctionCall()->getName() << "\n";
 }
 
 void TDependencyGraphOutput::visitFunctionCall(TGraphFunctionCall* functionCall)
@@ -27,7 +28,8 @@ void TDependencyGraphOutput::visitFunctionCall(TGraphFunctionCall* functionCall)
 void TDependencyGraphOutput::visitSymbol(TGraphSymbol* symbol)
 {
     outputIndentation();
-    mSink << symbol->getIntermSymbol()->getSymbol() << " (symbol id: " << symbol->getIntermSymbol()->getId() << ")\n";
+    mSink << symbol->getIntermSymbol()->getSymbol() << " (symbol id: "
+          << symbol->getIntermSymbol()->getId() << ")\n";
 }
 
 void TDependencyGraphOutput::visitSelection(TGraphSelection* selection)

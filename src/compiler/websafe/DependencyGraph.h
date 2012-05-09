@@ -57,7 +57,9 @@ private:
 //
 class TGraphArgument : public TGraphParentNode {
 public:
-    TGraphArgument(TIntermAggregate* intermFunctionCall, int argumentNumber) : TGraphParentNode(intermFunctionCall), mArgumentNumber(argumentNumber) {}
+    TGraphArgument(TIntermAggregate* intermFunctionCall, int argumentNumber)
+        : TGraphParentNode(intermFunctionCall)
+        , mArgumentNumber(argumentNumber) {}
     virtual ~TGraphArgument() {}
     const TIntermAggregate* getIntermFunctionCall() const { return intermNode->getAsAggregate(); }
     int getArgumentNumber() const { return mArgumentNumber; }
@@ -71,7 +73,8 @@ private:
 //
 class TGraphFunctionCall : public TGraphParentNode {
 public:
-    TGraphFunctionCall(TIntermAggregate* intermFunctionCall) : TGraphParentNode(intermFunctionCall) {}
+    TGraphFunctionCall(TIntermAggregate* intermFunctionCall)
+        : TGraphParentNode(intermFunctionCall) {}
     virtual ~TGraphFunctionCall() {}
     const TIntermAggregate* getIntermFunctionCall() const { return intermNode->getAsAggregate(); }
     virtual void traverse(TDependencyGraphTraverser* graphTraverser);
@@ -129,7 +132,8 @@ public:
 //
 // Dependency graph nodes should be created by using one of the provided "create..." methods.
 // This class (and nobody else) manages the memory of the created nodes.
-// Nodes may not be removed after being added, so all created nodes will exist while the TDependencyGraph exists.
+// Nodes may not be removed after being added, so all created nodes will exist while the
+// TDependencyGraph instance exists.
 //
 class TDependencyGraph {
 public:
@@ -138,8 +142,15 @@ public:
     TGraphNodeVector::const_iterator begin() const { return mAllNodes.begin(); }
     TGraphNodeVector::const_iterator end() const { return mAllNodes.end(); }
 
-    TFunctionCallVector::const_iterator beginUserDefinedFunctionCalls() const { return mUserDefinedFunctionCalls.begin(); }
-    TFunctionCallVector::const_iterator endUserDefinedFunctionCalls() const { return mUserDefinedFunctionCalls.end(); }
+    TFunctionCallVector::const_iterator beginUserDefinedFunctionCalls() const
+    {
+        return mUserDefinedFunctionCalls.begin();
+    }
+
+    TFunctionCallVector::const_iterator endUserDefinedFunctionCalls() const
+    {
+        return mUserDefinedFunctionCalls.end();
+    }
 
     // Returns NULL if the symbol is not found.
     TGraphSymbol* getGlobalSymbolByName(const TString& name) const;

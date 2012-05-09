@@ -86,7 +86,7 @@ protected:
     bool validateWebSafeVertexShader(TIntermNode* root, const TString& restrictedSymbol);
     // Returns true if the shader does not use the restricted symbol to affect control flow or in
     // operations whose time can depend on the input values.
-    bool validateWebSafeFragmentShader(const TDependencyGraph& graph, const TString& restrictedSymbol);    
+    bool validateWebSafeFragmentShader(const TDependencyGraph& graph, const TString& restrictedSymbol);
     // Get built-in extensions with default behavior.
     const TExtensionBehavior& getExtensionBehavior() const;
 
@@ -118,7 +118,7 @@ private:
 // and the machine dependent code.
 //
 // The machine dependent code should derive from the classes
-// above. Then Construct*() and Delete*() will create and 
+// above. Then Construct*() and Delete*() will create and
 // destroy the machine dependent objects, which contain the
 // above machine independent information.
 //
