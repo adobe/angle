@@ -15,9 +15,11 @@ void RewriteCSSVertexShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
 
-    // TODO(mvujovic): We rely on the original shader to define a_texCoord.
-    // In the future, all of the attributes and uniforms from the CSS Shaders spec will be built-ins,
-    // and we will insert declarations for them here.
+    // TODO(mvujovic): Right now, we rely on the original shader to define a_texCoord.
+    // In the future, we might make all of the attributes and uniforms from the CSS Shaders spec built-ins,
+    // and insert declarations for them here.
+    // If we don't make them built-ins, we can use a_texCoord if it is defined with the correct type in 
+    // the shader, and if not, we can insert a hidden symbol like css_a_texCoordXXX.
     insertTexCoordVaryingDeclaration();
     insertTexCoordVaryingAssignment();
 }
