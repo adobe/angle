@@ -6,6 +6,7 @@
 
 #include "compiler/cssshaders/RewriteCSSFragmentShader.h"
 #include "compiler/cssshaders/RewriteCSSShaderHelper.h"
+#include "compiler/cssshaders/SearchSymbols.h"
 
 using namespace RewriteCSSShaderHelper;
 
@@ -13,8 +14,15 @@ void RewriteCSSFragmentShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
 
-    bool usesBlendColor = isSymbolUsed(kBlendColor);
-    bool usesColorMatrix = isSymbolUsed(kColorMatrix);
+    SymbolNames builtins;
+    builtins.insert(kBlendColor);
+    builtins.insert(kColorMatrix);
+    
+    SearchSymbols search(builtins);
+    getRoot()->traverse(&search);
+    const SymbolNames& foundBuiltins = search.getFoundSymbolNames();
+    bool usesBlendColor = foundBuiltins.find(kBlendColor) != foundBuiltins.end();
+    bool usesColorMatrix = foundBuiltins.find(kColorMatrix) != foundBuiltins.end();;
 
     insertTextureUniformDeclaration();
     insertTexCoordVaryingDeclaration();

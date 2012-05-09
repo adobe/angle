@@ -4,8 +4,7 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/cssshaders/FindSymbolUsage.h" // TODO(mvujovic): Remove.
-#include "compiler/RenameFunction.h"
+#include "compiler/cssshaders/RenameFunction.h"
 #include "compiler/cssshaders/RewriteCSSShaderBase.h"
 #include "compiler/cssshaders/RewriteCSSShaderHelper.h"
 
@@ -58,15 +57,6 @@ void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const 
 {
     RenameFunction renameFunction(oldFunctionName, newFunctionName);
     getRoot()->traverse(&renameFunction);
-}
-
-
-bool RewriteCSSShaderBase::isSymbolUsed(const TString& symbolName)
-{
-    // TODO(mvujovic): Replace.
-    FindSymbolUsage findSymbolUsage(symbolName);
-    getRoot()->traverse(&findSymbolUsage);
-    return findSymbolUsage.symbolUsageFound();
 }
 
 const TType& RewriteCSSShaderBase::getBuiltinType(const TString& builtinName) const

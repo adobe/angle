@@ -93,7 +93,6 @@
         'compiler/VariableInfo.h',
         # CSS Shaders
         'compiler/cssshaders/RenameFunction.h',
-        'compiler/cssshaders/RemoveUnusedSymbols.h',
         'compiler/cssshaders/RewriteCSSFragmentShader.cpp',
         'compiler/cssshaders/RewriteCSSFragmentShader.h',
         'compiler/cssshaders/RewriteCSSShaderBase.cpp',
@@ -102,6 +101,7 @@
         'compiler/cssshaders/RewriteCSSShaderHelper.h',
         'compiler/cssshaders/RewriteCSSVertexShader.cpp',
         'compiler/cssshaders/RewriteCSSVertexShader.h',
+        'compiler/cssshaders/SearchSymbols.h',
         # Old preprocessor
         'compiler/preprocessor/atom.c',
         'compiler/preprocessor/atom.h',

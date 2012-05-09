@@ -31,19 +31,18 @@ protected:
 
     TIntermAggregate* findFunction(const TString& name) const;
     void renameFunction(const TString& oldFunctionName, const TString& newFunctionName);
-    bool isSymbolUsed(const TString& symbolName);
 
     const TType& getBuiltinType(const TString& builtinName) const;
     const TString& getTexCoordVaryingName() const { return mTexCoordVaryingName; }
 
+    TIntermAggregate* getRoot() const;
+    
 private:
     static const char* const kTexCoordVaryingPrefix;
 
     TIntermAggregate* mRoot;
     const TSymbolTable& mSymbolTable;
     TString mTexCoordVaryingName;
-
-    TIntermAggregate* getRoot() const;
 
     void createRootSequenceIfNeeded();
 };
