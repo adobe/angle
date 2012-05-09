@@ -26,7 +26,8 @@ class LongNameMap;
 class TCompiler;
 
 //
-// Helper function to identify specs based on the WebGL spec.
+// Helper function to identify specs that are based on the WebGL spec,
+// like the CSS Shaders spec.
 //
 bool isWebGLSpecSubset(ShShaderSpec spec);
 
