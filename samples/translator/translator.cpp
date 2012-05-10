@@ -203,7 +203,7 @@ void usage()
         "       -u       : print active attribs and uniforms\n"
         "       -l       : unroll for-loops with integer indices\n"
         "       -e       : emulate certain built-in functions (workaround for driver bugs)\n"
-        "       -w       : enforce web safe shader restrictions\n"
+        "       -w       : compile the shader for WebGL and enforce web safe shader restrictions\n"
         "       -d       : print the dependency graph used to enforce web safe shader restrictions\n"
         "       -b=e     : output GLSL ES code (this is by default)\n"
         "       -b=g     : output GLSL code\n"

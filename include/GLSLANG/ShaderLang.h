@@ -116,9 +116,9 @@ typedef enum {
   // This flag prints the dependency graph that is used to check if a
   // fragment shader is web safe.
   // This flag is only valid if all of the following are true:
-  // - The shader spec is SH_WEBGL_SPEC
-  // - The compile options contain the SH_WEB_SAFE flag
-  // - The shader type is SH_FRAGMENT_SHADER
+  // - The shader spec is SH_WEBGL_SPEC.
+  // - The compile options contain the SH_WEB_SAFE flag.
+  // - The shader type is SH_FRAGMENT_SHADER.
   SH_DEPENDENCY_GRAPH           = 0x0400
 } ShCompileOptions;
 
