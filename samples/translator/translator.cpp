@@ -74,6 +74,8 @@ int main(int argc, char* argv[])
     ShBuiltInResources resources;
     GenerateResources(&resources);
 
+    ShShaderSpec spec = SH_GLES2_SPEC;
+    
     argc--;
     argv++;
     for (; (argc >= 1) && (failCode == ESuccess); argc--, argv++) {
@@ -86,7 +88,10 @@ int main(int argc, char* argv[])
             case 'l': compileOptions |= SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX; break;
             case 'e': compileOptions |= SH_EMULATE_BUILT_IN_FUNCTIONS; break;
             case 'd': compileOptions |= SH_DEPENDENCY_GRAPH; break;
-            case 'w': compileOptions |= SH_WEB_SAFE; break;
+            case 'w':
+                spec = SH_WEBGL_SPEC;
+                compileOptions |= SH_WEB_SAFE;
+                break;
             case 'b':
                 if (argv[0][2] == '=') {
                     switch (argv[0][3]) {
@@ -118,13 +123,13 @@ int main(int argc, char* argv[])
             case SH_VERTEX_SHADER:
                 if (vertexCompiler == 0)
                     vertexCompiler = ShConstructCompiler(
-                        SH_VERTEX_SHADER, SH_GLES2_SPEC, output, &resources);
+                        SH_VERTEX_SHADER, spec, output, &resources);
                 compiler = vertexCompiler;
                 break;
             case SH_FRAGMENT_SHADER:
                 if (fragmentCompiler == 0)
                     fragmentCompiler = ShConstructCompiler(
-                        SH_FRAGMENT_SHADER, SH_GLES2_SPEC, output, &resources);
+                        SH_FRAGMENT_SHADER, spec, output, &resources);
                 compiler = fragmentCompiler;
                 break;
             default: break;

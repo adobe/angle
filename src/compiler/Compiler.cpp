@@ -253,23 +253,28 @@ bool TCompiler::validateLimitations(TIntermNode* root) {
 
 bool TCompiler::validateWebSafeShader(TIntermNode* root, const TString& restrictedSymbol, bool outputGraph)
 {
-    bool success = false;
+    if (shaderSpec != SH_WEBGL_SPEC) {
+        infoSink.info << "Web safe shaders must be compiled under the WebGL spec.";
+        return false;
+    }
 
     if (shaderType == SH_FRAGMENT_SHADER) {
         TDependencyGraph graph(root);
 
-        success = validateWebSafeFragmentShader(graph, restrictedSymbol);
-
+        // Output any errors first.
+        bool success = validateWebSafeFragmentShader(graph, restrictedSymbol);
+        
+        // Then, output the dependency graph.
         if (outputGraph) {
             TDependencyGraphOutput output(infoSink.info);
             output.outputAllSpanningTrees(graph);
         }
+        
+        return success;
     }
     else {
-        success = validateWebSafeVertexShader(root, restrictedSymbol);
+        return validateWebSafeVertexShader(root, restrictedSymbol);
     }
-
-    return success;
 }
 
 bool TCompiler::validateWebSafeFragmentShader(const TDependencyGraph& graph, const TString& restrictedSymbol)
