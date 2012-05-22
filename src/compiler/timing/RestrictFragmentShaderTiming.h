@@ -4,24 +4,24 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_VALIDATE_WEB_SAFE_FRAGMENT_SHADER_H_
-#define COMPILER_VALIDATE_WEB_SAFE_FRAGMENT_SHADER_H_
+#ifndef COMPILER_TIMING_RESTRICT_FRAGMENT_SHADER_TIMING_H_
+#define COMPILER_TIMING_RESTRICT_FRAGMENT_SHADER_TIMING_H_
 
 #include "GLSLANG/ShaderLang.h"
 
 #include "compiler/intermediate.h"
-#include "compiler/websafe/DependencyGraph.h"
+#include "compiler/depgraph/DependencyGraph.h"
 
 class TInfoSinkBase;
 
-class ValidateWebSafeFragmentShader : TDependencyGraphTraverser {
+class RestrictFragmentShaderTiming : TDependencyGraphTraverser {
 public:
-    ValidateWebSafeFragmentShader(TInfoSinkBase& sink, const TString& restrictedSymbol)
+    RestrictFragmentShaderTiming(TInfoSinkBase& sink, const TString& restrictedSymbol)
         : mSink(sink)
         , mRestrictedSymbol(restrictedSymbol)
         , mNumErrors(0) {}
 
-    void validate(const TDependencyGraph& graph);
+    void enforceRestrictions(const TDependencyGraph& graph);
     int numErrors() const { return mNumErrors; }
 
     virtual void visitArgument(TGraphArgument* parameter);
@@ -38,4 +38,4 @@ private:
     int mNumErrors;
 };
 
-#endif  // COMPILER_VALIDATE_WEB_SAFE_FRAGMENT_SHADER_H_
+#endif  // COMPILER_TIMING_RESTRICT_FRAGMENT_SHADER_TIMING_H_

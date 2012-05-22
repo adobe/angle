@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/websafe/DependencyGraph.h"
+#include "compiler/depgraph/DependencyGraph.h"
 
 // These methods do a breadth-first traversal through the graph and mark visited nodes.
 

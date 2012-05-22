@@ -6,12 +6,12 @@
 
 #include "compiler/InfoSink.h"
 #include "compiler/ParseHelper.h"
-#include "compiler/websafe/DependencyGraphOutput.h"
-#include "compiler/websafe/ValidateWebSafeFragmentShader.h"
+#include "compiler/depgraph/DependencyGraphOutput.h"
+#include "compiler/timing/RestrictFragmentShaderTiming.h"
 
 // FIXME(mvujovic): We do not know if the execution time of built-in operations like sin, pow, etc.
 // can vary based on the value of the input arguments. If so, we should restrict those as well.
-void ValidateWebSafeFragmentShader::validate(const TDependencyGraph& graph)
+void RestrictFragmentShaderTiming::enforceRestrictions(const TDependencyGraph& graph)
 {
     mNumErrors = 0;
 
@@ -28,7 +28,7 @@ void ValidateWebSafeFragmentShader::validate(const TDependencyGraph& graph)
         uTextureGraphSymbol->traverse(this);
 }
 
-void ValidateWebSafeFragmentShader::validateUserDefinedFunctionCallUsage(const TDependencyGraph& graph)
+void RestrictFragmentShaderTiming::validateUserDefinedFunctionCallUsage(const TDependencyGraph& graph)
 {
     for (TFunctionCallVector::const_iterator iter = graph.beginUserDefinedFunctionCalls();
          iter != graph.endUserDefinedFunctionCalls();
@@ -40,14 +40,14 @@ void ValidateWebSafeFragmentShader::validateUserDefinedFunctionCallUsage(const T
     }
 }
 
-void ValidateWebSafeFragmentShader::beginError(const TIntermNode* node)
+void RestrictFragmentShaderTiming::beginError(const TIntermNode* node)
 {
     ++mNumErrors;
     mSink.prefix(EPrefixError);
     mSink.location(node->getLine());
 }
 
-void ValidateWebSafeFragmentShader::visitArgument(TGraphArgument* parameter)
+void RestrictFragmentShaderTiming::visitArgument(TGraphArgument* parameter)
 {
     if (parameter->getIntermFunctionCall()->getName() != "texture2D(s21;vf2;" ||
         parameter->getArgumentNumber() != 1)
@@ -58,21 +58,21 @@ void ValidateWebSafeFragmentShader::visitArgument(TGraphArgument* parameter)
           << "' is not permitted to be the second argument of a texture2D call.\n";
 }
 
-void ValidateWebSafeFragmentShader::visitSelection(TGraphSelection* selection)
+void RestrictFragmentShaderTiming::visitSelection(TGraphSelection* selection)
 {
     beginError(selection->getIntermSelection());
     mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol
           << "' is not permitted in a conditional statement.\n";
 }
 
-void ValidateWebSafeFragmentShader::visitLoop(TGraphLoop* loop)
+void RestrictFragmentShaderTiming::visitLoop(TGraphLoop* loop)
 {
     beginError(loop->getIntermLoop());
     mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol
           << "' is not permitted in a loop condition.\n";
 }
 
-void ValidateWebSafeFragmentShader::visitLogicalOp(TGraphLogicalOp* logicalOp)
+void RestrictFragmentShaderTiming::visitLogicalOp(TGraphLogicalOp* logicalOp)
 {
     beginError(logicalOp->getIntermLogicalOp());
     mSink << "An expression dependent on a uniform sampler2D by the name '" << mRestrictedSymbol

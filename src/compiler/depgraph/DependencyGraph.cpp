@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/websafe/DependencyGraph.h"
-#include "compiler/websafe/DependencyGraphBuilder.h"
+#include "compiler/depgraph/DependencyGraph.h"
+#include "compiler/depgraph/DependencyGraphBuilder.h"
 
 TDependencyGraph::TDependencyGraph(TIntermNode* intermNode)
 {

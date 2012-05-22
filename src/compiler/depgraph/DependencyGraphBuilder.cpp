@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/websafe/DependencyGraphBuilder.h"
+#include "compiler/depgraph/DependencyGraphBuilder.h"
 
 TDependencyGraphBuilder::TLeftmostSymbolMaintainer::TSubtreePlaceholder
     TDependencyGraphBuilder::TLeftmostSymbolMaintainer::kLeftSubtree;

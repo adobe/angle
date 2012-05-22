@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/websafe/ValidateWebSafeVertexShader.h"
+#include "compiler/timing/RestrictVertexShaderTiming.h"
 
-void ValidateWebSafeVertexShader::visitSymbol(TIntermSymbol* node)
+void RestrictVertexShaderTiming::visitSymbol(TIntermSymbol* node)
 {
     if (node->getQualifier() == EvqUniform &&
         node->getBasicType() == EbtSampler2D &&
@@ -19,7 +19,7 @@ void ValidateWebSafeVertexShader::visitSymbol(TIntermSymbol* node)
     }
 }
 
-bool ValidateWebSafeVertexShader::visitAggregate(Visit visit, TIntermAggregate* node)
+bool RestrictVertexShaderTiming::visitAggregate(Visit visit, TIntermAggregate* node)
 {
     // Don't keep exploring if we've found the restricted symbol, and don't explore anything besides
     // the global scope (i.e. don't explore function definitions).

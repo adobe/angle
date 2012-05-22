@@ -4,10 +4,10 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_DEPENDENCY_GRAPH_OUTPUT_H
-#define COMPILER_DEPENDENCY_GRAPH_OUTPUT_H
+#ifndef COMPILER_DEPGRAPH_DEPENDENCY_GRAPH_OUTPUT_H
+#define COMPILER_DEPGRAPH_DEPENDENCY_GRAPH_OUTPUT_H
 
-#include "compiler/websafe/DependencyGraph.h"
+#include "compiler/depgraph/DependencyGraph.h"
 #include "compiler/InfoSink.h"
 
 class TDependencyGraphOutput : public TDependencyGraphTraverser {
@@ -27,4 +27,4 @@ private:
     TInfoSinkBase& mSink;
 };
 
-#endif  // COMPILER_DEPENDENCY_GRAPH_OUTPUT_H
+#endif  // COMPILER_DEPGRAPH_DEPENDENCY_GRAPH_OUTPUT_H

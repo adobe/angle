@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_DEPENDENCY_GRAPH_H
-#define COMPILER_DEPENDENCY_GRAPH_H
+#ifndef COMPILER_DEPGRAPH_DEPENDENCY_GRAPH_H
+#define COMPILER_DEPGRAPH_DEPENDENCY_GRAPH_H
 
 #include "compiler/intermediate.h"
 

@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 //
 
-#include "compiler/websafe/DependencyGraphOutput.h"
+#include "compiler/depgraph/DependencyGraphOutput.h"
 
 void TDependencyGraphOutput::outputIndentation()
 {

@@ -4,10 +4,10 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_DEPENDENCY_GRAPH_BUILDER_H
-#define COMPILER_DEPENDENCY_GRAPH_BUILDER_H
+#ifndef COMPILER_DEPGRAPH_DEPENDENCY_GRAPH_BUILDER_H
+#define COMPILER_DEPGRAPH_DEPENDENCY_GRAPH_BUILDER_H
 
-#include "compiler/websafe/DependencyGraph.h"
+#include "compiler/depgraph/DependencyGraph.h"
 
 //
 // Creates a dependency graph of symbols, function calls, conditions etc. by traversing a
@@ -183,4 +183,4 @@ private:
     bool mIsGlobalScope;
 };
 
-#endif  // COMPILER_DEPENDENCY_GRAPH_BUILDER_H
+#endif  // COMPILER_DEPGRAPH_DEPENDENCY_GRAPH_BUILDER_H

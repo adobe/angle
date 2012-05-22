@@ -12,10 +12,10 @@
 #include "compiler/ParseHelper.h"
 #include "compiler/ShHandle.h"
 #include "compiler/ValidateLimitations.h"
-#include "compiler/websafe/DependencyGraph.h"
-#include "compiler/websafe/DependencyGraphOutput.h"
-#include "compiler/websafe/ValidateWebSafeFragmentShader.h"
-#include "compiler/websafe/ValidateWebSafeVertexShader.h"
+#include "compiler/depgraph/DependencyGraph.h"
+#include "compiler/depgraph/DependencyGraphOutput.h"
+#include "compiler/timing/RestrictFragmentShaderTiming.h"
+#include "compiler/timing/RestrictVertexShaderTiming.h"
 
 namespace {
 bool InitializeSymbolTable(
@@ -166,10 +166,11 @@ bool TCompiler::compile(const char* const shaderStrings[],
             success = validateLimitations(root);
 
         // FIXME(mvujovic): For now, we only consider "u_texture" to be a potentially unsafe symbol.
-        // If we end up using web safe shader analysis, we should expose an API to pass in the names
-        // of other potentially unsafe symbols (e.g. uniforms referencing cross-domain textures).
-        if (success && (compileOptions & SH_WEB_SAFE))
-            success = validateWebSafeShader(root, "u_texture", compileOptions & SH_DEPENDENCY_GRAPH);
+        // If we end up using timing restrictions in WebGL and CSS Shaders, we should expose an API
+        // to pass in the names of other potentially unsafe symbols (e.g. uniforms referencing 
+        // cross-domain textures).
+        if (success && (compileOptions & SH_TIMING_RESTRICTIONS))
+            success = enforceTimingRestrictions(root, "u_texture", compileOptions & SH_DEPENDENCY_GRAPH);
 
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
@@ -251,10 +252,10 @@ bool TCompiler::validateLimitations(TIntermNode* root) {
     return validate.numErrors() == 0;
 }
 
-bool TCompiler::validateWebSafeShader(TIntermNode* root, const TString& restrictedSymbol, bool outputGraph)
+bool TCompiler::enforceTimingRestrictions(TIntermNode* root, const TString& restrictedSymbol, bool outputGraph)
 {
     if (shaderSpec != SH_WEBGL_SPEC) {
-        infoSink.info << "Web safe shaders must be compiled under the WebGL spec.";
+        infoSink.info << "Timing restrictions must be enforced under the WebGL spec.";
         return false;
     }
 
@@ -262,7 +263,7 @@ bool TCompiler::validateWebSafeShader(TIntermNode* root, const TString& restrict
         TDependencyGraph graph(root);
 
         // Output any errors first.
-        bool success = validateWebSafeFragmentShader(graph, restrictedSymbol);
+        bool success = enforceFragmentShaderTimingRestrictions(graph, restrictedSymbol);
         
         // Then, output the dependency graph.
         if (outputGraph) {
@@ -273,22 +274,22 @@ bool TCompiler::validateWebSafeShader(TIntermNode* root, const TString& restrict
         return success;
     }
     else {
-        return validateWebSafeVertexShader(root, restrictedSymbol);
+        return enforceVertexShaderTimingRestrictions(root, restrictedSymbol);
     }
 }
 
-bool TCompiler::validateWebSafeFragmentShader(const TDependencyGraph& graph, const TString& restrictedSymbol)
+bool TCompiler::enforceFragmentShaderTimingRestrictions(const TDependencyGraph& graph, const TString& restrictedSymbol)
 {
-    ValidateWebSafeFragmentShader validator(infoSink.info, restrictedSymbol);
-    validator.validate(graph);
-    return validator.numErrors() == 0;
+    RestrictFragmentShaderTiming restrictor(infoSink.info, restrictedSymbol);
+    restrictor.enforceRestrictions(graph);
+    return restrictor.numErrors() == 0;
 }
 
-bool TCompiler::validateWebSafeVertexShader(TIntermNode* root, const TString& restrictedSymbol)
+bool TCompiler::enforceVertexShaderTimingRestrictions(TIntermNode* root, const TString& restrictedSymbol)
 {
-    ValidateWebSafeVertexShader validator(infoSink.info, restrictedSymbol);
-    validator.validate(root);
-    return validator.numErrors() == 0;
+    RestrictVertexShaderTiming restrictor(infoSink.info, restrictedSymbol);
+    restrictor.enforceRestrictions(root);
+    return restrictor.numErrors() == 0;
 }
 
 void TCompiler::collectAttribsUniforms(TIntermNode* root)

@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_VALIDATE_WEB_SAFE_VERTEX_SHADER_H_
-#define COMPILER_VALIDATE_WEB_SAFE_VERTEX_SHADER_H_
+#ifndef COMPILER_TIMING_RESTRICT_VERTEX_SHADER_TIMING_H_
+#define COMPILER_TIMING_RESTRICT_VERTEX_SHADER_TIMING_H_
 
 #include "GLSLANG/ShaderLang.h"
 
@@ -14,15 +14,15 @@
 
 class TInfoSinkBase;
 
-class ValidateWebSafeVertexShader : public TIntermTraverser {
+class RestrictVertexShaderTiming : public TIntermTraverser {
 public:
-    ValidateWebSafeVertexShader(TInfoSinkBase& sink, const TString& restrictedSymbol)
+    RestrictVertexShaderTiming(TInfoSinkBase& sink, const TString& restrictedSymbol)
         : TIntermTraverser(true, false, false)
         , mSink(sink)
         , mRestrictedSymbol(restrictedSymbol)
         , mFoundRestrictedSymbol(false) {}
 
-    void validate(TIntermNode* root) { root->traverse(this); }
+    void enforceRestrictions(TIntermNode* root) { root->traverse(this); }
     int numErrors() { return mFoundRestrictedSymbol ? 1 : 0; }
 
     virtual void visitSymbol(TIntermSymbol*);
@@ -38,4 +38,4 @@ private:
     bool mFoundRestrictedSymbol;
 };
 
-#endif  // COMPILER_VALIDATE_WEB_SAFE_VERTEX_SHADER_H_
+#endif  // COMPILER_TIMING_RESTRICT_VERTEX_SHADER_TIMING_H_
