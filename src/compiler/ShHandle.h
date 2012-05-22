@@ -80,7 +80,7 @@ protected:
     void mapLongVariableNames(TIntermNode* root);
     // Translate to object code.
     virtual void translate(TIntermNode* root) = 0;
-    // Returns true if the shader passes the experimental restrictions that aim to prevent timing attacks.
+    // Returns true if the shader passes the restrictions that aim to prevent timing attacks.
     bool enforceTimingRestrictions(TIntermNode* root, const TString& restrictedSymbol, bool outputGraph);
     // Returns true if the shader does not define the restricted symbol.
     bool enforceVertexShaderTimingRestrictions(TIntermNode* root, const TString& restrictedSymbol);
