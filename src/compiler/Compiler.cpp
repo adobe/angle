@@ -170,7 +170,7 @@ bool TCompiler::compile(const char* const shaderStrings[],
         // to pass in the names of other potentially unsafe symbols (e.g. uniforms referencing 
         // cross-domain textures).
         if (success && (compileOptions & SH_TIMING_RESTRICTIONS))
-            success = enforceTimingRestrictions(root, "u_texture", compileOptions & SH_DEPENDENCY_GRAPH);
+            success = enforceTimingRestrictions(root, "u_texture", (compileOptions & SH_DEPENDENCY_GRAPH) != 0);
 
         // Unroll for-loop markup needs to happen after validateLimitations pass.
         if (success && (compileOptions & SH_UNROLL_FOR_LOOP_WITH_INTEGER_INDEX))
