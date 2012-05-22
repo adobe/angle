@@ -252,7 +252,9 @@ bool TCompiler::validateLimitations(TIntermNode* root) {
     return validate.numErrors() == 0;
 }
 
-bool TCompiler::enforceTimingRestrictions(TIntermNode* root, const TString& restrictedSymbol, bool outputGraph)
+bool TCompiler::enforceTimingRestrictions(TIntermNode* root,
+                                          const TString& restrictedSymbol,
+                                          bool outputGraph)
 {
     if (shaderSpec != SH_WEBGL_SPEC) {
         infoSink.info << "Timing restrictions must be enforced under the WebGL spec.";
@@ -278,14 +280,16 @@ bool TCompiler::enforceTimingRestrictions(TIntermNode* root, const TString& rest
     }
 }
 
-bool TCompiler::enforceFragmentShaderTimingRestrictions(const TDependencyGraph& graph, const TString& restrictedSymbol)
+bool TCompiler::enforceFragmentShaderTimingRestrictions(const TDependencyGraph& graph,
+                                                        const TString& restrictedSymbol)
 {
     RestrictFragmentShaderTiming restrictor(infoSink.info, restrictedSymbol);
     restrictor.enforceRestrictions(graph);
     return restrictor.numErrors() == 0;
 }
 
-bool TCompiler::enforceVertexShaderTimingRestrictions(TIntermNode* root, const TString& restrictedSymbol)
+bool TCompiler::enforceVertexShaderTimingRestrictions(TIntermNode* root,
+                                                      const TString& restrictedSymbol)
 {
     RestrictVertexShaderTiming restrictor(infoSink.info, restrictedSymbol);
     restrictor.enforceRestrictions(root);

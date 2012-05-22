@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 
     ShBuiltInResources resources;
     GenerateResources(&resources);
-    
+
     argc--;
     argv++;
     for (; (argc >= 1) && (failCode == ESuccess); argc--, argv++) {

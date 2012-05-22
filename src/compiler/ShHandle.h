@@ -81,12 +81,16 @@ protected:
     // Translate to object code.
     virtual void translate(TIntermNode* root) = 0;
     // Returns true if the shader passes the restrictions that aim to prevent timing attacks.
-    bool enforceTimingRestrictions(TIntermNode* root, const TString& restrictedSymbol, bool outputGraph);
+    bool enforceTimingRestrictions(TIntermNode* root,
+                                   const TString& restrictedSymbol,
+                                   bool outputGraph);
     // Returns true if the shader does not define the restricted symbol.
-    bool enforceVertexShaderTimingRestrictions(TIntermNode* root, const TString& restrictedSymbol);
+    bool enforceVertexShaderTimingRestrictions(TIntermNode* root,
+                                               const TString& restrictedSymbol);
     // Returns true if the shader does not use the restricted symbol to affect control flow or in
     // operations whose time can depend on the input values.
-    bool enforceFragmentShaderTimingRestrictions(const TDependencyGraph& graph, const TString& restrictedSymbol);
+    bool enforceFragmentShaderTimingRestrictions(const TDependencyGraph& graph,
+                                                 const TString& restrictedSymbol);
     // Get built-in extensions with default behavior.
     const TExtensionBehavior& getExtensionBehavior() const;
 
@@ -118,7 +122,7 @@ private:
 // and the machine dependent code.
 //
 // The machine dependent code should derive from the classes
-// above. Then Construct*() and Delete*() will create and
+// above. Then Construct*() and Delete*() will create and 
 // destroy the machine dependent objects, which contain the
 // above machine independent information.
 //
