@@ -19,7 +19,7 @@ void RewriteCSSFragmentShader::rewrite()
     builtins.insert(kColorMatrix);
     
     SearchSymbols search(builtins);
-    getRoot()->traverse(&search);
+    getRootAggregate()->traverse(&search);
     const SymbolNames& foundBuiltins = search.getFoundSymbolNames();
     bool usesBlendColor = foundBuiltins.find(kBlendColor) != foundBuiltins.end();
     bool usesColorMatrix = foundBuiltins.find(kColorMatrix) != foundBuiltins.end();;

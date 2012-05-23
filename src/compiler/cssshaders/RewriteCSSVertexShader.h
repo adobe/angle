@@ -39,15 +39,19 @@
 class RewriteCSSVertexShader : public RewriteCSSShaderBase {
 public:
     RewriteCSSVertexShader(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix)
-        : RewriteCSSShaderBase(root, symbolTable, hiddenSymbolSuffix) {}
+        : RewriteCSSShaderBase(root, symbolTable, hiddenSymbolSuffix)
+        , mHiddenTexCoordAttrName(kHiddenTexCoordAttrPrefix + hiddenSymbolSuffix) {}
 
     void rewrite();
 
 private:
-    static const char* const kTexCoordAttributeName;
-
+    static const char* const kUserDefinedTexCoordAttrName;
+    static const char* const kHiddenTexCoordAttrPrefix;
+    
     void insertTexCoordVaryingDeclaration();
-    void insertTexCoordVaryingAssignment();
+    void insertTexCoordVaryingAssignment(const TString& texCoordAttrName);
+    
+    TString mHiddenTexCoordAttrName;
 };
 
 #endif  // COMPILER_REWRITE_CSS_VERTEX_SHADER

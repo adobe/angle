@@ -32,18 +32,18 @@ const char* const RewriteCSSShaderBase::kTexCoordVaryingPrefix = "css_v_texCoord
 
 void RewriteCSSShaderBase::insertAtBeginningOfShader(TIntermNode* node)
 {
-    TIntermSequence& rootSequence = getRoot()->getSequence();
+    TIntermSequence& rootSequence = getRootAggregate()->getSequence();
     rootSequence.insert(rootSequence.begin(), node);
 }
 
 void RewriteCSSShaderBase::insertAtEndOfShader(TIntermNode* node)
 {
-    getRoot()->getSequence().push_back(node);
+    getRootAggregate()->getSequence().push_back(node);
 }
 
 TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name) const
 {
-    TIntermSequence& rootSequence = getRoot()->getSequence();
+    TIntermSequence& rootSequence = getRootAggregate()->getSequence();
     for (TIntermSequence::const_iterator iter = rootSequence.begin(); iter != rootSequence.end(); ++iter) {
         TIntermNode* node = *iter;
         TIntermAggregate* aggregate = node->getAsAggregate();
@@ -56,7 +56,7 @@ TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name) const
 void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const TString& newFunctionName)
 {
     RenameFunction renameFunction(oldFunctionName, newFunctionName);
-    getRoot()->traverse(&renameFunction);
+    getRootAggregate()->traverse(&renameFunction);
 }
 
 const TType& RewriteCSSShaderBase::getBuiltinType(const TString& builtinName) const
@@ -67,7 +67,7 @@ const TType& RewriteCSSShaderBase::getBuiltinType(const TString& builtinName) co
     return builtinVariable->getType();
 }
 
-TIntermAggregate* RewriteCSSShaderBase::getRoot() const
+TIntermAggregate* RewriteCSSShaderBase::getRootAggregate() const
 {
     // createRootSequenceIfNeeded should have been called at the beginning of the rewrite,
     // so the tree should be a sequence.

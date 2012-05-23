@@ -254,11 +254,11 @@ TIntermNode* TCompiler::rewriteCSSShader(TIntermNode* root)
     if (shaderType == SH_VERTEX_SHADER) {
         RewriteCSSVertexShader rewriter(root, symbolTable, hiddenSymbolSuffix);
         rewriter.rewrite();
-        return rewriter.getNewTreeRoot();
+        return rewriter.getNewRoot();
     } else {
         RewriteCSSFragmentShader rewriter(root, symbolTable, hiddenSymbolSuffix);
         rewriter.rewrite();
-        return rewriter.getNewTreeRoot();
+        return rewriter.getNewRoot();
     }
 }
 

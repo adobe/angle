@@ -19,7 +19,7 @@ public:
     RewriteCSSShaderBase(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix);
 
     virtual void rewrite();
-    TIntermNode* getNewTreeRoot() { return mRoot; }
+    TIntermNode* getNewRoot() { return mRoot; }
 
     virtual ~RewriteCSSShaderBase() {}
 
@@ -35,7 +35,7 @@ protected:
     const TType& getBuiltinType(const TString& builtinName) const;
     const TString& getTexCoordVaryingName() const { return mTexCoordVaryingName; }
 
-    TIntermAggregate* getRoot() const;
+    TIntermAggregate* getRootAggregate() const;
     
 private:
     static const char* const kTexCoordVaryingPrefix;
