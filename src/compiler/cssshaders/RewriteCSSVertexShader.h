@@ -46,7 +46,8 @@ public:
 private:
     static const char* const kUserTexCoordAttrName;
     static const char* const kHiddenTexCoordAttrPrefix;
-    
+
+    void insertTexCoordAttrDeclaration();
     void insertTexCoordVaryingDeclaration();
     void insertTexCoordVaryingAssignment(const TString& texCoordAttrName);
     

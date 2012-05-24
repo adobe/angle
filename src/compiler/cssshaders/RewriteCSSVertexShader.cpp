@@ -23,10 +23,22 @@ void RewriteCSSVertexShader::rewrite()
     SearchSymbols search(symbolNames);
     getRootAggregate()->traverse(&search);
     
+    bool isTexCoordAttrUserDefined = search.didFindSymbol(kUserTexCoordAttrName);
+    if (!isTexCoordAttrUserDefined)
+        insertTexCoordAttrDeclaration();
+    
     insertTexCoordVaryingDeclaration();
     
-    const TString& texCoordAttrName = search.didFindSymbol(kUserTexCoordAttrName) ? kUserTexCoordAttrName : mHiddenTexCoordAttrName;
+    const TString& texCoordAttrName = isTexCoordAttrUserDefined ? kUserTexCoordAttrName : mHiddenTexCoordAttrName;
     insertTexCoordVaryingAssignment(texCoordAttrName);
+}
+
+// Inserts "attribute vec2 css_a_texCoordXXX;".
+void RewriteCSSVertexShader::insertTexCoordAttrDeclaration()
+{
+    TIntermSymbol* texCoordAttr = createSymbol(mHiddenTexCoordAttrName, vec2Type(EvqAttribute));
+    TIntermAggregate* declaration = createDeclaration(texCoordAttr);
+    insertAtBeginningOfShader(declaration);
 }
 
 // Inserts "varying vec2 css_v_texCoordXXX;".
