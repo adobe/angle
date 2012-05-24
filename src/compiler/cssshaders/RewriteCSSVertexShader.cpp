@@ -17,20 +17,18 @@ void RewriteCSSVertexShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
 
-    SymbolNames symbolNames;
-    symbolNames.insert(kUserTexCoordAttrName);
-    
-    SearchSymbols search(symbolNames);
-    getRootAggregate()->traverse(&search);
-    
-    bool isTexCoordAttrUserDefined = search.didFindSymbol(kUserTexCoordAttrName);
-    if (!isTexCoordAttrUserDefined)
-        insertTexCoordAttrDeclaration();
-    
     insertTexCoordVaryingDeclaration();
-    
-    const TString& texCoordAttrName = isTexCoordAttrUserDefined ? kUserTexCoordAttrName : mHiddenTexCoordAttrName;
-    insertTexCoordVaryingAssignment(texCoordAttrName);
+
+    SearchSymbols search(1, kUserTexCoordAttrName);
+    getRootAggregate()->traverse(&search);
+
+    bool isTexCoordAttrUserDefined = search.didFindSymbol(kUserTexCoordAttrName);
+    if (isTexCoordAttrUserDefined) {
+        insertTexCoordVaryingAssignment(kUserTexCoordAttrName);
+    } else {
+        insertTexCoordAttrDeclaration();
+        insertTexCoordVaryingAssignment(mHiddenTexCoordAttrName);
+    }
 }
 
 // Inserts "attribute vec2 css_a_texCoordXXX;".

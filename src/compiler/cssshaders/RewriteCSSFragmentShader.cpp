@@ -14,11 +14,7 @@ void RewriteCSSFragmentShader::rewrite()
 {
     RewriteCSSShaderBase::rewrite();
 
-    SymbolNames builtins;
-    builtins.insert(kBlendColor);
-    builtins.insert(kColorMatrix);
-    
-    SearchSymbols search(builtins);
+    SearchSymbols search(2, kBlendColor, kColorMatrix);
     getRootAggregate()->traverse(&search);
     bool usesBlendColor = search.didFindSymbol(kBlendColor);
     bool usesColorMatrix = search.didFindSymbol(kColorMatrix);

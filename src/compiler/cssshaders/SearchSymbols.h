@@ -7,12 +7,10 @@
 #ifndef COMPILER_CSSSHADERS_SEARCH_SYMBOLS
 #define COMPILER_CSSSHADERS_SEARCH_SYMBOLS
 
+#include <stdarg.h>
 #include <set>
 
 #include "compiler/intermediate.h"
-
-// TODO: Remove.
-typedef std::set<TString> SymbolNames;
 
 //
 // Searches through the intermediate tree for multiple symbols at a time.
@@ -20,19 +18,29 @@ typedef std::set<TString> SymbolNames;
 class SearchSymbols : public TIntermTraverser
 {
 public:
-    SearchSymbols(const SymbolNames& symbolNames)
-        : TIntermTraverser(true, false, false)
-        , mSymbolNames(symbolNames) {}
+    SearchSymbols(int numSymbolNames, ...) : TIntermTraverser(true, false, false)
+    {
+        va_list symbolNames;
+        va_start(symbolNames, numSymbolNames);
+
+        for (int i = 0; i < numSymbolNames; ++i)
+        {
+            const char* symbolName = va_arg(symbolNames, const char*);
+            mMissingSymbolNames.insert(symbolName);
+        }
+   
+        va_end(symbolNames);
+    }
 
     virtual void visitSymbol(TIntermSymbol* node)
     {
         const TString& nodeSymbolName = node->getSymbol();
 
-        for (SymbolNames::iterator iter = mSymbolNames.begin(); iter != mSymbolNames.end(); ++iter)
+        for (SymbolNames::iterator iter = mMissingSymbolNames.begin(); iter != mMissingSymbolNames.end(); ++iter)
         {
-            const TString& searchSymbolName = *iter;
-            if (nodeSymbolName == searchSymbolName)
-                mFoundSymbolNames.insert(searchSymbolName);
+            const TString& missingSymbolName = *iter;
+            if (nodeSymbolName == missingSymbolName)
+                mFoundSymbolNames.insert(missingSymbolName);
         }
     }
     
@@ -42,7 +50,9 @@ public:
     }
 
 private:
-    const SymbolNames& mSymbolNames;
+    typedef std::set<TString> SymbolNames;
+    
+    SymbolNames mMissingSymbolNames;
     SymbolNames mFoundSymbolNames;
 };
 
