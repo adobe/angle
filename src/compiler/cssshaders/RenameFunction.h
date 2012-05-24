@@ -33,4 +33,4 @@ private:
     const TString& mNewFunctionName;
 };
 
-#endif
+#endif  // COMPILER_CSSSHADERS_RENAME_FUNCTION

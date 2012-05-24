@@ -40,20 +40,19 @@ public:
         {
             const TString& missingSymbolName = *iter;
             if (nodeSymbolName == missingSymbolName)
-                mFoundSymbolNames.insert(missingSymbolName);
+                mMissingSymbolNames.erase(iter);
         }
     }
     
     bool didFindSymbol(const TString& symbolName) const
     {
-        return mFoundSymbolNames.find(symbolName) != mFoundSymbolNames.end();
+        return mMissingSymbolNames.find(symbolName) == mMissingSymbolNames.end();
     }
 
 private:
     typedef std::set<TString> SymbolNames;
     
     SymbolNames mMissingSymbolNames;
-    SymbolNames mFoundSymbolNames;
 };
 
-#endif COMPILER_CSSSHADERS_SEARCH_SYMBOLS
+#endif  // COMPILER_CSSSHADERS_SEARCH_SYMBOLS

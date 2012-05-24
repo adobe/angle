@@ -32,4 +32,4 @@ namespace RewriteCSSShaderHelper {
     void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node);
 }
 
-#endif
+#endif  // COMPILER_CSSSHADERS_REWRITE_CSS_SHADER_HELPER
