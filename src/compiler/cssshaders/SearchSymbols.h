@@ -36,11 +36,13 @@ public:
     {
         const TString& nodeSymbolName = node->getSymbol();
 
-        for (SymbolNames::iterator iter = mMissingSymbolNames.begin(); iter != mMissingSymbolNames.end(); ++iter)
+        for (SymbolNames::iterator iter = mMissingSymbolNames.begin(); iter != mMissingSymbolNames.end(); )
         {
             const TString& missingSymbolName = *iter;
             if (nodeSymbolName == missingSymbolName)
-                mMissingSymbolNames.erase(iter);
+                mMissingSymbolNames.erase(iter++);
+            else
+                ++iter;
         }
     }
     
