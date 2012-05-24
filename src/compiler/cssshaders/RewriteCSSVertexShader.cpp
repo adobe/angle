@@ -10,7 +10,7 @@
 
 using namespace RewriteCSSShaderHelper;
 
-const char* const RewriteCSSVertexShader::kUserDefinedTexCoordAttrName = "a_texCoord";
+const char* const RewriteCSSVertexShader::kUserTexCoordAttrName = "a_texCoord";
 const char* const RewriteCSSVertexShader::kHiddenTexCoordAttrPrefix = "css_a_texCoord";
 
 void RewriteCSSVertexShader::rewrite()
@@ -18,16 +18,14 @@ void RewriteCSSVertexShader::rewrite()
     RewriteCSSShaderBase::rewrite();
 
     SymbolNames symbolNames;
-    symbolNames.insert(kUserDefinedTexCoordAttrName);
+    symbolNames.insert(kUserTexCoordAttrName);
     
     SearchSymbols search(symbolNames);
     getRootAggregate()->traverse(&search);
-    const SymbolNames& foundSymbolNames = search.getFoundSymbolNames();
-    bool foundTexCoordAttribute = foundSymbolNames.find(kUserDefinedTexCoordAttrName) != foundSymbolNames.end();
     
     insertTexCoordVaryingDeclaration();
     
-    const TString& texCoordAttrName = foundTexCoordAttribute ? kUserDefinedTexCoordAttrName : mHiddenTexCoordAttrName;
+    const TString& texCoordAttrName = search.didFindSymbol(kUserTexCoordAttrName) ? kUserTexCoordAttrName : mHiddenTexCoordAttrName;
     insertTexCoordVaryingAssignment(texCoordAttrName);
 }
 

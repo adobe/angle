@@ -18,7 +18,6 @@
 // Example original vertex shader:
 /*
 
- attribute vec2 a_texCoord;
  void main() {
  }
 
@@ -29,9 +28,9 @@
 /*
 
  varying vec2 css_v_texCoordXXX;
- attribute vec2 a_texCoord;
+ attribute vec2 css_a_texCoordXXX;
  void main(){
- (css_v_texCoordXXX = a_texCoord);
+ (css_v_texCoordXXX = css_a_texCoordXXX);
  }
 
  */
@@ -45,7 +44,7 @@ public:
     void rewrite();
 
 private:
-    static const char* const kUserDefinedTexCoordAttrName;
+    static const char* const kUserTexCoordAttrName;
     static const char* const kHiddenTexCoordAttrPrefix;
     
     void insertTexCoordVaryingDeclaration();

@@ -20,9 +20,8 @@ void RewriteCSSFragmentShader::rewrite()
     
     SearchSymbols search(builtins);
     getRootAggregate()->traverse(&search);
-    const SymbolNames& foundBuiltins = search.getFoundSymbolNames();
-    bool usesBlendColor = foundBuiltins.find(kBlendColor) != foundBuiltins.end();
-    bool usesColorMatrix = foundBuiltins.find(kColorMatrix) != foundBuiltins.end();;
+    bool usesBlendColor = search.didFindSymbol(kBlendColor);
+    bool usesColorMatrix = search.didFindSymbol(kColorMatrix);
 
     insertTextureUniformDeclaration();
     insertTexCoordVaryingDeclaration();

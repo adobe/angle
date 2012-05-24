@@ -35,9 +35,9 @@ public:
         }
     }
     
-    const SymbolNames& getFoundSymbolNames() const
+    bool didFindSymbol(const TString& symbolName) const
     {
-        return mFoundSymbolNames;
+        return mFoundSymbolNames.find(symbolName) != mFoundSymbolNames.end();
     }
 
 private:
