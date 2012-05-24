@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_RENAME_FUNCTION
-#define COMPILER_RENAME_FUNCTION
+#ifndef COMPILER_CSSSHADERS_RENAME_FUNCTION
+#define COMPILER_CSSSHADERS_RENAME_FUNCTION
 
 #include "compiler/intermediate.h"
 

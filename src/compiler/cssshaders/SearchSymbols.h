@@ -4,13 +4,14 @@
 // found in the LICENSE file.
 //
 
-#ifndef COMPILER_SEARCH_SYMBOLS
-#define COMPILER_SEARCH_SYMBOLS
+#ifndef COMPILER_CSSSHADERS_SEARCH_SYMBOLS
+#define COMPILER_CSSSHADERS_SEARCH_SYMBOLS
 
 #include <set>
 
 #include "compiler/intermediate.h"
 
+// TODO: Remove.
 typedef std::set<TString> SymbolNames;
 
 //
@@ -45,4 +46,4 @@ private:
     SymbolNames mFoundSymbolNames;
 };
 
-#endif COMPILER_SEARCH_SYMBOLS
+#endif COMPILER_CSSSHADERS_SEARCH_SYMBOLS
