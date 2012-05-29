@@ -518,6 +518,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="cssshaders"
+				>
+				<File
+					RelativePath=".\cssshaders\RewriteCSSFragmentShader.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\cssshaders\RewriteCSSShaderBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\cssshaders\RewriteCSSShaderHelper.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\cssshaders\RewriteCSSVertexShader.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -693,6 +713,34 @@
 				>
 				<File
 					RelativePath=".\glslang_tab.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="cssshaders"
+				>
+				<File
+					RelativePath=".\cssshaders\RenameFunction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\cssshaders\RewriteCSSFragmentShader.h"
+					>
+				</File>
+				<File
+					RelativePath=".\cssshaders\RewriteCSSShaderBase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\cssshaders\RewriteCSSShaderHelper.h"
+					>
+				</File>
+				<File
+					RelativePath=".\cssshaders\RewriteCSSVertexShader.h"
+					>
+				</File>
+				<File
+					RelativePath=".\cssshaders\SearchSymbols.h"
 					>
 				</File>
 			</Filter>
