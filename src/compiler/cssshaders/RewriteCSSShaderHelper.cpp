@@ -115,7 +115,10 @@ TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs)
     return createDeclaration(initialization);
 }
 
-TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& returnType)
+TIntermBinary* createBinary(TOperator op,
+                            TIntermTyped* left,
+                            TIntermTyped* right,
+                            const TType& returnType)
 {
     TIntermBinary* binary = new TIntermBinary(op);
     binary->setType(returnType);
@@ -149,7 +152,10 @@ TIntermAggregate* createFunctionCall(const TString& name, const TType& returnTyp
     return functionCall;
 }
 
-TIntermAggregate* createFunctionCall(const TString& name, TIntermNode* argument1, TIntermNode* argument2, const TType& returnType)
+TIntermAggregate* createFunctionCall(const TString& name,
+                                     TIntermNode* argument1,
+                                     TIntermNode* argument2,
+                                     const TType& returnType)
 {
     TIntermAggregate* functionCall = createFunctionCall(name, returnType);
     addArgument(functionCall, argument1);
@@ -173,4 +179,4 @@ void insertAtEndOfFunction(TIntermAggregate* function, TIntermNode* node)
     getOrCreateFunctionBody(function)->getSequence().push_back(node);
 }
 
-}  // namespace
+}  // RewriteCSSShaderHelper namespace

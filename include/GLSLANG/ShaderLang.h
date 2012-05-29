@@ -50,6 +50,16 @@ typedef enum {
 typedef enum {
   SH_GLES2_SPEC = 0x8B40,
   SH_WEBGL_SPEC = 0x8B41,
+
+  // The CSS Shaders spec is a subset of the WebGL spec.
+  // When a shader is compiled with this flag, the shader is rewritten as
+  // described in the CSS Shaders spec.
+  // To briefly summarize:
+  // In the fragment shader, gl_FragColor is disabled, css_BlendColor and
+  // css_ColorMatrix are enabled, and a blending operation is inserted at
+  // the end of the shader.
+  // In the vertex shader, a texture coordinate attribute may be inserted,
+  // and a texture coordinate varying is inserted.
   SH_CSS_SHADERS_SPEC = 0x8B42
 } ShShaderSpec;
 
@@ -202,11 +212,15 @@ COMPILER_EXPORT void ShDestruct(ShHandle handle);
 // where "XXX" represents the hidden symbol suffix you provide via this function.
 //
 // Vertex Shader Hidden Symbols:
+//     attibute vec2 css_a_texCoordXXX
 //     varying vec2 css_v_texCoordXXX
 //
 // Fragment Shader Hidden Symbols:
 //     varying vec2 css_v_texCoordXXX
 //     uniform sampler2D css_u_textureXXX
+//
+// If the author defines a_texCoord in the vertex shader, css_a_texCoordXXX
+// will not be written.
 //
 // Parameters:
 // handle: Specifies the handle of compiler to be used.

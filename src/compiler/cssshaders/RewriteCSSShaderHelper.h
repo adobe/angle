@@ -22,10 +22,14 @@ namespace RewriteCSSShaderHelper {
     TIntermSymbol* createSymbol(const TString& name, const TType& type);
     TIntermAggregate* createDeclaration(TIntermNode* child);
     TIntermAggregate* createDeclaration(TIntermSymbol* symbol, TIntermTyped* rhs);
-    TIntermBinary* createBinary(TOperator op, TIntermTyped* left, TIntermTyped* right, const TType& type);
+    TIntermBinary* createBinary(TOperator op,
+                                TIntermTyped* left,
+                                TIntermTyped* right,
+                                const TType& type);
     TIntermAggregate* createFunction(const TString& name, const TType& returnType);
     TIntermAggregate* createFunctionCall(const TString& name, const TType& returnType);
-    TIntermAggregate* createFunctionCall(const TString& name, TIntermNode* argument1, TIntermNode* argument2, const TType& returnType);
+    TIntermAggregate* createFunctionCall(const TString& name, TIntermNode* argument1,
+    TIntermNode* argument2, const TType& returnType);
     void addArgument(TIntermAggregate* functionCall, TIntermNode* argument);
 
     void insertAtBeginningOfFunction(TIntermAggregate* function, TIntermNode* node);

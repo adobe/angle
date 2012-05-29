@@ -53,6 +53,9 @@ void RewriteCSSVertexShader::insertTexCoordVaryingAssignment(const TString& texC
 {
     TIntermSymbol* texCoordVarying = createSymbol(getTexCoordVaryingName(), vec2Type(EvqVaryingIn));
     TIntermSymbol* texCoordAttribute = createSymbol(texCoordAttrName, vec2Type(EvqAttribute));
-    TIntermBinary* assignment = createBinary(EOpAssign, texCoordVarying, texCoordAttribute, vec2Type(EvqTemporary));
+    TIntermBinary* assignment = createBinary(EOpAssign,
+                                             texCoordVarying,
+                                             texCoordAttribute,
+                                             vec2Type(EvqTemporary));
     insertAtBeginningOfFunction(findFunction(kMain), assignment);
 }

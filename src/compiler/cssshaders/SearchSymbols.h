@@ -28,7 +28,7 @@ public:
             const char* symbolName = va_arg(symbolNames, const char*);
             mMissingSymbolNames.insert(symbolName);
         }
-   
+
         va_end(symbolNames);
     }
 
@@ -36,7 +36,8 @@ public:
     {
         const TString& nodeSymbolName = node->getSymbol();
 
-        for (SymbolNames::iterator iter = mMissingSymbolNames.begin(); iter != mMissingSymbolNames.end(); )
+        for (SymbolNames::iterator iter = mMissingSymbolNames.begin();
+             iter != mMissingSymbolNames.end(); )
         {
             const TString& missingSymbolName = *iter;
             if (nodeSymbolName == missingSymbolName)
@@ -45,7 +46,7 @@ public:
                 ++iter;
         }
     }
-    
+
     bool didFindSymbol(const TString& symbolName) const
     {
         return mMissingSymbolNames.find(symbolName) == mMissingSymbolNames.end();
@@ -53,7 +54,7 @@ public:
 
 private:
     typedef std::set<TString> SymbolNames;
-    
+
     SymbolNames mMissingSymbolNames;
 };
 

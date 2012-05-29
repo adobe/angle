@@ -10,16 +10,20 @@
 
 using namespace RewriteCSSShaderHelper;
 
-RewriteCSSShaderBase::RewriteCSSShaderBase(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix)
+RewriteCSSShaderBase::RewriteCSSShaderBase(TIntermNode* root,
+                                           const TSymbolTable& symbolTable,
+                                           const TString& hiddenSymbolSuffix)
     : mRoot(root->getAsAggregate())
     , mSymbolTable(symbolTable)
     , mTexCoordVaryingName(kTexCoordVaryingPrefix + hiddenSymbolSuffix)
 {
     // The intermediate tree root should come in as an aggregate node.
     // It should be either a sequence or the main function declaration.
-    // Previous compiler steps should have already thrown an error and exited if there is no main function.
+    // Previous compiler steps should have already thrown an error and exited if there is no main
+    // function.
     ASSERT(mRoot);
-    ASSERT(mRoot->getOp() == EOpSequence || (mRoot->getOp() == EOpFunction && mRoot->getName() == kMain));
+    ASSERT(mRoot->getOp() == EOpSequence ||
+           (mRoot->getOp() == EOpFunction && mRoot->getName() == kMain));
 }
 
 void RewriteCSSShaderBase::rewrite()
@@ -44,7 +48,10 @@ void RewriteCSSShaderBase::insertAtEndOfShader(TIntermNode* node)
 TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name) const
 {
     TIntermSequence& rootSequence = getRootAggregate()->getSequence();
-    for (TIntermSequence::const_iterator iter = rootSequence.begin(); iter != rootSequence.end(); ++iter) {
+    for (TIntermSequence::const_iterator iter = rootSequence.begin();
+         iter != rootSequence.end();
+         ++iter)
+    {
         TIntermNode* node = *iter;
         TIntermAggregate* aggregate = node->getAsAggregate();
         if (aggregate && aggregate->getOp() == EOpFunction && aggregate->getName() == name)
@@ -53,7 +60,8 @@ TIntermAggregate* RewriteCSSShaderBase::findFunction(const TString& name) const
     return NULL;
 }
 
-void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName, const TString& newFunctionName)
+void RewriteCSSShaderBase::renameFunction(const TString& oldFunctionName,
+                                          const TString& newFunctionName)
 {
     RenameFunction renameFunction(oldFunctionName, newFunctionName);
     getRootAggregate()->traverse(&renameFunction);
@@ -76,9 +84,8 @@ TIntermAggregate* RewriteCSSShaderBase::getRootAggregate() const
 }
 
 // The tree root comes in as either a sequence or a main function declaration.
-// If the tree root is a main function declaration, this method creates a new sequence,
-// puts the main function declaration inside it, and changes the tree root to point to
-// the new sequence.
+// If the tree root is a main function declaration, this method creates a new sequence, puts the
+// main function declaration inside it, and changes the tree root to point to the new sequence.
 // Thus, after this function is called, the tree root can only be a sequence.
 void RewriteCSSShaderBase::createRootSequenceIfNeeded()
 {

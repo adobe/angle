@@ -12,7 +12,7 @@
 #include "compiler/cssshaders/RewriteCSSShaderBase.h"
 
 //
-// Rewrites a CSS fragment shader's intermediate tree into a valid GLSL shader.
+// Rewrites a CSS fragment shader's intermediate tree according to the CSS Shaders spec.
 //
 
 // Example original fragment shader:
@@ -45,7 +45,9 @@ class TInfoSinkBase;
 
 class RewriteCSSFragmentShader : public RewriteCSSShaderBase {
 public:
-    RewriteCSSFragmentShader(TIntermNode* root, const TSymbolTable& symbolTable, const TString& hiddenSymbolSuffix)
+    RewriteCSSFragmentShader(TIntermNode* root,
+                             const TSymbolTable& symbolTable,
+                             const TString& hiddenSymbolSuffix)
         : RewriteCSSShaderBase(root, symbolTable, hiddenSymbolSuffix)
         , mTextureUniformName(kTextureUniformPrefix + hiddenSymbolSuffix)
         , mUserMainFunctionName(kUserMainFunctionPrefix + hiddenSymbolSuffix + "(") {}

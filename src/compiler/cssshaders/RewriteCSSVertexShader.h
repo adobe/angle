@@ -12,7 +12,7 @@
 #include "compiler/cssshaders/RewriteCSSShaderBase.h"
 
 //
-// Rewrites a CSS vertex shader's intermediate tree into a valid GLSL shader.
+// Rewrites a CSS vertex shader's intermediate tree according to the CSS Shaders spec.
 //
 
 // Example original vertex shader:
@@ -50,7 +50,7 @@ private:
     void insertTexCoordAttrDeclaration();
     void insertTexCoordVaryingDeclaration();
     void insertTexCoordVaryingAssignment(const TString& texCoordAttrName);
-    
+
     TString mHiddenTexCoordAttrName;
 };
 
