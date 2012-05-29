@@ -67,15 +67,16 @@ int main(int argc, char* argv[])
     char* buffer = 0;
     int bufferLen = 0;
     int numAttribs = 0, numUniforms = 0;
+    const char* hiddenSymbolSuffix = NULL;
+    
+    // TODO(mvujovic): This will conflict after the patch for SH_TIMING_RESTRICTIONS lands.
+    ShShaderSpec spec = SH_GLES2_SPEC;
     ShShaderOutput output = SH_ESSL_OUTPUT;
 
     ShInitialize();
 
     ShBuiltInResources resources;
     GenerateResources(&resources);
-
-    ShShaderSpec spec = SH_GLES2_SPEC;
-    const char* hiddenSymbolSuffix = NULL;
 
     argc--;
     argv++;

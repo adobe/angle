@@ -118,11 +118,6 @@ typedef enum {
   SH_EMULATE_BUILT_IN_FUNCTIONS = 0x0100
 } ShCompileOptions;
 
-typedef enum {
-    SH_TEXCOORD_ATTRIBUTE_NAME = 1,
-    SH_TEXTURE_UNIFORM_NAME = 2
-} ShCSSShaderInfo;
-    
 //
 // Driver must call this first, once, before doing any other
 // compiler operations.
