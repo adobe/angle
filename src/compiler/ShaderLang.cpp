@@ -164,7 +164,7 @@ void ShDestruct(ShHandle handle)
 
 //
 // Set the suffix that the compiler will append to hidden symbols as a
-// backup security measure.
+// backup security measure for CSS shader rewriting.
 //
 COMPILER_EXPORT void ShSetHiddenSymbolSuffix(const ShHandle handle, const char* const suffix)
 {
