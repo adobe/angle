@@ -214,7 +214,7 @@ void usage()
         "       -b=h     : output HLSL code\n"
         "       -x=i     : enable GL_OES_EGL_image_external\n"
         "       -x=d     : enable GL_OES_EGL_standard_derivatives\n"
-        "       -c       : rewrite a CSS shader into a valid GLSL shader\n"
+        "       -c       : rewrite a shader according to the CSS Shaders spec\n"
         "       -s=<str> : append a suffix <str> to the hidden symbols generated in CSS shader rewriting\n");
 }
 
