@@ -49,6 +49,9 @@ void RestrictFragmentShaderTiming::beginError(const TIntermNode* node)
 
 void RestrictFragmentShaderTiming::visitArgument(TGraphArgument* parameter)
 {
+    // FIXME(mvujovic): We should restrict sampler dependent values from being texture coordinates 
+    // in all available sampling operationsn supported in GLSL ES.
+    // This includes overloaded signatures of texture2D, textureCube, and others.
     if (parameter->getIntermFunctionCall()->getName() != "texture2D(s21;vf2;" ||
         parameter->getArgumentNumber() != 1)
         return;
